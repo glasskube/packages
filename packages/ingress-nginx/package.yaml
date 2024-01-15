@@ -1,0 +1,3 @@
+# yaml-language-server: $schema=https://packages.dl.glasskube.dev/schema.json
+
+name: "ingress-nginx"
