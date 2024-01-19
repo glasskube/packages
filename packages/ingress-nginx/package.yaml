@@ -1,3 +1,9 @@
-# yaml-language-server: $schema=https://packages.dl.glasskube.dev/schema.json
+# yaml-language-server: $schema=../schema.json
 
 name: "ingress-nginx"
+shortDescription: "ingress-nginx is an Ingress controller for Kubernetes using NGINX as a reverse proxy and load balancer."
+defaultNamespace: "ingress-nginx"
+helm:
+  repositoryUrl: "https://kubernetes.github.io/ingress-nginx"
+  chartName: "ingress-nginx"
+  chartVersion: "4.9.0"
