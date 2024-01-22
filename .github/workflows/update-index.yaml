@@ -1,0 +1,25 @@
+name: Update index.yaml
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  update-index:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4
+        with:
+          fetch-depth: 0
+      - name: Generate index.yaml
+        uses: mikefarah/yq@master
+        with:
+          cmd: yq ea '[.]' packages/**/package.yaml | yq '... comments=""' | yq '{"packages":.}' > packages/index.yaml
+      - name: Commit index.yaml
+        uses: EndBug/add-and-commit@v9
+        with:
+          author_name: glasskube-bot
+          author_email: githubbot@glasskube.eu
+          message: 'chore: update index.yaml'
+          add: 'packages/index.yaml'
