@@ -28,7 +28,7 @@ jobs:
           git commit -m "chore: update packages/index.yaml"
           git branch -D bot/package-index-update || true
           git checkout -b bot/package-index-update
-          git push --force --set-upstream origin bot/package-index-update
+          git push --force --set-upstream origin bot/package-index-update || true
       - name: Create pull request if it not yet exists
         env:
           GH_TOKEN: ${{ github.token }}
