@@ -5,6 +5,9 @@ on:
     branches:
       - main
 
+permissions:
+  pull-requests: write
+
 jobs:
   update-index:
     runs-on: ubuntu-latest
@@ -13,13 +16,19 @@ jobs:
         with:
           fetch-depth: 0
       - name: Generate index.yaml
-        uses: mikefarah/yq@master
+        uses: mikefarah/yq@dd648994340a5d03225d97abf19c9bf1086c3f07 # v4.40.5
         with:
-          cmd: yq ea '[.]' packages/**/package.yaml | yq '... comments=""' | yq '{"packages":.}' > packages/index.yaml
-      - name: Commit index.yaml
-        uses: EndBug/add-and-commit@v9
-        with:
-          author_name: glasskube-bot
-          author_email: githubbot@glasskube.eu
-          message: 'chore: update index.yaml'
-          add: 'packages/index.yaml'
+          cmd: yq ea '{"name":.name, "shortDescription":.shortDescription}' packages/*/package.yaml | yq '[.]' | yq '{"packages":.}' > packages/index.yaml
+      - name: Generate and push index.yaml
+        run: |
+          git config user.name 'glasskube-bot'
+          git config user.email 'githubbot@glasskube.eu'
+          git add packages/index.yaml
+          git commit -m "chore: update packages/index.yaml"
+          git branch -D bot/package-index-update || true
+          git checkout -b bot/package-index-update
+          git push --force
+      - name: Create pull request if it not yet exists
+        run: |
+          gh_pr_up() { gh pr create $* || gh pr edit $* }
+          gh_pr_up --fill --head bot/package-index-update
