@@ -1,0 +1,9 @@
+# yaml-language-server: $schema=../schema.json
+name: cyclops
+defaultNamespace: cyclops
+iconUrl: https://cyclops-ui.com/img/logo.png
+manifests:
+  - url: https://raw.githubusercontent.com/cyclops-ui/cyclops/v0.0.1-alpha.10/install/cyclops-install.yaml
+entrypoints:
+  - serviceName: cyclops-ui
+    port: 3000
