@@ -19,7 +19,7 @@ jobs:
       - name: Generate index.yaml
         uses: mikefarah/yq@dd648994340a5d03225d97abf19c9bf1086c3f07 # v4.40.5
         with:
-          cmd: yq ea '{"name":.name, "shortDescription":.shortDescription}' packages/*/package.yaml | yq '[.]' | yq '{"packages":.}' > packages/index.yaml
+          cmd: yq ea '{"name":.name, "shortDescription":.shortDescription, "iconUrl":.iconUrl}' packages/*/package.yaml | yq '[.]' | yq '{"packages":.}' > packages/index.yaml
       - name: Generate and push index.yaml
         run: |
           git config user.name 'glasskube-bot'
