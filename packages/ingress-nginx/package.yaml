@@ -2,6 +2,7 @@
 
 name: "ingress-nginx"
 shortDescription: "ingress-nginx is an Ingress controller for Kubernetes using NGINX as a reverse proxy and load balancer."
+iconUrl: "https://avatars.githubusercontent.com/u/13629408"
 defaultNamespace: "ingress-nginx"
 helm:
   repositoryUrl: "https://kubernetes.github.io/ingress-nginx"

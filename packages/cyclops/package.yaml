@@ -1,5 +1,6 @@
 # yaml-language-server: $schema=../schema.json
 name: cyclops
+shortDescription: Developer friendly Kubernetes
 defaultNamespace: cyclops
 iconUrl: https://cyclops-ui.com/img/logo.png
 manifests:
