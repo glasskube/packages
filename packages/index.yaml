@@ -9,3 +9,6 @@ packages:
   - name: "ingress-nginx"
     shortDescription: "ingress-nginx is an Ingress controller for Kubernetes using NGINX as a reverse proxy and load balancer."
     iconUrl: "https://avatars.githubusercontent.com/u/13629408"
+  - name: kubernetes-dashboard
+    shortDescription: General-purpose web UI for Kubernetes clusters
+    iconUrl: https://avatars.githubusercontent.com/u/13629408
