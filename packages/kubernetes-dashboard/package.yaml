@@ -1,0 +1,10 @@
+# yaml-language-server: $schema=../schema.json
+name: kubernetes-dashboard
+shortDescription: General-purpose web UI for Kubernetes clusters
+defaultNamespace: kubernetes-dashboard
+iconUrl: https://avatars.githubusercontent.com/u/13629408
+manifests:
+  - url: https://raw.githubusercontent.com/kubernetes/dashboard/v2.7.0/aio/deploy/recommended.yaml
+entrypoints:
+  - serviceName: kubernetes-dashboard
+    port: 443
