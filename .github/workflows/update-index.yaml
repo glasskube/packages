@@ -20,17 +20,16 @@ jobs:
         uses: mikefarah/yq@dd648994340a5d03225d97abf19c9bf1086c3f07 # v4.40.5
         with:
           cmd: yq ea '{"name":.name, "shortDescription":.shortDescription, "iconUrl":.iconUrl}' packages/*/package.yaml | yq '[.]' | yq '{"packages":.}' > packages/index.yaml
-      - name: Generate and push index.yaml
-        run: |
-          git config user.name 'glasskube-bot'
-          git config user.email 'githubbot@glasskube.eu'
-          git add packages/index.yaml
-          git commit -m "chore: update packages/index.yaml"
-          git branch -D bot/package-index-update || true
-          git checkout -b bot/package-index-update
-          git push --force --set-upstream origin bot/package-index-update || true
-      - name: Create pull request if it not yet exists
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          gh pr create --fill || true
+      - name: Create or update pull request
+        uses: peter-evans/create-pull-request@b1ddad2c994a25fbc81a28b3ec0e368bb2021c50 # v6
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          committer: "glasskube-bot <githubbot@glasskube.eu>"
+          signoff: true
+          branch: "bot/package-index-update"
+          commit-message: "chore: update packages/index.yaml"
+          title: "chore: update packages/index.yaml"
+          body: |
+            :robot: Automated PR
+            ---
+            Merge this PR to update `packages/index.yaml`.
