@@ -4,7 +4,7 @@ name: "keptn"
 shortDescription: >-
   Supercharge your deployments with Keptn! Keptn provides a “cloud-native” approach for managing the application
   release lifecycle metrics, observability, health checks, with pre- and post-deployment evaluations and tasks.
-iconUrl: "https://raw.githubusercontent.com/cncf/artwork/main/projects/keptn/stacked/color/keptn-stacked-color.svg"
+iconUrl: "https://avatars.githubusercontent.com/u/46796476"
 defaultNamespace: "keptn-system"
 helm:
   repositoryUrl: "https://charts.lifecycle.keptn.sh"
