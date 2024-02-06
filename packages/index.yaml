@@ -9,6 +9,10 @@ packages:
   - name: "ingress-nginx"
     shortDescription: "ingress-nginx is an Ingress controller for Kubernetes using NGINX as a reverse proxy and load balancer."
     iconUrl: "https://avatars.githubusercontent.com/u/13629408"
+  - name: "keptn"
+    shortDescription: >-
+      Supercharge your deployments with Keptn! Keptn provides a “cloud-native” approach for managing the application release lifecycle metrics, observability, health checks, with pre- and post-deployment evaluations and tasks.
+    iconUrl: "https://raw.githubusercontent.com/cncf/artwork/main/projects/keptn/stacked/color/keptn-stacked-color.svg"
   - name: kubernetes-dashboard
     shortDescription: General-purpose web UI for Kubernetes clusters
     iconUrl: https://avatars.githubusercontent.com/u/13629408
