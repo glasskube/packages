@@ -9,4 +9,4 @@ defaultNamespace: "keptn-system"
 helm:
   repositoryUrl: "https://charts.lifecycle.keptn.sh"
   chartName: "keptn"
-  chartVersion: "v0.3.0"
+  chartVersion: "v0.4.0"
