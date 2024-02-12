@@ -8,3 +8,5 @@ manifests:
 entrypoints:
   - serviceName: kubernetes-dashboard
     port: 443
+    localPort: 8443
+    scheme: https
