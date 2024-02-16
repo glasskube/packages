@@ -1,4 +1,4 @@
-# yaml-language-server: $schema=../schema.json
+# yaml-language-server: $schema=https://glasskube.dev/schemas/v1/package-manifest.json
 name: cyclops
 shortDescription: Developer friendly Kubernetes
 longDescription: |
