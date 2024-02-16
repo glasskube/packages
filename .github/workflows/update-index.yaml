@@ -17,7 +17,7 @@ jobs:
         with:
           fetch-depth: 0
       - name: Generate index.yaml
-        uses: mikefarah/yq@bb66c9c872a7a4cf3d6846c2ff6d182c66ec3f77 # v4.40.7
+        uses: mikefarah/yq@047694546cad8f9eaac1627bbc8bcc502fdd88bf # v4.41.1
         with:
           cmd: yq ea '{"name":.name, "shortDescription":.shortDescription, "iconUrl":.iconUrl}' packages/*/package.yaml | yq '[.]' | yq '{"packages":.}' > packages/index.yaml
       - name: Create or update pull request
