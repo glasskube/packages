@@ -20,6 +20,3 @@ entrypoints:
   - serviceName: cyclops-ui
     port: 3000
     name: ui
-  - serviceName: cyclops-ctrl
-    port: 8080
-    name: ctrl
