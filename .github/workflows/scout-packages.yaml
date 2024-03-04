@@ -3,7 +3,7 @@ name: Scout packages
 on:
   workflow_dispatch:
   schedule:
-    - 0 6 * * 1-5
+    - cron: "0 6 * * 1-5"
 
 jobs:
   setup:
