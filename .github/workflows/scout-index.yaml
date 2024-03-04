@@ -1,25 +1,25 @@
-name: Update index.yaml
+name: Scout index
 
 on:
+  workflow_dispatch:
   push:
     branches:
       - main
 
-permissions:
-  pull-requests: write
-  contents: write
-
 jobs:
-  update-index:
+  scout-index:
     runs-on: ubuntu-latest
+    permissions:
+      packages: read
+      pull-requests: write
+      contents: write
     steps:
-      - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4
+      - name: Checkout
+        uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4
+      - uses: glasskube/scout/actions/setup@v0.1.1
         with:
-          fetch-depth: 0
-      - name: Generate index.yaml
-        uses: mikefarah/yq@9adde1ac14bb283b8955d2b0d567bcaf3c69e639 # v4.42.1
-        with:
-          cmd: yq ea '{"name":.name, "shortDescription":.shortDescription, "iconUrl":.iconUrl}' packages/*/package.yaml | yq '[.]' | yq '{"packages":.}' > packages/index.yaml
+          token: ${{ secrets.GITHUB_TOKEN }}
+      - run: scout index
       - name: Create or update pull request
         uses: peter-evans/create-pull-request@a4f52f8033a6168103c2538976c07b467e8163bc # v6
         with:
