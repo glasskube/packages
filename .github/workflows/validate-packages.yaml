@@ -18,17 +18,17 @@ jobs:
     steps:
       - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4
       - name: Validate Package Manifest Schema
-        uses: cardinalby/schema-validator-action@2166123eb256fa40baef7e22ab1379708425efc7 # v3
+        uses: cardinalby/schema-validator-action@2166123eb256fa40baef7e22ab1379708425efc7 # v3.1.1
         with:
           file: "packages/**/package.yaml"
           schema: "https://glasskube.dev/schemas/v1/package-manifest.json"
       - name: Validate Package Versions Schema
-        uses: cardinalby/schema-validator-action@2166123eb256fa40baef7e22ab1379708425efc7 # v3
+        uses: cardinalby/schema-validator-action@2166123eb256fa40baef7e22ab1379708425efc7 # v3.1.1
         with:
           file: "packages/**/versions.yaml"
           schema: "https://glasskube.dev/schemas/v1/versions.json"
       - name: Validate Package Index Schema
-        uses: cardinalby/schema-validator-action@2166123eb256fa40baef7e22ab1379708425efc7 # v3
+        uses: cardinalby/schema-validator-action@2166123eb256fa40baef7e22ab1379708425efc7 # v3.1.1
         with:
           file: "packages/index.yaml"
           schema: "https://glasskube.dev/schemas/v1/index.json"
