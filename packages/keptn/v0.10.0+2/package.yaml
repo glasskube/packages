@@ -1,0 +1,14 @@
+# yaml-language-server: $schema=https://glasskube.dev/schemas/v1/package-manifest.json
+
+name: "keptn"
+shortDescription: >-
+  Supercharge your deployments with Keptn! Keptn provides a “cloud-native” approach for managing the application
+  release lifecycle metrics, observability, health checks, with pre- and post-deployment evaluations and tasks.
+iconUrl: "https://avatars.githubusercontent.com/u/46796476"
+defaultNamespace: "keptn-system"
+helm:
+  repositoryUrl: "https://charts.lifecycle.keptn.sh"
+  chartName: "keptn"
+  chartVersion: "v0.4.0"
+dependencies:
+  - name: "cert-manager"
