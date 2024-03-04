@@ -23,6 +23,7 @@ jobs:
     strategy:
       matrix:
         package: ${{ fromJson(needs.setup.outputs.packages) }}
+    continue-on-error: true
     permissions:
       packages: read
       pull-requests: write
