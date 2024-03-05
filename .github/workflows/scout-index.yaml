@@ -25,6 +25,7 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           committer: "glasskube-bot <githubbot@glasskube.eu>"
+          author: "glasskube-bot <githubbot@glasskube.eu>"
           signoff: true
           branch: "bot/package-index-update"
           commit-message: "chore: update packages/index.yaml"
