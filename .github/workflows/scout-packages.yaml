@@ -40,6 +40,7 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           committer: "glasskube-bot <githubbot@glasskube.eu>"
+          author: "glasskube-bot <githubbot@glasskube.eu>"
           signoff: true
           branch: "bot/package-update/${{ matrix.package }}"
           commit-message: "chore: update package ${{ matrix.package }}"
