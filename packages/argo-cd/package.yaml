@@ -5,6 +5,7 @@ defaultNamespace: argocd
 iconUrl: https://avatars.githubusercontent.com/u/30269780
 manifests:
   - url: https://raw.githubusercontent.com/argoproj/argo-cd/v2.10.2/manifests/install.yaml
+    defaultNamespace: argocd
 entrypoints:
   - serviceName: argocd-server
     port: 443
