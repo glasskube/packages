@@ -13,5 +13,8 @@ helm:
   values:
     global:
       certManagerEnabled: false
+manifests:
+  - url: https://glasskube.github.io/packages/packages/keptn/v0.10.0+2/keptn-cert.yaml
+  - url: https://glasskube.github.io/packages/packages/keptn/v0.10.0+2/keptn-issuer.yaml
 dependencies:
   - name: "cert-manager"
