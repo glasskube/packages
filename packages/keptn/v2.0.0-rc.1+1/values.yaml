@@ -1,0 +1,7 @@
+# helm template keptn/keptn --namespace keptn-system --name-template keptn --version v0.4.0 --values values.yaml > template.yaml
+global:
+  certManagerEnabled: false
+  caInjectionAnnotations:
+    cert-manager.io/inject-ca-from: keptn-system/keptn-certs
+metricsOperator:
+  enabled: false
