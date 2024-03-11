@@ -2,3 +2,5 @@ latestVersion: "v0.10.0+1"
 versions:
 - version: "v0.10.0+1"
 - version: "v0.10.0+2"
+- version: "v0.10.0+3"
+- version: "v2.0.0-rc.1+1"

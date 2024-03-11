@@ -1,0 +1,17 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: lifecycle-operator
+  namespace: keptn-system
+spec:
+  template:
+    spec:
+      containers:
+        - name: lifecycle-operator
+          volumeMounts:
+            - mountPath: "/tmp/webhook/certs/"
+              name: keptn-certs
+      volumes:
+        - name: keptn-certs
+          secret:
+            secretName: keptn-certs

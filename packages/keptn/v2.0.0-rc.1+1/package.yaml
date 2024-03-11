@@ -1,0 +1,28 @@
+# yaml-language-server: $schema=https://glasskube.dev/schemas/v1/package-manifest.json
+
+# helm template keptn/keptn --namespace keptn-system --name-template keptn --version v0.4.0 --values values.yaml > template.yaml
+# kubectl kustomize . > keptn.yaml
+
+name: "keptn"
+shortDescription: >-
+  Supercharge your deployments with Keptn! Keptn provides a “cloud-native” approach for managing the application
+  release lifecycle metrics, observability, health checks, with pre- and post-deployment evaluations and tasks.
+iconUrl: "https://avatars.githubusercontent.com/u/46796476"
+defaultNamespace: "keptn-system"
+helm:
+  repositoryUrl: "https://charts.lifecycle.keptn.sh"
+  chartName: "keptn"
+  chartVersion: "v0.5.0"
+  values:
+    global:
+      certManagerEnabled: false
+      caInjectionAnnotations:
+        cert-manager.io/inject-ca-from: keptn-system/keptn-certs
+    metricsOperator:
+      enabled: false
+manifests:
+  - url: https://glasskube.github.io/packages/packages/keptn/v2.0.0-rc.1+1/keptn.yaml
+  - url: https://glasskube.github.io/packages/packages/keptn/v2.0.0-rc.1+1/keptn-cert.yaml
+  - url: https://glasskube.github.io/packages/packages/keptn/v2.0.0-rc.1+1/keptn-issuer.yaml
+dependencies:
+  - name: "cert-manager"
