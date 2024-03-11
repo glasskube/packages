@@ -9,17 +9,6 @@ shortDescription: >-
   release lifecycle metrics, observability, health checks, with pre- and post-deployment evaluations and tasks.
 iconUrl: "https://avatars.githubusercontent.com/u/46796476"
 defaultNamespace: "keptn-system"
-helm:
-  repositoryUrl: "https://charts.lifecycle.keptn.sh"
-  chartName: "keptn"
-  chartVersion: "v0.5.0"
-  values:
-    global:
-      certManagerEnabled: false
-      caInjectionAnnotations:
-        cert-manager.io/inject-ca-from: keptn-system/keptn-certs
-    metricsOperator:
-      enabled: false
 manifests:
   - url: https://glasskube.github.io/packages/packages/keptn/v2.0.0-rc.1+1/keptn.yaml
   - url: https://glasskube.github.io/packages/packages/keptn/v2.0.0-rc.1+1/keptn-cert.yaml
