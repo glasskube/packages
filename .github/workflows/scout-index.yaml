@@ -15,7 +15,7 @@ jobs:
       contents: write
     steps:
       - name: Checkout
-        uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4
+        uses: actions/checkout@9bb56186c3b09b4f86b1c65136769dd318469633 # v4
       - uses: glasskube/scout/actions/setup@c67530076f5e6696e137327aedb6b0d42cfcf69f # v0.1.1
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
