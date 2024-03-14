@@ -4,7 +4,8 @@
 # kubectl kustomize . > keptn.yaml
 
 name: "keptn"
-shortDescription: >-
+shortDescription: Toolkit for cloud-native application lifecycle management
+longDescription: >-
   Supercharge your deployments with Keptn! Keptn provides a “cloud-native” approach for managing the application
   release lifecycle metrics, observability, health checks, with pre- and post-deployment evaluations and tasks.
 iconUrl: "https://avatars.githubusercontent.com/u/46796476"
