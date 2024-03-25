@@ -8,7 +8,7 @@ packages:
     name: cert-manager
     shortDescription: X.509 certificate management for Kubernetes and OpenShift
   - iconUrl: https://cyclops-ui.com/img/logo.png
-    latestVersion: v0.0.1+1
+    latestVersion: v0.2.0+1
     name: cyclops
     shortDescription: Developer friendly Kubernetes
   - iconUrl: https://avatars.githubusercontent.com/u/13629408
