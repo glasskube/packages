@@ -1,0 +1,25 @@
+# yaml-language-server: $schema=https://glasskube.dev/schemas/v1/package-manifest.json
+name: kubernetes-dashboard
+shortDescription: General-purpose web UI for Kubernetes clusters
+defaultNamespace: kubernetes-dashboard
+iconUrl: https://avatars.githubusercontent.com/u/13629408
+helm:
+  repositoryUrl: "https://kubernetes.github.io/dashboard"
+  chartName: "kubernetes-dashboard"
+  chartVersion: "6.0.8"
+  values:
+    metricsScraper:
+      enabled: true
+    resources:
+      requests:
+        cpu: 10m
+        memory: 20Mi
+      limits:
+        memory: 100Mi
+manifests:
+  - url: https://glasskube.github.io/packages/packages/kubernetes-dashboard/v2.7.0+2/dashboard-user.yaml
+entrypoints:
+  - serviceName: kubernetes-dashboard
+    port: 443
+    localPort: 8443
+    scheme: https
