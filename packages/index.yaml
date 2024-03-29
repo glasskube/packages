@@ -21,6 +21,6 @@ packages:
     name: keptn
     shortDescription: Toolkit for cloud-native application lifecycle management
   - iconUrl: https://avatars.githubusercontent.com/u/13629408
-    latestVersion: v2.7.0+1
+    latestVersion: v2.7.0+2
     name: kubernetes-dashboard
     shortDescription: General-purpose web UI for Kubernetes clusters
