@@ -16,8 +16,8 @@ packages:
     name: ingress-nginx
     shortDescription: ingress-nginx is an Ingress controller for Kubernetes using
       NGINX as a reverse proxy and load balancer.
-  - iconUrl: https://avatars.githubusercontent.com/u/46796476
-    latestVersion: v0.10.0+1
+  - iconUrl: https://raw.githubusercontent.com/cncf/artwork/main/projects/keptn/icon/color/keptn-icon-color.svg
+    latestVersion: v2.0.0-rc.2+1
     name: keptn
     shortDescription: Toolkit for cloud-native application lifecycle management
   - iconUrl: https://avatars.githubusercontent.com/u/13629408
