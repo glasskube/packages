@@ -1,0 +1,58 @@
+# yaml-language-server: $schema=https://glasskube.dev/schemas/v1/package-manifest.json
+name: k8sgpt-operator
+iconUrl: https://avatars.githubusercontent.com/u/128535266?s=150
+shortDescription: Automatic SRE Superpowers within your Kubernetes cluster
+longDescription: |
+  This Operator is designed to enable K8sGPT within a Kubernetes cluster.
+  It will allow you to create a custom resource that defines the behaviour and scope of a managed K8sGPT workload.
+  Analysis and outputs will also be configurable to enable integration into existing workflows.
+defaultNamespace: k8sgpt-operator-system
+helm:
+  repositoryUrl: https://charts.k8sgpt.ai/
+  chartName: k8sgpt-operator
+  chartVersion: v0.1.3
+manifests:
+  - url: https://glasskube.github.io/packages/packages/k8sgpt-operator/v0.1.3+1/manifest.yaml
+valueDefinitions:
+  openaiApiKey:
+    type: text
+    targets:
+      - patch:
+          op: add
+          path: /data/openai-api-key
+        valueTemplate: |
+          "{{ . | base64 }}"
+        resource:
+          apiGroup: v1
+          kind: Secret
+          name: k8sgpt-secret
+          namespace: k8sgpt-operator-system
+    constraints:
+      required: true
+      minLength: 50
+      pattern: "sk-.+"
+  anonymized:
+    type: boolean
+    defaultValue: "false"
+    targets:
+      - patch:
+          op: add
+          path: /spec/ai/anonymized
+        valueTemplate: "{{ . }}"
+        resource:
+          apiGroup: core.k8sgpt.ai/v1alpha1
+          kind: K8sGPT
+          name: k8sgpt
+          namespace: k8sgpt-operator-system
+  language:
+    type: text
+    defaultValue: english
+    targets:
+      - patch:
+          op: add
+          path: /spec/ai/language
+        resource:
+          apiGroup: core.k8sgpt.ai/v1alpha1
+          kind: K8sGPT
+          name: k8sgpt
+          namespace: k8sgpt-operator-system
