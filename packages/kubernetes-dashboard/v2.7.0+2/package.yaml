@@ -1,6 +1,10 @@
 # yaml-language-server: $schema=https://glasskube.dev/schemas/v1/package-manifest.json
 name: kubernetes-dashboard
 shortDescription: General-purpose web UI for Kubernetes clusters
+longDescription: |
+  To log in to the Kubernetes Dashboard, you need to generate a token for the Kubernetes Dashboard.
+  Glasskube creates a dashboard user. You can generate a token to log in via:
+  `kubectl -n kubernetes-dashboard create token dashboard-user`.
 defaultNamespace: kubernetes-dashboard
 iconUrl: https://avatars.githubusercontent.com/u/13629408
 helm:
