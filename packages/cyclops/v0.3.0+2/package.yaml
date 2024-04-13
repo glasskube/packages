@@ -25,6 +25,7 @@ defaultNamespace: cyclops
 iconUrl: https://cyclops-ui.com/img/logo.png
 manifests:
   - url: https://raw.githubusercontent.com/cyclops-ui/cyclops/v0.3.0/install/cyclops-install.yaml
+  - url: https://raw.githubusercontent.com/cyclops-ui/cyclops/v0.3.1/install/demo-templates.yaml
 entrypoints:
   - serviceName: cyclops-ui
     port: 3000
