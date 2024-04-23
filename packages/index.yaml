@@ -14,8 +14,7 @@ packages:
   - iconUrl: https://avatars.githubusercontent.com/u/13629408
     latestVersion: v1.9.5+1
     name: ingress-nginx
-    shortDescription:
-      ingress-nginx is an Ingress controller for Kubernetes using
+    shortDescription: ingress-nginx is an Ingress controller for Kubernetes using
       NGINX as a reverse proxy and load balancer.
   - iconUrl: https://avatars.githubusercontent.com/u/128535266?s=150
     latestVersion: v0.1.3+1
@@ -25,11 +24,11 @@ packages:
     latestVersion: v2.0.0-rc.2+1
     name: keptn
     shortDescription: Toolkit for cloud-native application lifecycle management
+  - iconUrl: https://avatars.githubusercontent.com/u/66682517
+    latestVersion: v58.0.0+1
+    name: kube-prometheus-stack
+    shortDescription: Use Prometheus to monitor Kubernetes and applications running on Kubernetes
   - iconUrl: https://avatars.githubusercontent.com/u/13629408
     latestVersion: v2.7.0+2
     name: kubernetes-dashboard
     shortDescription: General-purpose web UI for Kubernetes clusters
-  - name: kube-prometheus-stack
-    latestVersion: v58.0.0+1
-    shortDescription: Use Prometheus to monitor Kubernetes and applications running on Kubernetes
-    iconUrl: https://avatars.githubusercontent.com/u/66682517
