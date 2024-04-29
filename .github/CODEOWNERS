@@ -1,1 +1,4 @@
 * @pmig
+
+# no codeowners to allow auto merging dependency updates
+.github/workflows/*.yaml
