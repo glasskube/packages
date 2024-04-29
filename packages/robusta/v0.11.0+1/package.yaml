@@ -1,0 +1,167 @@
+# yaml-language-server: $schema=https://glasskube.dev/schemas/v1/package-manifest.json
+
+name: robusta
+shortDescription: Kubernetes observability and automation, with an awesome Prometheus integration
+longDescription: |
+  Robusta is an open source observability tool for Kubernetes, which extends Prometheus. Using automation rules,
+  Robusta automatically fetches the data you need to investigate, and attaches it to your alerts.
+
+  ### Examples
+  - When alerts fire on Pods, fetch Pod logs
+  - When Jobs fail, show data from the last run
+  - When Pods are Pending, see why (kubectl get events)
+  - When common alerts in kube-prometheus-stack fire, suggest fixes
+  - Optionally send alerts to ChatGPT for analysis (disabled by default)
+
+  ### More Features
+  - Batteries included. No need to define alerts or automations. (We regularly test our alerts on GKE, EKS, AKS, and RKE to fine-tune.)
+  - Route alerts by namespace, team, and severity
+  - Not just Prometheus. Send notifications for rollouts/changes too
+  - Remediate alerts with custom commands
+  - Many integrations, including Slack, MSTeams, OpsGenie, PagerDuty, and JIRA
+
+  ### Installation Tips
+  Robusta is best installed by generating a configuration using the Robusta web UI or CLI and copying the generated values here.
+  For more information check out the
+  [official installation guide](https://docs.robusta.dev/master/setup-robusta/installation/extend-prometheus-installation.html#generate-a-config).
+iconUrl: https://raw.githubusercontent.com/robusta-dev/robusta/e4907fb/logos/logo-only.png
+references:
+  - label: GitHub
+    url: https://github.com/robusta-dev/robusta/
+  - label: ArtifactHub
+    url: https://artifacthub.io/packages/helm/robusta/robusta/
+  - label: Website
+    url: https://home.robusta.dev/
+defaultNamespace: robusta
+helm:
+  repositoryUrl: https://robusta-charts.storage.googleapis.com
+  chartName: robusta
+  chartVersion: "0.11.0"
+  values:
+    isSmallCluster: false
+    disableCloudRouting: true
+    globalConfig: {}
+    sinksConfig: []
+    runner:
+      sendAdditionalTelemetry: false
+dependencies:
+  - name: kube-prometheus-stack
+    version: ">= 55.7.0"
+valueDefinitions:
+  clusterName:
+    type: text
+    constraints:
+      required: true
+      minLength: 1
+    metadata:
+      label: Cluster name
+    targets:
+      - chartName: robusta
+        patch:
+          op: add
+          path: /clusterName
+  isSmallCluster:
+    type: boolean
+    metadata:
+      description: |
+        Test clusters tend to have fewer resources. Check this to lower Robusta's resource requests.
+    targets:
+      - chartName: robusta
+        valueTemplate: "{{ . }}"
+        patch:
+          op: add
+          path: /isSmallCluster
+  disableCloudRouting:
+    type: boolean
+    defaultValue: "true"
+    targets:
+      - chartName: robusta
+        valueTemplate: "{{ . }}"
+        patch:
+          op: add
+          path: /disableCloudRouting
+  accountId:
+    type: text
+    metadata:
+      label: Account ID
+    targets:
+      - chartName: robusta
+        patch:
+          op: add
+          path: /globalConfig/account_id
+  signingKey:
+    type: text
+    metadata:
+      label: Signing key
+    targets:
+      - chartName: robusta
+        patch:
+          op: add
+          path: /globalConfig/signing_key
+  sendAdditionalTelemetry:
+    type: boolean
+    defaultValue: "false"
+    targets:
+      - chartName: robusta
+        valueTemplate: "{{ . }}"
+        patch:
+          op: add
+          path: /runner/sendAdditionalTelemetry
+  webhookSinkUrl:
+    type: text
+    metadata:
+      label: Webhook URL
+      description: Enable the webhook sink by specifying a URL in this field.
+    targets:
+      - chartName: robusta
+        valueTemplate: |
+          {{ if eq . "" }}{}{{ else }}
+          {
+            "webhook_sink": {
+              "name": "webkook_sink",
+              "url": "{{ . }}"
+            }
+          }
+          {{ end }}
+        patch:
+          op: add
+          path: /sinksConfig/-
+  mailSinkMailto:
+    type: text
+    metadata:
+      label: Mailto URL
+      description: Enable the Mail sink by specifying a mailto URL in this field.
+    targets:
+      - chartName: robusta
+        valueTemplate: |
+          {{ if eq . "" }}{}{{ else }}
+          {
+            "mail_sink": {
+              "name": "mail_sink",
+              "mailto": "{{ . }}"
+            }
+          }
+          {{ end }}
+        patch:
+          op: add
+          path: /sinksConfig/-
+  robustaSinkToken:
+    type: text
+    metadata:
+      label: Robusta UI Token
+      description: Enable the Robusta UI sink by specifying a token in this field.
+    targets:
+      - chartName: robusta
+        valueTemplate: |
+          {{ if eq . "" }}{}{{ else }}
+          {
+            "robusta_sink": {
+              "name": "robusta_ui_sink",
+              "token": "{{ . }}",
+              "ttl_hours": 4380
+            }
+          }
+          {{ end }}
+        patch:
+          op: add
+          path: /sinksConfig/-

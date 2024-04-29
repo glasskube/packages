@@ -32,3 +32,8 @@ packages:
     latestVersion: v2.7.0+2
     name: kubernetes-dashboard
     shortDescription: General-purpose web UI for Kubernetes clusters
+  - iconUrl: https://raw.githubusercontent.com/robusta-dev/robusta/e4907fb/logos/logo-only.png
+    latestVersion: v0.11.0+1
+    name: robusta
+    shortDescription: Kubernetes observability and automation, with an awesome
+      Prometheus integration
