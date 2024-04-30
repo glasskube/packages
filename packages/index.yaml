@@ -40,3 +40,7 @@ packages:
     latestVersion: v2.8.0+1
     name: rabbitmq-operator
     shortDescription: Kubernetes operator to deploy and manage RabbitMQ clusters
+  - iconUrl: https://avatars.githubusercontent.com/u/34656521
+    latestVersion: v2.15.3+1
+    name: sealed-secrets
+    shortDescription: A Kubernetes controller and tool for one-way encrypted Secrets
