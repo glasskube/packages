@@ -1,0 +1,20 @@
+# yaml-language-server: $schema=https://glasskube.dev/schemas/v1/package-manifest.json
+
+name: "sealed-secrets"
+shortDescription: A Kubernetes controller and tool for one-way encrypted Secrets 
+longDescription:
+  To use this package, install the [kubeseal](https://github.com/bitnami-labs/sealed-secrets#kubeseal) application. 
+  Use kubeseal with the `--controller-namespace=sealed-secrets-system` flag.
+
+  For more information, check out the [official documentation](https://github.com/bitnami-labs/sealed-secrets#usage).
+iconUrl: "https://avatars.githubusercontent.com/u/34656521"
+defaultNamespace: "sealed-secrets-system"
+helm:
+  repositoryUrl: "https://bitnami-labs.github.io/sealed-secrets/"
+  chartName: "sealed-secrets"
+  chartVersion: "v2.15.3+1"
+  values:
+    fullnameOverride: "sealed-secrets-controller"
+references:
+  - label: "ArtifactHub"
+    url: "https://artifacthub.io/packages/helm/bitnami/sealed-secrets"
