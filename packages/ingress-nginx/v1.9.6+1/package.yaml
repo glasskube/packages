@@ -8,3 +8,6 @@ helm:
   repositoryUrl: "https://kubernetes.github.io/ingress-nginx"
   chartName: "ingress-nginx"
   chartVersion: "4.9.1"
+references:
+  - label: "ArtifactHub"
+    url: "https://artifacthub.io/packages/helm/ingress-nginx/ingress-nginx"

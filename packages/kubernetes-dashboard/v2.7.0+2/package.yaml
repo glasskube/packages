@@ -27,3 +27,6 @@ entrypoints:
     port: 443
     localPort: 8443
     scheme: https
+references:
+  - label: "ArtifactHub"
+    url: "https://artifacthub.io/packages/helm/k8s-dashboard/kubernetes-dashboard"

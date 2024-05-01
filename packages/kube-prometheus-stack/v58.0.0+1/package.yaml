@@ -3,6 +3,9 @@ name: kube-prometheus-stack
 defaultNamespace: kube-prometheus-stack
 shortDescription: Use Prometheus to monitor Kubernetes and applications running on Kubernetes
 iconUrl: https://avatars.githubusercontent.com/u/66682517
+references:
+  - label: "ArtifactHub"
+    url: "https://artifacthub.io/packages/helm/prometheus-community/kube-prometheus-stack"
 entrypoints:
   - name: grafana
     serviceName: kube-prometheus-stack-grafana

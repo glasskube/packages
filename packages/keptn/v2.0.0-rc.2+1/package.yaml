@@ -21,3 +21,6 @@ manifests:
   - url: https://glasskube.github.io/packages/packages/keptn/v2.0.0-rc.2+1/keptn-issuer.yaml
 dependencies:
   - name: "cert-manager"
+references:
+  - label: "ArtifactHub"
+    url: "https://artifacthub.io/packages/helm/lifecycle-toolkit/keptn"

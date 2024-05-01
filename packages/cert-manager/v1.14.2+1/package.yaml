@@ -13,3 +13,6 @@ helm:
   chartVersion: "v1.14.2"
   values:
     installCRDs: "true"
+references:
+  - label: "ArtifactHub"
+    url: "https://artifacthub.io/packages/helm/cert-manager/cert-manager"
