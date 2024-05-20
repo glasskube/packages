@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@0ad4b8fadaa221de15dcec353f45205ec38ea70b # v4
+        uses: actions/checkout@a5ac7e51b41094c92402da3b24376905380afc29 # v4
       - id: ls
         run: echo "packages=$(ls -d packages/*/ | cut -f2 -d'/' | jq -cnR [inputs])" >> $GITHUB_OUTPUT
     outputs:
@@ -30,7 +30,7 @@ jobs:
       contents: write
     steps:
       - name: Checkout
-        uses: actions/checkout@0ad4b8fadaa221de15dcec353f45205ec38ea70b # v4
+        uses: actions/checkout@a5ac7e51b41094c92402da3b24376905380afc29 # v4
       - uses: glasskube/scout/actions/setup@c67530076f5e6696e137327aedb6b0d42cfcf69f # v0.1.1
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
