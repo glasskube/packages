@@ -1,0 +1,52 @@
+name: Update Latest Version
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+
+jobs:
+  setup:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@a5ac7e51b41094c92402da3b24376905380afc29 # v4
+      - id: ls
+        run: echo "packages=$(ls -d packages/*/ | cut -f2 -d'/' | jq -cnR [inputs])" >> $GITHUB_OUTPUT
+    outputs:
+      packages: ${{ steps.ls.outputs.packages }}
+
+  scout-package-bump:
+    runs-on: ubuntu-latest
+    needs:
+      - setup
+    strategy:
+      matrix:
+        package: ${{ fromJson(needs.setup.outputs.packages) }}
+    continue-on-error: true
+    permissions:
+      packages: read
+      pull-requests: write
+      contents: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@a5ac7e51b41094c92402da3b24376905380afc29 # v4
+      - uses: glasskube/scout/actions/setup@ad01d2e28419d4f49e48823b35d43da108118559 # v0.2.1
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+      - run: scout package:bump --name=${{ matrix.package }}
+      - name: Create or update pull request
+        uses: peter-evans/create-pull-request@6d6857d36972b65feb161a90e484f2984215f83e # v6
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          committer: "glasskube-bot <githubbot@glasskube.eu>"
+          author: "glasskube-bot <githubbot@glasskube.eu>"
+          signoff: true
+          branch: "bot/package-bump/${{ matrix.package }}"
+          commit-message: "chore: update `latestVersion` for package ${{ matrix.package }}"
+          title: "chore: update `latestVersion` for package ${{ matrix.package }}"
+          body: |
+            :robot: Automated PR
+            ---
+            Merge this PR to update the `latestVersion` for `${{ matrix.package }}`.
