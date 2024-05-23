@@ -36,6 +36,7 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
       - run: scout package:bump --name=${{ matrix.package }}
+      - run: scout index
       - name: Create or update pull request
         uses: peter-evans/create-pull-request@6d6857d36972b65feb161a90e484f2984215f83e # v6
         with:
