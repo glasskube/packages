@@ -32,7 +32,7 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@a5ac7e51b41094c92402da3b24376905380afc29 # v4
-      - uses: glasskube/scout/actions/setup@cfc43f8d93c797de14f72d21343b5ecc771465a4 # v0.3.0
+      - uses: glasskube/scout/actions/setup@f1026f7be47dbe1f7b0b99ad09435764ad7536bc # v0.3.1
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
       - run: scout package:bump --name=${{ matrix.package }}
