@@ -23,6 +23,16 @@ helm:
   repositoryUrl: https://litmuschaos.github.io/litmus-helm/
   chartName: litmus
   chartVersion: "3.6.0"
+  values:
+    mongodb:
+      enabled: false
+    adminConfig:
+      DBUSER: litmus
+      DBPASSWORD: "litmus1234"
+      DB_SERVER: "mongodb://litmus-db-svc:27017/admin"
+dependencies:
+  - name: litmus-mongodb
+    version: ">=3.6.0"
 entrypoints:
   - name: frontend
     serviceName: litmus-frontend-service
