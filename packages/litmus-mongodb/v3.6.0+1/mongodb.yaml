@@ -1,0 +1,28 @@
+apiVersion: mongodbcommunity.mongodb.com/v1
+kind: MongoDBCommunity
+metadata:
+  name: litmus-db
+spec:
+  members: 3
+  type: ReplicaSet
+  version: "6.0.5"
+  security:
+    authentication:
+      modes: ["SCRAM-SHA-1"]
+  users:
+    - name: litmus
+      passwordSecretRef:
+        name: litmus-db
+      scramCredentialsSecretName: litmus-db
+      roles:
+        - name: root
+          db: "admin"
+
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: litmus-db
+type: Opaque
+stringData:
+  password: "litmus1234"

@@ -1,0 +1,17 @@
+# yaml-language-server: $schema=https://glasskube.dev/schemas/v1/package-manifest.json
+name: litmus-mongodb
+iconUrl: https://avatars.githubusercontent.com/u/45120
+shortDescription: MongoDB instance for litmus
+defaultNamespace: litmus
+helm:
+  repositoryUrl: https://mongodb.github.io/helm-charts
+  chartName: community-operator
+  chartVersion: "0.9.0"
+  values:
+    community-operator-crds:
+      enabled: false
+manifests:
+  - url: http://localhost:9090/packages/litmus-mongodb/v3.6.0+1/mongodb.yaml
+dependencies:
+  - name: mongodb-operator-crds
+    version: ">=0.9.0"
