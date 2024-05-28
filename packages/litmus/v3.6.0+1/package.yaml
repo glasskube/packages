@@ -1,0 +1,29 @@
+# yaml-language-server: $schema=https://glasskube.dev/schemas/v1/package-manifest.json
+name: litmus
+iconUrl: https://avatars.githubusercontent.com/u/49853472
+shortDescription: Open Source Chaos Engineering platform
+longDescription: |
+  LitmusChaos is an open source Chaos Engineering platform that enables teams to identify weaknesses & potential outages
+  in infrastructures by inducing chaos tests in a controlled way. Developers & SREs can practice Chaos Engineering with
+  LitmusChaos as it is easy to use, based on modern Chaos Engineering principles & community collaborated. It is 100%
+  open source & a CNCF project.
+
+  LitmusChaos takes a cloud-native approach to create, manage and monitor chaos. The platform itself runs as a set of
+  microservices and uses Kubernetes custom resources (CRs) to define the chaos intent, as well as the steady state
+  hypothesis.
+references:
+  - label: GitHub
+    url: https://github.com/litmuschaos/litmus/
+  - label: Website
+    url: https://litmuschaos.io/
+  - label: ArtifactHub
+    url: https://artifacthub.io/packages/helm/litmuschaos/litmus
+defaultNamespace: litmus
+helm:
+  repositoryUrl: https://litmuschaos.github.io/litmus-helm/
+  chartName: litmus
+  chartVersion: "3.6.0"
+entrypoints:
+  - name: frontend
+    serviceName: litmus-frontend-service
+    port: 9091
