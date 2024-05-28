@@ -1,0 +1,12 @@
+# yaml-language-server: $schema=https://glasskube.dev/schemas/v1/package-manifest.json
+name: mongodb-operator-crds
+iconUrl: https://avatars.githubusercontent.com/u/45120
+shortDescription: CRDs for the MongoDB Community Kubernetes Operator
+references:
+  - label: GitHub
+    url: https://github.com/mongodb/mongodb-kubernetes-operator
+defaultNamespace: mongodb-operator
+helm:
+  repositoryUrl: https://mongodb.github.io/helm-charts
+  chartName: community-operator-crds
+  chartVersion: "0.9.0"
