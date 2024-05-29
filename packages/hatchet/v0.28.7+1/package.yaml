@@ -1,0 +1,105 @@
+# yaml-language-server: $schema=https://glasskube.dev/schemas/v1/package-manifest.json
+name: hatchet
+shortDescription: A distributed, fault-tolerant task queue
+longDescription: |
+  Hatchet replaces difficult to manage legacy queues or pub/sub systems so you can design durable workloads that
+  recover from failure and solve for problems like concurrency, fairness, and rate limiting. Instead of managing your
+  own task queue or pub/sub system, you can use Hatchet to distribute your functions between a set of workers with
+  minimal configuration or infrastructure.
+
+  ### Special Installation Instructions
+  To install Hatchet in your cluster, please follow these steps:
+  1. Create a `Secret` in the `hatchet` namespace that contains the
+     [secret keys required by Hatchet](https://docs.hatchet.run/self-hosting/kubernetes#generate-encryption-keys).
+  2. Initially set the engine and API replicas to "0"
+  3. Wait for the installation to finish
+  4. Update the values to the desired replica counts.
+
+  For more information, please refer to the original [documentation](https://docs.hatchet.run/self-hosting/kubernetes).
+iconUrl: https://avatars.githubusercontent.com/u/118301880
+references:
+  - label: GitHub
+    url: https://github.com/hatchet-dev/hatchet
+  - label: Website
+    url: https://hatchet.run/
+defaultNamespace: hatchet
+manifests:
+  - url: http://host.minikube.internal:9090/packages/hatchet/v0.28.7+1/rabbitmq.yaml
+  - url: http://host.minikube.internal:9090/packages/hatchet/v0.28.7+1/postgres.yaml
+helm:
+  repositoryUrl: https://hatchet-dev.github.io/hatchet-charts
+  chartName: hatchet-stack
+  chartVersion: "0.2.0"
+  values:
+    api:
+      env:
+        DATABASE_URL: "postgres://hatchet:hatchet@hatchet-postgres-rw:5432/hatchet?sslmode=disable"
+        DATABASE_POSTGRES_HOST: "hatchet-postgres-rw"
+        SERVER_TASKQUEUE_RABBITMQ_URL: "amqp://hatchet:hatchet@hatchet-rabbitmq:5672/"
+      envFrom: []
+    engine:
+      env:
+        DATABASE_URL: "postgres://hatchet:hatchet@hatchet-postgres-rw:5432/hatchet?sslmode=disable"
+        DATABASE_POSTGRES_HOST: "hatchet-postgres-rw"
+        SERVER_TASKQUEUE_RABBITMQ_URL: "amqp://hatchet:hatchet@hatchet-rabbitmq:5672/"
+      envFrom: []
+    caddy:
+      enabled: true
+    rabbitmq:
+      enabled: false
+    postgres:
+      enabled: false
+dependencies:
+  - name: rabbitmq-operator
+    version: ">=2.8.0"
+  - name: cloudnative-pg
+    version: ">=1.23.1"
+valueDefinitions:
+  encryptionSecretSource:
+    metadata:
+      label: Encryption secret source
+      description: |
+        Name of a secret to load additional environment variables from.
+        Check the [documentation](https://docs.hatchet.run/self-hosting/kubernetes#generate-encryption-keys)
+        for more information about generating the required encryption secrets.
+        The secret must be located in the hatchet namespace.
+    type: text
+    targets:
+      - chartName: hatchet-stack
+        valueTemplate: |-
+          {"secretRef": {"name": "{{ . }}"}}
+        patch:
+          op: add
+          path: /api/envFrom/-
+      - chartName: hatchet-stack
+        valueTemplate: |-
+          {"secretRef": {"name": "{{ . }}"}}
+        patch:
+          op: add
+          path: /engine/envFrom/-
+    constraints:
+      required: true
+      minLength: 1
+  apiReplicas:
+    type: number
+    metadata:
+      label: API replicas
+    defaultValue: "2"
+    targets:
+      - chartName: hatchet-stack
+        patch:
+          op: add
+          path: /api/replicaCount
+  engineReplicas:
+    type: number
+    metadata:
+      label: Engine replicas
+    defaultValue: "1"
+    targets:
+      - chartName: hatchet-stack
+        patch:
+          op: add
+          path: /engine/replicaCount
+entrypoints:
+  - serviceName: caddy
+    port: 8080
