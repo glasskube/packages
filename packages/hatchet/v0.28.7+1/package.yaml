@@ -21,6 +21,8 @@ references:
   - label: Website
     url: https://hatchet.run/
 defaultNamespace: hatchet
+manifests:
+  - url: http://host.minikube.internal:9090/packages/hatchet/v0.28.7+1/rabbitmq.yaml
 helm:
   repositoryUrl: https://hatchet-dev.github.io/hatchet-charts
   chartName: hatchet-stack
@@ -40,6 +42,11 @@ helm:
       envFrom: []
     caddy:
       enabled: true
+    rabbitmq:
+      enabled: false
+dependencies:
+  - name: rabbitmq-operator
+    version: ">=2.8.0"
 valueDefinitions:
   encryptionSecretSource:
     metadata:
