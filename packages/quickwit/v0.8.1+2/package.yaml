@@ -1,0 +1,98 @@
+# yaml-language-server: $schema=https://glasskube.dev/schemas/v1/package-manifest.json
+name: quickwit
+shortDescription: Cloud-native search engine for observability
+longDescription: |
+  Quickwit is the first engine to execute complex search and analytics queries directly on cloud storage with
+  sub-second latency. Powered by Rust and its decoupled compute and storage architecture, it is designed to be
+  resource-efficient, easy to operate, and scale to petabytes of data.
+
+  Quickwit is a great fit for log management, distributed tracing, and generally immutable data such as conversational
+  data (emails, texts, messaging platforms) and event-based analytics.
+defaultNamespace: quickwit
+iconUrl: https://avatars.githubusercontent.com/u/98504233
+helm:
+  repositoryUrl: "https://helm.quickwit.io"
+  chartName: quickwit
+  chartVersion: "0.5.16"
+  values:
+    environment: {}
+    config:
+      storage:
+        s3: {}
+valueDefinitions:
+  s3Uri:
+    type: text
+    metadata:
+      description: >
+        The S3 URI usually looks like this: "s3://<bucket-name>/<optional-base-path>"
+    constraints:
+      required: true
+      minLength: 1
+    targets:
+      - chartName: quickwit
+        patch:
+          op: add
+          path: /environment/QW_METASTORE_URI
+      - chartName: quickwit
+        patch:
+          op: add
+          path: /config/default_index_root_uri
+  s3Flavor:
+    type: options
+    metadata:
+      description: Leave empty if using genuine AWS S3
+    options:
+      - ""
+      - do
+      - garage
+      - gcp
+      - minio
+    targets:
+      - chartName: quickwit
+        valueTemplate: |
+          {{if .}}"{{.}}"{{else}}null{{end}}
+        patch:
+          op: add
+          path: /config/storage/s3/flavor
+  s3Endpoint:
+    type: text
+    metadata:
+      description: The S3 endpoint is required for alternative S3 API providers
+    targets:
+      - chartName: quickwit
+        valueTemplate: |
+          {{if .}}"{{.}}"{{else}}null{{end}}
+        patch:
+          op: add
+          path: /config/storage/s3/endpoint
+  s3Region:
+    type: text
+    targets:
+      - chartName: quickwit
+        patch:
+          op: add
+          path: /config/storage/s3/region
+  s3AccessKeyId:
+    type: text
+    targets:
+      - chartName: quickwit
+        patch:
+          op: add
+          path: /config/storage/s3/access_key_id
+  s3SecretAccessKey:
+    type: text
+    targets:
+      - chartName: quickwit
+        patch:
+          op: add
+          path: /config/storage/s3/secret_access_key
+entrypoints:
+  - serviceName: quickwit-searcher
+    port: 7280
+references:
+  - label: Website
+    url: https://quickwit.io/
+  - label: Documentation
+    url: https://quickwit.io/docs
+  - label: GitHub
+    url: https://github.com/quickwit-oss/quickwit
