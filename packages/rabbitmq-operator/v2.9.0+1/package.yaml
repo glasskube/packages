@@ -1,0 +1,21 @@
+# yaml-language-server: $schema=https://glasskube.dev/schemas/v1/package-manifest.json
+
+name: rabbitmq-operator
+iconUrl: https://raw.githubusercontent.com/rabbitmq/rabbitmq-website/30967fb4a7c39f28e9a5f591b8d70db185d8fd54/static/img/rabbitmq-logo.svg
+shortDescription: Kubernetes operator to deploy and manage RabbitMQ clusters
+longDescription: >
+  The RabbitMQ Cluster Kubernetes Operator provides a consistent and easy way to
+  deploy RabbitMQ clusters to Kubernetes
+
+  and run them, including "day two" (continuous) operations. RabbitMQ clusters
+  deployed using the Operator can be used
+
+  by applications running on Kubernetes or outside of Kubernetes.
+references:
+  - label: GitHub
+    url: https://github.com/rabbitmq/cluster-operator
+  - label: Documentation
+    url: https://www.rabbitmq.com/kubernetes/operator/operator-overview
+defaultNamespace: rabbitmq-system
+manifests:
+  - url: https://github.com/rabbitmq/cluster-operator/releases/download/v2.9.0/cluster-operator.yml
