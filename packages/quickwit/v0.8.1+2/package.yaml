@@ -8,6 +8,9 @@ longDescription: |
 
   Quickwit is a great fit for log management, distributed tracing, and generally immutable data such as conversational
   data (emails, texts, messaging platforms) and event-based analytics.
+
+  Make sure that the object storage user has all permissions (e.g. `"s3:*"`) for the configured bucket.
+  For more information make sure to check out the Quickwit documentation.
 defaultNamespace: quickwit
 iconUrl: https://avatars.githubusercontent.com/u/98504233
 helm:
@@ -90,6 +93,8 @@ entrypoints:
   - serviceName: quickwit-searcher
     port: 7280
 references:
+  - label: ArtifactHub
+    url: https://artifacthub.io/packages/helm/quickwit/quickwit
   - label: Website
     url: https://quickwit.io/
   - label: Documentation
