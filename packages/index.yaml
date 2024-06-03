@@ -29,7 +29,7 @@ packages:
     name: keptn
     shortDescription: Toolkit for cloud-native application lifecycle management
   - iconUrl: https://avatars.githubusercontent.com/u/66682517
-    latestVersion: v58.0.0+1
+    latestVersion: v58.6.1+1
     name: kube-prometheus-stack
     shortDescription: Use Prometheus to monitor Kubernetes and applications running on Kubernetes
   - iconUrl: https://avatars.githubusercontent.com/u/13629408
