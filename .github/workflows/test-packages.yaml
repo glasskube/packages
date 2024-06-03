@@ -57,7 +57,7 @@ jobs:
       - name: Add local repository
         run: ./glasskube repo add local "http://host.minikube.internal:9090/packages/" --default
       - name: Install package in Minikube cluster
-        run: ./glasskube install "${{ matrix.change[0] }}" --repository="local" --version="${{ matrix.change[1] }}" --yes
+        run: ./glasskube install "${{ matrix.change[0] }}" --repository="local" --version="${{ matrix.change[1] }}" --yes --non-interactive
       - name: Check package status
         run: |
           ./glasskube describe "${{ matrix.change[0] }}" | grep -E "Status: *Ready"
