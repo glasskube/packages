@@ -31,7 +31,7 @@ valueDefinitions:
     type: text
     metadata:
       description: >
-        The default index URI is a S3 bucket which usually looks like this: "s3://<bucket-name>/<optional-base-path>"
+        The default index URI is a S3 bucket which usually looks like this: `s3://<bucket-name>/<optional-base-path>`
     constraints:
       required: true
       minLength: 1

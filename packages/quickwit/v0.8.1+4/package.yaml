@@ -2,41 +2,49 @@
 name: quickwit
 shortDescription: Cloud-native search engine for observability
 longDescription: |
-  > _**PLEASE READ:** If you previously installed this package as a `ClusterPackage`, please remove and install it as a
-  > namespace-scoped `Package` instead._
-
   Quickwit is the first engine to execute complex search and analytics queries directly on cloud storage with
   sub-second latency. Powered by Rust and its decoupled compute and storage architecture, it is designed to be
   resource-efficient, easy to operate, and scale to petabytes of data.
 
   Quickwit is a great fit for log management, distributed tracing, and generally immutable data such as conversational
   data (emails, texts, messaging platforms) and event-based analytics.
+
+  Make sure that the object storage user has all permissions (e.g. `"s3:*"`) for the configured bucket.
+  For more information make sure to check out the Quickwit documentation.
 scope: Namespaced
 defaultNamespace: quickwit
 iconUrl: https://avatars.githubusercontent.com/u/98504233
 helm:
   repositoryUrl: "https://helm.quickwit.io"
   chartName: quickwit
-  chartVersion: "0.5.15"
+  chartVersion: "0.5.16"
   values:
     environment: {}
     config:
       storage:
         s3: {}
+    ingress:
+      enabled: false
+      annotations:
+        cert-manager.io/cluster-issuer: letsencrypt
+      hosts:
+        - host: ""
+          paths:
+            - path: /
+              pathType: Prefix
+      ingressClassName: nginx
+      tls:
+        - hosts: [ ]
 valueDefinitions:
-  s3Uri:
+  defaultIndexRootUri:
     type: text
     metadata:
       description: >
-        The S3 URI usually looks like this: `s3://<bucket-name>/<optional-base-path>`
+        The default index URI is a S3 bucket which usually looks like this: `s3://<bucket-name>/<optional-base-path>`
     constraints:
       required: true
       minLength: 1
     targets:
-      - chartName: quickwit
-        patch:
-          op: add
-          path: /environment/QW_METASTORE_URI
       - chartName: quickwit
         patch:
           op: add
@@ -90,10 +98,55 @@ valueDefinitions:
         patch:
           op: add
           path: /config/storage/s3/secret_access_key
+  metastoreUri:
+    type: text
+    metadata:
+      description: >
+        If you're not using PostgreSQL and object storage, you can pick the same bucket and value you used for the defaultIndexRootUri parameter
+    constraints:
+      required: true
+      minLength: 1
+    targets:
+      - chartName: quickwit
+        patch:
+          op: add
+          path: /environment/QW_METASTORE_URI
+  quickwitDomain:
+    type: text
+    metadata:
+      label: Quickwit domain
+      description: |
+        DNS name for the Quickwit Ingress.
+        Leave this empty to disable the Ingress.
+    constraints:
+      pattern: ^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$
+    targets:
+      - patch:
+          op: add
+          path: /ingress/enabled
+        valueTemplate: |
+          {{ if eq . "" }}false{{ else }}true{{ end }}
+        chartName: quickwit
+      - patch:
+          op: add
+          path: /ingress/hosts/0/host
+        chartName: quickwit
+      - patch:
+          op: add
+          path: /ingress/tls/0/hosts/-
+        chartName: quickwit
+      - patch:
+          op: add
+          path: /ingress/tls/0/secretName
+        valueTemplate: |
+          "{{ . }}"
+        chartName: quickwit
 entrypoints:
   - serviceName: quickwit-searcher
     port: 7280
 references:
+  - label: ArtifactHub
+    url: https://artifacthub.io/packages/helm/quickwit/quickwit
   - label: Website
     url: https://quickwit.io/
   - label: Documentation
