@@ -1,6 +1,6 @@
 packages:
   - iconUrl: https://avatars.githubusercontent.com/u/30269780
-    latestVersion: v2.11.2+1
+    latestVersion: v2.11.3+1
     name: argo-cd
     shortDescription: Declarative Continuous Deployment for Kubernetes
   - iconUrl: https://avatars.githubusercontent.com/u/39950598
