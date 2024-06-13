@@ -15,6 +15,10 @@ packages:
     latestVersion: v0.6.5+1
     name: cyclops
     shortDescription: Developer friendly Kubernetes
+  - iconUrl: https://avatars.githubusercontent.com/u/118301880
+    latestVersion: v0.28.7+1
+    name: hatchet
+    shortDescription: A distributed, fault-tolerant task queue
   - iconUrl: https://avatars.githubusercontent.com/u/13629408
     latestVersion: v1.9.5+1
     name: ingress-nginx
