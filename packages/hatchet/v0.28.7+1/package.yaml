@@ -9,11 +9,14 @@ longDescription: |
 
   ### Special Installation Instructions
   To install Hatchet in your cluster, please follow these steps:
-  1. Create a `Secret` in the `hatchet` namespace that contains the
+  1. Manually create the `hatchet` namespace.
+  2. Create a `Secret` in the `hatchet` namespace that contains the
      [secret keys required by Hatchet](https://docs.hatchet.run/self-hosting/kubernetes#generate-encryption-keys).
-  2. Initially set the engine and API replicas to "0"
-  3. Wait for the installation to finish
-  4. Update the values to the desired replica counts.
+  3. Make sure that `LoadBalancer` services will receive an IP.
+     (e.g. If you are using minikube execute: `minikube tunnel`)
+  4. Initially set the API **and** engine replicas to "0".
+  5. Wait for the installation to finish.
+  6. Update the values to the desired replica counts.
 
   For more information, please refer to the original [documentation](https://docs.hatchet.run/self-hosting/kubernetes).
 iconUrl: https://avatars.githubusercontent.com/u/118301880
@@ -24,8 +27,8 @@ references:
     url: https://hatchet.run/
 defaultNamespace: hatchet
 manifests:
-  - url: http://host.minikube.internal:9090/packages/hatchet/v0.28.7+1/rabbitmq.yaml
-  - url: http://host.minikube.internal:9090/packages/hatchet/v0.28.7+1/postgres.yaml
+  - url: https://glasskube.github.io/packages/packages/hatchet/v0.28.7+1/postgres.yaml
+  - url: https://glasskube.github.io/packages/packages/hatchet/v0.28.7+1/rabbitmq.yaml
 helm:
   repositoryUrl: https://hatchet-dev.github.io/hatchet-charts
   chartName: hatchet-stack
