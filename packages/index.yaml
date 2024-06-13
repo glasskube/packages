@@ -8,7 +8,7 @@ packages:
     name: cert-manager
     shortDescription: X.509 certificate management for Kubernetes and OpenShift
   - iconUrl: https://github.com/glasskube/glasskube/assets/16959694/99f3192a-587f-4eb9-884d-62800c022992
-    latestVersion: v1.23.1+1
+    latestVersion: v1.23.2+1
     name: cloudnative-pg
     shortDescription: A comprehensive platform designed to seamlessly manage PostgreSQL databases
   - iconUrl: https://cyclops-ui.com/img/logo.png
