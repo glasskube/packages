@@ -51,7 +51,7 @@ jobs:
       - name: Check local webserver
         run: curl -v "http://host.minikube.internal:9090/packages/${{ matrix.change[0] }}/${{ matrix.change[1] }}/package.yaml"
       - name: Start minikube cluster
-        uses: medyagh/setup-minikube@9ed194ee345beecad406ec1b59b177509f00dcf2 # v0.0.17
+        uses: medyagh/setup-minikube@d8c0eb871f6f455542491d86a574477bd3894533 # v0.0.18
       - name: Bootstrap Glasskube in Minikube cluster
         run: ./glasskube bootstrap --disable-telemetry --create-default-repository=false
       - name: Add local repository
