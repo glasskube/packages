@@ -37,7 +37,7 @@ packages:
     name: kubernetes-dashboard
     shortDescription: General-purpose web UI for Kubernetes clusters
   - iconUrl: https://avatars.githubusercontent.com/u/98504233
-    latestVersion: v0.8.1+2
+    latestVersion: v0.8.1+3
     name: quickwit
     shortDescription: Cloud-native search engine for observability
   - iconUrl: https://raw.githubusercontent.com/rabbitmq/rabbitmq-website/30967fb4a7c39f28e9a5f591b8d70db185d8fd54/static/img/rabbitmq-logo.svg
