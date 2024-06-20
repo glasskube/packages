@@ -31,7 +31,7 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4
-      - uses: glasskube/scout/actions/setup@f1026f7be47dbe1f7b0b99ad09435764ad7536bc # v0.3.1
+      - uses: glasskube/scout/actions/setup@292ab7e9d33cae075d89ab6cf0e686b1d4aeaddc # v0.3.2
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
       - run: scout package --name=${{ matrix.package }}
