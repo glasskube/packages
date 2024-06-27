@@ -4,7 +4,7 @@ packages:
     name: argo-cd
     shortDescription: Declarative Continuous Deployment for Kubernetes
   - iconUrl: https://avatars.githubusercontent.com/u/39950598
-    latestVersion: v1.15.0+1
+    latestVersion: v1.15.1+1
     name: cert-manager
     shortDescription: X.509 certificate management for Kubernetes and OpenShift
   - iconUrl: https://github.com/glasskube/glasskube/assets/16959694/99f3192a-587f-4eb9-884d-62800c022992
