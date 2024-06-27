@@ -15,6 +15,9 @@ packages:
     latestVersion: v0.7.1+1
     name: cyclops
     shortDescription: Developer friendly Kubernetes
+  - latestVersion: v0.12.0+1
+    name: glasskube-autoupdater
+    shortDescription: Opt-in to automatic updates for your Packages
   - iconUrl: https://avatars.githubusercontent.com/u/13629408
     latestVersion: v1.9.5+1
     name: ingress-nginx
