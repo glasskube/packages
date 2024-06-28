@@ -1,0 +1,25 @@
+kind: Cluster
+apiVersion: postgresql.cnpg.io/v1
+metadata:
+  name: hatchet-postgres
+spec:
+  enableSuperuserAccess: false
+  instances: 2
+  bootstrap:
+    initdb:
+      database: hatchet
+      owner: hatchet
+      secret:
+        name: hatchet-postgres-user
+  storage:
+    size: 5Gi
+
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: hatchet-postgres-user
+type: BasicAuth
+stringData:
+  username: hatchet
+  password: hatchet

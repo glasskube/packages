@@ -1,0 +1,16 @@
+apiVersion: rabbitmq.com/v1beta1
+kind: RabbitmqCluster
+metadata:
+  name: hatchet-rabbitmq
+spec:
+  delayStartSeconds: 30
+  replicas: 3
+  terminationGracePeriodSeconds: 604800
+  rabbitmq:
+    additionalConfig: |
+      default_user = hatchet
+      default_pass = hatchet
+  resources:
+    requests:
+      cpu: 200m
+      memory: 500Mi
