@@ -1,0 +1,25 @@
+# yaml-language-server: $schema=https://glasskube.dev/schemas/v1/package-manifest.json
+
+name: headlamp
+shortDescription: A Kubernetes web UI that is fully-featured, user-friendly and extensible.
+longDescription: |
+  To log in to the Headlamp Dashboard, you need to generate a token for the Kubernetes Dashboard.
+  Glasskube creates a dashboard user. You can generate a token to log in via:
+  `kubectl -n headlamp-system create token headlamp-admin`.
+iconUrl: https://avatars.githubusercontent.com/u/122369679
+defaultNamespace: headlamp-system
+helm:
+  chartName: headlamp
+  chartVersion: 0.22.0
+  repositoryUrl: https://headlamp-k8s.github.io/headlamp/
+  values:
+    serviceAccount:
+      name: headlamp-admin
+references:
+  - label: ArtifactHub
+    url: https://artifacthub.io/packages/helm/headlamp/headlamp
+entrypoints:
+  - serviceName: headlamp-headlamp
+    port: 80
+    localPort: 8030
+    name: ui
