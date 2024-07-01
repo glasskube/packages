@@ -1,0 +1,10 @@
+# yaml-language-server: $schema=https://glasskube.dev/schemas/v1/package-manifest.json
+
+name: "gateway-api"
+shortDescription: The Gateway API provides a standardized way to configure and manage network traffic routing in Kubernetes clusters.
+longDescription: >-
+  The Gateway API is a Kubernetes extension that standardizes the configuration and management of network traffic routing. It introduces new resource types like Gateway, GatewayClass, and HTTPRoute to provide flexible and extensible traffic control. This API enables better separation of concerns and more robust traffic management in Kubernetes environments.
+iconUrl: "https://avatars.githubusercontent.com/u/36015203"
+defaultNamespace: "gateway-api-system"
+manifests:
+  - url: https://objects.githubusercontent.com/github-production-release-asset-2e65be/219058535/32e6db11-1a9d-4159-9f74-ac18d09024ce?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=releaseassetproduction%2F20240618%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20240618T130009Z&X-Amz-Expires=300&X-Amz-Signature=bb468caa1b2889c387276679659b6f95c70b6d7c2350621aa885b8c402959707&X-Amz-SignedHeaders=host&actor_id=0&key_id=0&repo_id=219058535&response-content-disposition=attachment%3B%20filename%3Dstandard-install.yaml&response-content-type=application%2Foctet-stream
