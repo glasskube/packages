@@ -11,14 +11,14 @@ longDescription: |
   To install Hatchet in your cluster, please follow these steps:
   1. Manually create the `hatchet` namespace.
   2. Create a `Secret` in the `hatchet` namespace that contains the
-     [secret keys required by Hatchet](https://docs.hatchet.run/self-hosting/kubernetes#generate-encryption-keys).
+     [secret keys required by Hatchet](https://docs.hatchet.run/self-hosting/kubernetes-glasskube#generate-encryption-keys).
   3. Make sure that `LoadBalancer` services will receive an IP.
      (e.g. If you are using minikube execute: `minikube tunnel`)
   4. Initially set the API **and** engine replicas to "0".
   5. Wait for the installation to finish.
   6. Update the values to the desired replica counts.
 
-  For more information, please refer to the original [documentation](https://docs.hatchet.run/self-hosting/kubernetes).
+  For more information, please refer to the original [documentation](https://docs.hatchet.run/self-hosting/kubernetes-glasskube).
 iconUrl: https://avatars.githubusercontent.com/u/118301880
 references:
   - label: GitHub
@@ -63,9 +63,9 @@ valueDefinitions:
       label: Encryption secret source
       description: |
         Name of a secret to load additional environment variables from.
-        Check the [documentation](https://docs.hatchet.run/self-hosting/kubernetes#generate-encryption-keys)
+        Check the [documentation](https://docs.hatchet.run/self-hosting/kubernetes-glasskube#generate-encryption-keys)
         for more information about generating the required encryption secrets.
-        The secret must be located in the hatchet namespace.
+        The secret must be located in the same namespace.
     type: text
     targets:
       - chartName: hatchet-stack
