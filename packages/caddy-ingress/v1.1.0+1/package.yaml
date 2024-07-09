@@ -8,14 +8,17 @@ defaultNamespace: "caddy-system"
 helm:
   repositoryUrl: "https://caddyserver.github.io/ingress"
   chartName: "caddy-ingress"
-  chartVersion: "0.2.1"
+  chartVersion: "1.1.0"
+  values:
+    ingressController:
+      config: {}
 valueDefinitions:
   automaticHTTPS:
     metadata:
       description: Add you email address for automatic HTTPS - "your@email.com"
     type: text
     targets:
-      - chartName: caddy-ingress
+      - chartName: caddy-ingress-controller
         patch:
           op: add
           path: /ingressController/config/email
