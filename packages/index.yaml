@@ -23,6 +23,7 @@ packages:
   - iconUrl: https://avatars.githubusercontent.com/u/122369679
     latestVersion: v0.24.0+1
     name: headlamp
+    scope: Cluster
     shortDescription: A Kubernetes web UI that is fully-featured, user-friendly and extensible.
   - iconUrl: https://avatars.githubusercontent.com/u/13629408
     latestVersion: v1.9.5+1
