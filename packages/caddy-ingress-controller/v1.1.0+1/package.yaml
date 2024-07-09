@@ -7,7 +7,7 @@ scope: Cluster
 defaultNamespace: "caddy-system"
 helm:
   repositoryUrl: "https://caddyserver.github.io/ingress"
-  chartName: "caddy-ingress"
+  chartName: "caddy-ingress-controller"
   chartVersion: "1.1.0"
   values:
     ingressController:
