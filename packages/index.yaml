@@ -20,6 +20,11 @@ packages:
     latestVersion: v0.7.3+1
     name: cyclops
     shortDescription: Developer friendly Kubernetes
+  - iconUrl: https://avatars.githubusercontent.com/u/122369679
+    latestVersion: v0.24.0+1
+    name: headlamp
+    scope: Cluster
+    shortDescription: A Kubernetes web UI that is fully-featured, user-friendly and extensible.
   - iconUrl: https://avatars.githubusercontent.com/u/13629408
     latestVersion: v1.9.5+1
     name: ingress-nginx
