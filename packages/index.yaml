@@ -3,6 +3,11 @@ packages:
     latestVersion: v2.11.3+1
     name: argo-cd
     shortDescription: Declarative Continuous Deployment for Kubernetes
+  - iconUrl: https://avatars.githubusercontent.com/u/12955528
+    latestVersion: v1.1.0+1
+    name: caddy-ingress-controller
+    scope: Cluster
+    shortDescription: This is the Kubernetes Ingress Controller for Caddy
   - iconUrl: https://avatars.githubusercontent.com/u/39950598
     latestVersion: v1.15.1+1
     name: cert-manager
@@ -36,6 +41,10 @@ packages:
     latestVersion: v2.7.0+2
     name: kubernetes-dashboard
     shortDescription: General-purpose web UI for Kubernetes clusters
+  - iconUrl: https://avatars.githubusercontent.com/u/141319696
+    latestVersion: v0.5.6+1
+    name: kubetail
+    shortDescription: Kubetail is a web-based, real-time log viewer for Kubernetes clusters
   - iconUrl: https://avatars.githubusercontent.com/u/98504233
     latestVersion: v0.8.1+3
     name: quickwit
