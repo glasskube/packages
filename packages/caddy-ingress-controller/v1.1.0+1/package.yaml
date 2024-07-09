@@ -1,0 +1,29 @@
+# yaml-language-server: $schema=https://glasskube.dev/schemas/v1/package-manifest.json
+
+name: "caddy-ingress-controller"
+shortDescription: "This is the Kubernetes Ingress Controller for Caddy"
+iconUrl: "https://avatars.githubusercontent.com/u/12955528"
+scope: Cluster
+defaultNamespace: "caddy-system"
+helm:
+  repositoryUrl: "https://caddyserver.github.io/ingress"
+  chartName: "caddy-ingress-controller"
+  chartVersion: "1.1.0"
+  values:
+    ingressController:
+      config: {}
+valueDefinitions:
+  automaticHTTPS:
+    metadata:
+      description: Add you email address for automatic HTTPS - "your@email.com"
+    type: text
+    targets:
+      - chartName: caddy-ingress-controller
+        patch:
+          op: add
+          path: /ingressController/config/email
+references:
+  - label: Github
+    url: https://github.com/caddyserver/ingress
+  - label: Website
+    url: https://caddyserver.com
