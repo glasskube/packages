@@ -20,6 +20,11 @@ packages:
     latestVersion: v0.7.3+1
     name: cyclops
     shortDescription: Developer friendly Kubernetes
+  - iconUrl: https://avatars.githubusercontent.com/u/36015203
+    latestVersion: v1.1.0
+    name: gateway-api
+    shortDescription: The Gateway API provides a standardized way to configure and
+      manage network traffic routing in Kubernetes clusters.
   - iconUrl: https://avatars.githubusercontent.com/u/122369679
     latestVersion: v0.24.0+1
     name: headlamp
