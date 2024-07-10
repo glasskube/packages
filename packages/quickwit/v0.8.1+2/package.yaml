@@ -31,7 +31,7 @@ valueDefinitions:
     type: text
     metadata:
       description: >
-        The S3 URI usually looks like this: "s3://<bucket-name>/<optional-base-path>"
+        The S3 URI usually looks like this: `s3://<bucket-name>/<optional-base-path>`
     constraints:
       required: true
       minLength: 1
