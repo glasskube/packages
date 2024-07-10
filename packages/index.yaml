@@ -26,7 +26,7 @@ packages:
     shortDescription: The Gateway API provides a standardized way to configure and
       manage network traffic routing in Kubernetes clusters.
   - iconUrl: https://avatars.githubusercontent.com/u/122369679
-    latestVersion: v0.24.0+1
+    latestVersion: v0.24.1+1
     name: headlamp
     scope: Cluster
     shortDescription: A Kubernetes web UI that is fully-featured, user-friendly and extensible.
