@@ -3,7 +3,15 @@
 name: "gateway-api"
 shortDescription: The Gateway API provides a standardized way to configure and manage network traffic routing in Kubernetes clusters.
 longDescription: >-
-  The Gateway API is a Kubernetes extension that standardizes the configuration and management of network traffic routing. It introduces new resource types like Gateway, GatewayClass, and HTTPRoute to provide flexible and extensible traffic control. This API enables better separation of concerns and more robust traffic management in Kubernetes environments.
+  The Gateway API is a Kubernetes extension that standardizes the configuration and management of network traffic routing. 
+  
+  It introduces new resource types like Gateway, GatewayClass, and HTTPRoute to provide flexible and extensible traffic control. 
+  
+  This API enables better separation of concerns and more robust traffic management in Kubernetes environments.
+  
+  > **Note:** This package installs the Gateway API CRDs from the official source.
+    To utilize them, install a controller implementing this API.
+    You can find a list of implementations [here](https://gateway-api.sigs.k8s.io/implementations/).
 iconUrl: "https://avatars.githubusercontent.com/u/36015203"
 defaultNamespace: "gateway-api-system"
 manifests:
