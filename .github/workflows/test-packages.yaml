@@ -56,8 +56,11 @@ jobs:
         run: ./glasskube bootstrap --disable-telemetry --create-default-repository=false
       - name: Add local repository
         run: ./glasskube repo add local "http://host.minikube.internal:9090/packages/" --default
+      - name: Fetch test config values
+        id: config
+        run: echo "config=$(curl -fL http://host.minikube.internal:9090/packages/${{ matrix.change[0] }}/${{ matrix.change[1] }}/.test/config-values.txt)" >> $GITHUB_OUTPUT
       - name: Install package in Minikube cluster
-        run: ./glasskube install "${{ matrix.change[0] }}" --repository="local" --version="${{ matrix.change[1] }}" --yes --non-interactive
+        run: ./glasskube install "${{ matrix.change[0] }}" --repository="local" --version="${{ matrix.change[1] }}" ${{ steps.config.outputs.config }} --yes --non-interactive
       - name: Check package status
         run: |
           ./glasskube describe "${{ matrix.change[0] }}" | grep -E "Status: *Ready"

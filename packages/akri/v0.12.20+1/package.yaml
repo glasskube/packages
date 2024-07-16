@@ -1,0 +1,43 @@
+# yaml-language-server: $schema=https://glasskube.dev/schemas/v1/package-manifest.json
+name: akri
+iconUrl: https://avatars.githubusercontent.com/u/91915613
+shortDescription: Akri lets you easily expose heterogeneous leaf devices (such as IP cameras and USB devices) as resources in a Kubernetes cluster
+defaultNamespace: akri-system
+helm:
+  repositoryUrl: "https://project-akri.github.io/akri/"
+  chartName: "akri"
+  chartVersion: "0.12.20"
+  values:
+    agent:
+      host:
+        containerRuntimeSocket: k8s
+valueDefinitions:
+  useLatestContainers:
+    type: boolean
+    defaultValue: "false"
+    metadata:
+      label: Use the latest containers of the Akri components
+    targets:
+      - patch:
+          op: add
+          path: /useLatestContainers
+        chartName: akri
+  containerRuntimeSocket:
+    type: options
+    metadata:
+      label: Which is the users Kubernetes distribution.
+      description: Leave empty if using Kubernetes or Minukube
+    options:
+      - ""
+      - k3s
+      - micro8s
+    targets:
+      - patch:
+          op: add
+          path: /agent/host/containerRuntimeSocket
+        chartName: "akri"
+references:
+  - label: Documentation
+    url: https://docs.akri.sh/
+  - label: GitHub
+    url: https://github.com/project-akri/akri
