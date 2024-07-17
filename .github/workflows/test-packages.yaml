@@ -60,7 +60,14 @@ jobs:
         id: config
         run: echo "config=$(curl -fL http://host.minikube.internal:9090/packages/${{ matrix.change[0] }}/${{ matrix.change[1] }}/.test/config-values.txt)" >> $GITHUB_OUTPUT
       - name: Install package in Minikube cluster
-        run: ./glasskube install "${{ matrix.change[0] }}" --repository="local" --version="${{ matrix.change[1] }}" ${{ steps.config.outputs.config }} --yes --non-interactive
+        run: ./glasskube install "${{ matrix.change[0] }}" --repository="local" --version="${{ matrix.change[1] }}" ${{ steps.config.outputs.config }} --yes --non-interactive --no-wait
       - name: Check package status
+        timeout-minutes: 5
         run: |
-          ./glasskube describe "${{ matrix.change[0] }}" | grep -E "Status: *Ready"
+          while true; do
+            sleep 5
+            status=`./glasskube describe "${{ matrix.change[0] }}" -o json | jq -r .status`
+            if [ $status == "Ready" ]; then
+              break;
+            fi
+          done
