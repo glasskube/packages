@@ -22,7 +22,7 @@ packages:
     name: cloudnative-pg
     shortDescription: A comprehensive platform designed to seamlessly manage PostgreSQL databases
   - iconUrl: https://cyclops-ui.com/img/logo.png
-    latestVersion: v0.8.2+1
+    latestVersion: v0.8.3+1
     name: cyclops
     shortDescription: Developer friendly Kubernetes
   - iconUrl: https://avatars.githubusercontent.com/u/36015203
