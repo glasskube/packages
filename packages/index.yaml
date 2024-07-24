@@ -30,6 +30,10 @@ packages:
     name: gateway-api
     shortDescription: The Gateway API provides a standardized way to configure and
       manage network traffic routing in Kubernetes clusters.
+  - latestVersion: v0.14.0+1
+    name: glasskube-autoupdater
+    scope: Cluster
+    shortDescription: Opt-in to automatically update your Packages
   - iconUrl: https://avatars.githubusercontent.com/u/122369679
     latestVersion: v0.24.1+1
     name: headlamp
