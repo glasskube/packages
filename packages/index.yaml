@@ -65,7 +65,7 @@ packages:
     name: kubetail
     shortDescription: Kubetail is a web-based, real-time log viewer for Kubernetes clusters
   - iconUrl: https://avatars.githubusercontent.com/u/98504233
-    latestVersion: v0.8.1+4
+    latestVersion: v0.8.1+5
     name: quickwit
     scope: Namespaced
     shortDescription: Cloud-native search engine for observability
