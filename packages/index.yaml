@@ -5,7 +5,7 @@ packages:
     shortDescription: Akri lets you easily expose heterogeneous leaf devices (such
       as IP cameras and USB devices) as resources in a Kubernetes cluster
   - iconUrl: https://avatars.githubusercontent.com/u/30269780
-    latestVersion: v2.11.3+1
+    latestVersion: v2.11.5+1
     name: argo-cd
     shortDescription: Declarative Continuous Deployment for Kubernetes
   - iconUrl: https://avatars.githubusercontent.com/u/12955528
