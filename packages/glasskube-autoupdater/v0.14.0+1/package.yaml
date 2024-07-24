@@ -2,7 +2,7 @@
 name: glasskube-autoupdater
 defaultNamespace: glasskube-system
 scope: Cluster
-shortDescription: Opt-in to automatic updates for your Packages
+shortDescription: Opt-in to automatically update your Packages
 manifests:
   - url: https://github.com/glasskube/glasskube/releases/download/v0.14.0/manifest-autoupdater.yaml
 references:
