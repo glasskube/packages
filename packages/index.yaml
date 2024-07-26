@@ -77,3 +77,11 @@ packages:
     latestVersion: v2.15.3+1
     name: sealed-secrets
     shortDescription: A Kubernetes controller and tool for one-way encrypted Secrets
+  - iconUrl: https://avatars.githubusercontent.com/u/157650797
+    latestVersion: v0.2.0+1
+    name: spin-operator
+    shortDescription: The Spin Operator enables deploying Spin applications to Kubernetes
+  - iconUrl: https://avatars.githubusercontent.com/u/113929551
+    latestVersion: v0.2.3+1
+    name: kwasm-operator
+    shortDescription: The KWasm Operator allows for fine-grained control over node provisioning
