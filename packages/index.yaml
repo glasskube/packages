@@ -83,5 +83,5 @@ packages:
     shortDescription: The Spin Operator enables deploying Spin applications to Kubernetes
   - iconUrl: https://avatars.githubusercontent.com/u/113929551
     latestVersion: v0.2.3+1
-    name: kwasm-operator
+    name: kwasm
     shortDescription: The KWasm Operator allows for fine-grained control over node provisioning
