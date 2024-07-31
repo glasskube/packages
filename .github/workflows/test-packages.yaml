@@ -9,7 +9,7 @@ on:
 
 jobs:
   setup:
-    name: Setup
+    name: package_install_setup
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -23,7 +23,7 @@ jobs:
       changes: ${{ steps.diff.outputs.changes }}
 
   test:
-    name: Test install
+    name: package_install
     runs-on: ubuntu-latest
     needs:
       - setup
@@ -60,7 +60,31 @@ jobs:
         id: config
         run: echo "config=$(curl -fL http://host.minikube.internal:9090/packages/${{ matrix.change[0] }}/${{ matrix.change[1] }}/.test/config-values.txt)" >> $GITHUB_OUTPUT
       - name: Install package in Minikube cluster
-        run: ./glasskube install "${{ matrix.change[0] }}" --repository="local" --version="${{ matrix.change[1] }}" ${{ steps.config.outputs.config }} --yes --non-interactive
+        run: ./glasskube install "${{ matrix.change[0] }}" --repository="local" --version="${{ matrix.change[1] }}" ${{ steps.config.outputs.config }} --yes --non-interactive --no-progress
       - name: Check package status
         run: |
           ./glasskube describe "${{ matrix.change[0] }}" | grep -E "Status: *Ready"
+
+  conclusion:
+    name: package_install_conclusion
+    runs-on: ubuntu-latest
+    needs:
+      - setup
+      - test
+    if: always() && github.event_name == 'pull_request'
+    steps:
+      - run: |
+          CHANGES='${{ needs.setup.outputs.changes }}'
+          TEST_RESULT='${{ needs.test.result }}'
+
+          if [[ "$TEST_RESULT" = "failure" ]] || [[ "$TEST_RESULT" = "cancelled" ]]; then
+            echo "test job has result $TEST_RESULT --> error"
+            exit 1
+          fi
+
+          if [[ "$TEST_RESULT" = "skipped" ]] && [[ "$CHANGES" != "[]" ]]; then
+            echo "test job has result $TEST_RESULT but changes is not empty --> error"
+            exit 1
+          fi
+
+          echo "test job has result $TEST_RESULT --> ok"
