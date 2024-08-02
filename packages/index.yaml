@@ -34,6 +34,10 @@ packages:
     name: glasskube-autoupdater
     scope: Cluster
     shortDescription: Opt-in to automatically update your Packages
+  - iconUrl: https://avatars.githubusercontent.com/u/1728152
+    latestVersion: v24.3.0+1
+    name: gpu-operator
+    shortDescription: Management of NVIDIA components needed to provision GPU
   - iconUrl: https://avatars.githubusercontent.com/u/122369679
     latestVersion: v0.25.0+1
     name: headlamp
