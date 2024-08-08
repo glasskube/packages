@@ -1,0 +1,239 @@
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  labels:
+    app.kubernetes.io/name: serviceaccount
+    app.kubernetes.io/instance: glasskube-ui-sa
+    app.kubernetes.io/component: rbac
+  name: glasskube-ui-sa
+  namespace: glasskube-system
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: glasskube-ui-role
+rules:
+  - apiGroups:
+      - ""
+    resources:
+      - namespaces
+    verbs:
+      - create
+      - get
+      - list
+      - update
+      - watch
+  - apiGroups:
+      - ""
+    resources:
+      - events
+    verbs:
+      - create
+      - patch
+  - apiGroups:
+      - helm.toolkit.fluxcd.io
+    resources:
+      - helmreleases
+    verbs:
+      - create
+      - get
+      - list
+      - update
+      - watch
+  - apiGroups:
+      - packages.glasskube.dev
+    resources:
+      - clusterpackages
+    verbs:
+      - create
+      - delete
+      - get
+      - list
+      - patch
+      - update
+      - watch
+  - apiGroups:
+      - packages.glasskube.dev
+    resources:
+      - clusterpackages/finalizers
+    verbs:
+      - update
+  - apiGroups:
+      - packages.glasskube.dev
+    resources:
+      - clusterpackages/status
+    verbs:
+      - get
+      - patch
+      - update
+  - apiGroups:
+      - packages.glasskube.dev
+    resources:
+      - packageinfos
+    verbs:
+      - create
+      - delete
+      - get
+      - list
+      - patch
+      - update
+      - watch
+  - apiGroups:
+      - packages.glasskube.dev
+    resources:
+      - packageinfos/finalizers
+    verbs:
+      - update
+  - apiGroups:
+      - packages.glasskube.dev
+    resources:
+      - packageinfos/status
+    verbs:
+      - get
+      - patch
+      - update
+  - apiGroups:
+      - packages.glasskube.dev
+    resources:
+      - packagerepositories
+    verbs:
+      - create
+      - delete
+      - get
+      - list
+      - patch
+      - update
+      - watch
+  - apiGroups:
+      - packages.glasskube.dev
+    resources:
+      - packagerepositories/finalizers
+    verbs:
+      - update
+  - apiGroups:
+      - packages.glasskube.dev
+    resources:
+      - packagerepositories/status
+    verbs:
+      - get
+      - patch
+      - update
+  - apiGroups:
+      - packages.glasskube.dev
+    resources:
+      - packages
+    verbs:
+      - create
+      - delete
+      - get
+      - list
+      - patch
+      - update
+      - watch
+  - apiGroups:
+      - packages.glasskube.dev
+    resources:
+      - packages/finalizers
+    verbs:
+      - update
+  - apiGroups:
+      - packages.glasskube.dev
+    resources:
+      - packages/status
+    verbs:
+      - get
+      - patch
+      - update
+  - apiGroups:
+      - source.toolkit.fluxcd.io
+    resources:
+      - helmrepositories
+    verbs:
+      - create
+      - get
+      - list
+      - update
+      - watch
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  labels:
+    app.kubernetes.io/name: clusterrolebinding
+    app.kubernetes.io/instance: glasskube-ui-rolebinding
+    app.kubernetes.io/component: rbac
+  name: glasskube-ui-rolebinding
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: cluster-admin
+subjects:
+  - kind: ServiceAccount
+    name: glasskube-ui-sa
+    namespace: glasskube-system
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: glasskube-ui
+  namespace: glasskube-system
+spec:
+  selector:
+    matchLabels:
+      app: glasskube-ui
+  template:
+    metadata:
+      labels:
+        app: glasskube-ui
+    spec:
+      containers:
+      - image: ghcr.io/glasskube/glasskube:v0.16.0
+        imagePullPolicy: IfNotPresent
+        name: glasskube
+        ports:
+          - name: http
+            containerPort: 8580
+        args:
+          - serve
+          - --host=
+      restartPolicy: Always
+      securityContext:
+        runAsNonRoot: true
+      serviceAccountName: glasskube-ui-sa
+      terminationGracePeriodSeconds: 30
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: glasskube-ui
+  name: glasskube-ui
+  namespace: glasskube-system
+spec:
+  ports:
+    - name: http
+      protocol: TCP
+      port: 8580
+      targetPort: http
+  selector:
+    app: glasskube-ui
+  type: NodePort
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: glasskube-ui
+  namespace: glasskube-system
+spec:
+  rules:
+    - host: glasskube-ui
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: glasskube-ui
+                port:
+                  name: http

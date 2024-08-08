@@ -1,0 +1,24 @@
+# yaml-language-server: $schema=https://glasskube.dev/schemas/v1/package-manifest.json
+name: glasskube-ui
+defaultNamespace: glasskube-system
+scope: Cluster
+shortDescription: Run the Glasskube UI inside the cluster
+manifests:
+  - url: http://localhost:9090/packages/glasskube-ui/v0.16.0+1/manifests.yaml
+references:
+  - label: GitHub
+    url: https://github.com/glasskube/glasskube
+valueDefinitions:
+  host:
+    type: text
+    targets:
+      - patch:
+          op: add
+          path: /spec/rules/0/host
+        resource:
+          apiGroup: networking.k8s.io/v1
+          kind: Ingress
+          name: glasskube-ui
+          namespace: glasskube-system
+    constraints:
+      required: true
