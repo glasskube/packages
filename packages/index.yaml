@@ -17,6 +17,10 @@ packages:
     latestVersion: v1.15.2+1
     name: cert-manager
     shortDescription: X.509 certificate management for Kubernetes and OpenShift
+  - iconUrl: https://avatars.githubusercontent.com/u/54801242
+    latestVersion: v0.23.7+1
+    name: clickhouse-operator
+    shortDescription: Altinity Kubernetes Operator for ClickHouse
   - iconUrl: https://github.com/glasskube/glasskube/assets/16959694/99f3192a-587f-4eb9-884d-62800c022992
     latestVersion: v1.23.3+1
     name: cloudnative-pg

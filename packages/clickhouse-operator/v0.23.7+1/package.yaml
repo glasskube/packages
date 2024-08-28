@@ -1,0 +1,30 @@
+# yaml-language-server: $schema=https://glasskube.dev/schemas/v1/package-manifest.json
+
+name: clickhouse-operator
+iconUrl: https://avatars.githubusercontent.com/u/54801242
+shortDescription: Altinity Kubernetes Operator for ClickHouse
+longDescription: >
+  ClickHouse® is an open-source column-oriented database management system
+  that allows generating analytical data reports in real-time.
+
+references:
+  - label: ArtifactHub
+    url: https://artifacthub.io/packages/helm/altinity-clickhouse-operator/altinity-clickhouse-operator
+  - label: GitHub
+    url: https://github.com/Altinity/clickhouse-operator
+  - label: Documentation
+    url: https://github.com/Altinity/clickhouse-operator/tree/master/docs
+defaultNamespace: clickhouse-system
+manifests:
+  - url: https://raw.githubusercontent.com/Altinity/clickhouse-operator/0.23.6/deploy/helm/clickhouse-operator/crds/CustomResourceDefinition-clickhouseinstallations.clickhouse.altinity.com.yaml
+  - url: https://raw.githubusercontent.com/Altinity/clickhouse-operator/0.23.6/deploy/helm/clickhouse-operator/crds/CustomResourceDefinition-clickhouseinstallationtemplates.clickhouse.altinity.com.yaml
+  - url: https://raw.githubusercontent.com/Altinity/clickhouse-operator/0.23.6/deploy/helm/clickhouse-operator/crds/CustomResourceDefinition-clickhouseoperatorconfigurations.clickhouse.altinity.com.yaml
+helm:
+  chartName: altinity-clickhouse-operator
+  chartVersion: 0.23.7
+  repositoryUrl: https://docs.altinity.com/clickhouse-operator/
+  values:
+    fullnameOverride: clickhouse-operator
+    metrics:
+      enabled: false
+
