@@ -61,6 +61,16 @@ packages:
     latestVersion: v2.1.0+1
     name: keptn
     shortDescription: Toolkit for cloud-native application lifecycle management
+  - iconUrl: https://avatars.githubusercontent.com/u/4921466
+    latestVersion: v25.0.2+1
+    name: keycloak-operator
+    scope: Namespaced
+    shortDescription: Open Source Identity and Access Management
+  - iconUrl: https://avatars.githubusercontent.com/u/4921466
+    latestVersion: v25.0.2+1
+    name: keycloak-operator-crds
+    scope: Cluster
+    shortDescription: Open Source Identity and Access Management
   - iconUrl: https://avatars.githubusercontent.com/u/66682517
     latestVersion: v61.6.0+1
     name: kube-prometheus-stack
