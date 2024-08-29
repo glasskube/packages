@@ -102,6 +102,11 @@ packages:
     latestVersion: v2.9.0+1
     name: rabbitmq-operator
     shortDescription: Kubernetes operator to deploy and manage RabbitMQ clusters
+  - iconUrl: https://avatars.githubusercontent.com/u/1529926
+    latestVersion: v7.4.0+1
+    name: redis
+    scope: Namespaced
+    shortDescription: In-memory database
   - iconUrl: https://avatars.githubusercontent.com/u/34656521
     latestVersion: v2.15.3+1
     name: sealed-secrets
