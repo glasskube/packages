@@ -1,0 +1,10 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: tika
+spec:
+  ports:
+    - port: 9998
+      name: tika
+  selector:
+    app: tika
