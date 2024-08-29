@@ -1,6 +1,11 @@
 packages:
+  - iconUrl: https://avatars.githubusercontent.com/u/91915613
+    latestVersion: v0.12.20+1
+    name: akri
+    shortDescription: Akri lets you easily expose heterogeneous leaf devices (such
+      as IP cameras and USB devices) as resources in a Kubernetes cluster
   - iconUrl: https://avatars.githubusercontent.com/u/30269780
-    latestVersion: v2.11.3+1
+    latestVersion: v2.12.3+1
     name: argo-cd
     shortDescription: Declarative Continuous Deployment for Kubernetes
   - iconUrl: https://avatars.githubusercontent.com/u/12955528
@@ -9,15 +14,19 @@ packages:
     scope: Cluster
     shortDescription: This is the Kubernetes Ingress Controller for Caddy
   - iconUrl: https://avatars.githubusercontent.com/u/39950598
-    latestVersion: v1.15.1+1
+    latestVersion: v1.15.3+1
     name: cert-manager
     shortDescription: X.509 certificate management for Kubernetes and OpenShift
+  - iconUrl: https://avatars.githubusercontent.com/u/54801242
+    latestVersion: v0.23.7+1
+    name: clickhouse-operator
+    shortDescription: Altinity Kubernetes Operator for ClickHouse
   - iconUrl: https://github.com/glasskube/glasskube/assets/16959694/99f3192a-587f-4eb9-884d-62800c022992
-    latestVersion: v1.23.2+1
+    latestVersion: v1.23.3+1
     name: cloudnative-pg
     shortDescription: A comprehensive platform designed to seamlessly manage PostgreSQL databases
   - iconUrl: https://cyclops-ui.com/img/logo.png
-    latestVersion: v0.7.3+1
+    latestVersion: v0.9.1+1
     name: cyclops
     shortDescription: Developer friendly Kubernetes
   - iconUrl: https://avatars.githubusercontent.com/u/36015203
@@ -25,14 +34,23 @@ packages:
     name: gateway-api
     shortDescription: The Gateway API provides a standardized way to configure and
       manage network traffic routing in Kubernetes clusters.
+  - latestVersion: v0.14.0+1
+    name: glasskube-autoupdater
+    scope: Cluster
+    shortDescription: Opt-in to automatically update your Packages
+  - iconUrl: https://avatars.githubusercontent.com/u/1728152
+    latestVersion: v24.6.1+1
+    name: gpu-operator
+    shortDescription: Management of NVIDIA components needed to provision GPU
   - iconUrl: https://avatars.githubusercontent.com/u/122369679
-    latestVersion: v0.24.1+1
+    latestVersion: v0.25.0+1
     name: headlamp
     scope: Cluster
     shortDescription: A Kubernetes web UI that is fully-featured, user-friendly and extensible.
   - iconUrl: https://avatars.githubusercontent.com/u/13629408
-    latestVersion: v1.9.5+1
+    latestVersion: v1.9.6+1
     name: ingress-nginx
+    scope: Namespaced
     shortDescription: ingress-nginx is an Ingress controller for Kubernetes using
       NGINX as a reverse proxy and load balancer.
   - iconUrl: https://avatars.githubusercontent.com/u/128535266?s=150
@@ -40,11 +58,21 @@ packages:
     name: k8sgpt-operator
     shortDescription: Automatic SRE Superpowers within your Kubernetes cluster
   - iconUrl: https://raw.githubusercontent.com/cncf/artwork/main/projects/keptn/icon/color/keptn-icon-color.svg
-    latestVersion: v2.0.0+1
+    latestVersion: v2.1.0+1
     name: keptn
     shortDescription: Toolkit for cloud-native application lifecycle management
+  - iconUrl: https://avatars.githubusercontent.com/u/4921466
+    latestVersion: v25.0.2+1
+    name: keycloak-operator
+    scope: Namespaced
+    shortDescription: Open Source Identity and Access Management
+  - iconUrl: https://avatars.githubusercontent.com/u/4921466
+    latestVersion: v25.0.2+1
+    name: keycloak-operator-crds
+    scope: Cluster
+    shortDescription: Open Source Identity and Access Management
   - iconUrl: https://avatars.githubusercontent.com/u/66682517
-    latestVersion: v58.6.1+1
+    latestVersion: v61.6.0+1
     name: kube-prometheus-stack
     shortDescription: Use Prometheus to monitor Kubernetes and applications running on Kubernetes
   - iconUrl: https://avatars.githubusercontent.com/u/13629408
@@ -52,11 +80,21 @@ packages:
     name: kubernetes-dashboard
     shortDescription: General-purpose web UI for Kubernetes clusters
   - iconUrl: https://avatars.githubusercontent.com/u/141319696
-    latestVersion: v0.5.6+1
+    latestVersion: v0.6.0+1
     name: kubetail
     shortDescription: Kubetail is a web-based, real-time log viewer for Kubernetes clusters
+  - iconUrl: https://avatars.githubusercontent.com/u/13629408
+    latestVersion: v0.16.4+1
+    name: node-feature-discovery
+    shortDescription: Detects hardware features available on each node in a
+      Kubernetes cluster, and advertises those features using node labels.
+  - iconUrl: https://avatars.githubusercontent.com/u/73504361
+    latestVersion: v1.11.1+1
+    name: qdrant
+    scope: Namespaced
+    shortDescription: High-Performance Vector Search at Scale
   - iconUrl: https://avatars.githubusercontent.com/u/98504233
-    latestVersion: v0.8.1+4
+    latestVersion: v0.8.1+5
     name: quickwit
     scope: Namespaced
     shortDescription: Cloud-native search engine for observability
@@ -64,7 +102,17 @@ packages:
     latestVersion: v2.9.0+1
     name: rabbitmq-operator
     shortDescription: Kubernetes operator to deploy and manage RabbitMQ clusters
+  - iconUrl: https://avatars.githubusercontent.com/u/1529926
+    latestVersion: v7.4.0+1
+    name: redis
+    scope: Namespaced
+    shortDescription: In-memory database
   - iconUrl: https://avatars.githubusercontent.com/u/34656521
     latestVersion: v2.15.3+1
     name: sealed-secrets
     shortDescription: A Kubernetes controller and tool for one-way encrypted Secrets
+  - iconUrl: https://avatars.githubusercontent.com/u/47359
+    latestVersion: v2.9.2+1
+    name: tika
+    scope: Namespaced
+    shortDescription: Content analysis toolkit
