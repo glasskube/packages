@@ -111,3 +111,8 @@ packages:
     latestVersion: v2.15.3+1
     name: sealed-secrets
     shortDescription: A Kubernetes controller and tool for one-way encrypted Secrets
+  - iconUrl: https://avatars.githubusercontent.com/u/47359
+    latestVersion: v2.9.2+1
+    name: tika
+    scope: Namespaced
+    shortDescription: Content analysis toolkit
