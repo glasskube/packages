@@ -88,6 +88,11 @@ packages:
     name: node-feature-discovery
     shortDescription: Detects hardware features available on each node in a
       Kubernetes cluster, and advertises those features using node labels.
+  - iconUrl: https://avatars.githubusercontent.com/u/73504361
+    latestVersion: v1.11.1+1
+    name: qdrant
+    scope: Namespaced
+    shortDescription: High-Performance Vector Search at Scale
   - iconUrl: https://avatars.githubusercontent.com/u/98504233
     latestVersion: v0.8.1+5
     name: quickwit
@@ -97,6 +102,11 @@ packages:
     latestVersion: v2.9.0+1
     name: rabbitmq-operator
     shortDescription: Kubernetes operator to deploy and manage RabbitMQ clusters
+  - iconUrl: https://avatars.githubusercontent.com/u/1529926
+    latestVersion: v7.4.0+1
+    name: redis
+    scope: Namespaced
+    shortDescription: In-memory database
   - iconUrl: https://avatars.githubusercontent.com/u/34656521
     latestVersion: v2.15.3+1
     name: sealed-secrets
