@@ -1,0 +1,12 @@
+# yaml-language-server: $schema=https://glasskube.dev/schemas/v1/package-manifest.json
+name: tika
+iconUrl: https://avatars.githubusercontent.com/u/47359
+shortDescription: Content analysis toolkit
+longDescription: |
+  The Apache Tika toolkit detects and extracts metadata and text from over a thousand different file types
+  (such as PPT, XLS, and PDF).
+defaultNamespace: default
+scope: Namespaced
+manifests:
+  - url: ./deployment.yaml
+  - url: ./service.yaml
