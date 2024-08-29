@@ -8,6 +8,10 @@ packages:
     latestVersion: v2.12.3+1
     name: argo-cd
     shortDescription: Declarative Continuous Deployment for Kubernetes
+  - iconUrl: https://avatars.githubusercontent.com/u/30269780
+    latestVersion: v3.5.8+1
+    name: argo-workflows
+    shortDescription: Kubernetes-native workflow engine supporting DAG and step-based workflows.
   - iconUrl: https://avatars.githubusercontent.com/u/12955528
     latestVersion: v1.1.0+1
     name: caddy-ingress-controller
