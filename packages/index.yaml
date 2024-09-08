@@ -89,7 +89,7 @@ packages:
     shortDescription: Detects hardware features available on each node in a
       Kubernetes cluster, and advertises those features using node labels.
   - iconUrl: https://avatars.githubusercontent.com/u/73504361
-    latestVersion: v1.11.1+1
+    latestVersion: v1.11.3+1
     name: qdrant
     scope: Namespaced
     shortDescription: High-Performance Vector Search at Scale
