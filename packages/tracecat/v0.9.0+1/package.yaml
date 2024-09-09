@@ -40,7 +40,6 @@ valueDefinitions:
           apiGroup: v1
           kind: ConfigMap
           name: tracecat-config
-          namespace: tracecat # TODO
       - patch:
           op: add
           path: /data/PUBLIC_API_URL
@@ -50,4 +49,3 @@ valueDefinitions:
           apiGroup: v1
           kind: ConfigMap
           name: tracecat-config
-          namespace: tracecat # TODO

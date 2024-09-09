@@ -40,10 +40,10 @@ spec:
       labels:
         app: tracecat-api
     spec:
-      initContainers:
-        - name: service-key-generator
-          image: busybox:1.30
-          command: [ 'sh', '-c', 'openssl rand -hex 32' ]
+#      initContainers:
+#        - name: service-key-generator
+#          image: busybox:1.30
+#          command: [ 'sh', '-c', 'openssl rand -hex 32' ]
       containers:
         - name: tracecat-api
           image: "ghcr.io/tracecathq/tracecat:0.9.0"
