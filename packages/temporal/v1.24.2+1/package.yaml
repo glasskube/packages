@@ -69,6 +69,16 @@ transformations:
         patch:
           op: add
           path: /server/config/persistence/visibility/sql/existingSecret
+      - chartName: temporal
+        valueTemplate: '"{{.}}-db-rw"'
+        patch:
+          op: add
+          path: /server/config/persistence/default/sql/host
+      - chartName: temporal
+        valueTemplate: '"{{.}}-db-rw"'
+        patch:
+          op: add
+          path: /server/config/persistence/visibility/sql/host
 references:
   - label: Website
     url: https://temporal.io/
