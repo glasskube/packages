@@ -121,3 +121,8 @@ packages:
     name: tika
     scope: Namespaced
     shortDescription: Content analysis toolkit
+  - iconUrl: https://avatars.githubusercontent.com/u/122049913
+    latestVersion: v0.11.8+1
+    name: trieve
+    scope: Namespaced
+    shortDescription: Infrastructure for search, recommendations, RAG, and analytics

@@ -1,0 +1,3468 @@
+apiVersion: v1
+data:
+  embedding_function.xml: |-
+    <functions>
+        <function>
+            <name>embed_p</name>
+            <type>executable_pool</type>
+            <pool_size>10</pool_size>
+            <send_chunk_header>true</send_chunk_header>
+            <format>TabSeparated</format>
+            <return_type>Array(Float32)</return_type>
+            <argument>
+                <type>String</type>
+            </argument>
+            <command>embed.py</command>
+        </function>
+    </functions>
+kind: ConfigMap
+metadata:
+  labels:
+    app.kubernetes.io/instance: trieve
+    app.kubernetes.io/name: trieve
+    app.kubernetes.io/part-of: trieve
+  name: trieve-clickhouse-functions
+  namespace: default
+---
+apiVersion: v1
+data:
+  load_embed.sh: |-
+    #!/usr/bin/env bash
+    echo "STARTING TRIEVE CLICKHOUSE INIT SCRIPT"
+
+    apt -qq update
+    apt -qq install -y python3 python3-pip
+
+    cat > requirements.txt << EOL
+    tenacity==8.4.1
+    requests==2.32.3
+    EOL
+
+    pip install -r requirements.txt
+
+    cat > /opt/user_scripts/embed.py << EOL
+    #!/usr/bin/python3
+    import sys
+    import requests
+    import os
+
+    request_timeout = 3
+
+
+    def completion_with_backoff(model_input):
+      url = os.getenv("EMBEDDING_SERVER_URL")
+      parameters = {"model": "dense-embeddings", "input": f"Search for {model_input}"}
+      headers = {
+        "Content-Type": "application/json",
+      }
+      try:
+        response = requests.post(
+          f"{url}/embeddings?api-version=2023-05-15",
+          headers=headers,
+          json=parameters,
+        )
+        response.raise_for_status()
+        return [embedding["embedding"] for embedding in response.json()["data"]][0]
+      except requests.exceptions.RequestException as e:
+        raise Exception("Failed to send message to embedding server") from e
+      except Exception as e:
+        raise Exception("Failed to get text from embeddings") from e
+
+
+    def embed(text):
+      if text == "":
+        return "NULL"
+      try:
+        response = completion_with_backoff(text)
+        return response
+      except:
+        return "ERROR"
+
+
+    for size in sys.stdin:
+      try:
+        # collect a batch for performance
+        for row in range(0, int(size)):
+          print(embed(sys.stdin.readline().strip()))
+        sys.stdout.flush()
+      except Exception as e:
+        print(f"ERROR: {e}")
+        sys.stdout.flush()
+        continue
+    EOL
+
+    chmod -v +x /opt/user_scripts/embed.py
+
+    echo "FINISHED TRIEVE CLICKHOUSE INIT SCRIPT"
+kind: ConfigMap
+metadata:
+  labels:
+    app.kubernetes.io/instance: trieve
+    app.kubernetes.io/name: trieve
+    app.kubernetes.io/part-of: trieve
+  name: trieve-clickhouse-scripts
+  namespace: default
+---
+apiVersion: v1
+data:
+  ADMIN_API_KEY: admin
+  ADMIN_DASHBOARD_URL: http://localhost:5173
+  ANTHROPIC_API_KEY: sk-************************************************
+  BASE_SERVER_URL: http://api.localtrieve.com
+  BM25_ACTIVE: "true"
+  CLICKHOUSE_DB: default
+  CLICKHOUSE_DSN: clickhouse://default:password@clickhouse-trieve-clickhouse:8123/default
+  CLICKHOUSE_PASSWORD: password
+  CLICKHOUSE_URL: http://clickhouse-trieve-clickhouse:8123
+  CLICKHOUSE_USER: default
+  COOKIE_SECURE: "false"
+  CREATE_QDRANT_COLLECTIONS: "true"
+  EMBEDDING_SERVER_ORIGIN: http://trieve-embedding-bgem3
+  EMBEDDING_SERVER_ORIGIN_BGEM3: http://trieve-embedding-bgem3
+  EMBEDDING_SERVER_ORIGIN_JINA_CODE: http://trieve-embedding-jina
+  GPU_SERVER_ORIGIN: http://localhost:7070
+  JINA_CODE_API_KEY: ""
+  LLM_API_KEY: sk-************************************************
+  OIDC_AUTH_REDIRECT_URL: http://trieve-keycloak-service:8080/realms/trieve/protocol/openid-connect/auth
+  OIDC_CLIENT_ID: trieve
+  OIDC_CLIENT_SECRET: YllmLDTy67MbsUBrUAWvQ7z9aMq0QcKx
+  OIDC_ISSUER_URL: http://trieve-keycloak-service:8080/realms/trieve
+  OPENAI_API_KEY: sk-************************************************
+  OPENAI_BASE_URL: https://api.openai.com/v1
+  QDRANT_URL: http://trieve-qdrant-qdrant:6334
+  QUANTIZE_VECTORS: "false"
+  REDIS_CONNECTIONS: "2"
+  REDIS_URL: redis://redis:6379
+  REPLICATION_FACTOR: "2"
+  RERANKER_SERVER_ORIGIN: http://trieve-embedding-reranker
+  RUST_LOG: INFO
+  S3_ACCESS_KEY: ""
+  S3_BUCKET: ""
+  S3_ENDPOINT: ""
+  S3_SECRET_KEY: ""
+  SALT: ""
+  SECRET_KEY: "01234012340123401234012340123401234012340123401234012340123401234012340123401234"
+  SENTRY_URL: https://********************************@sentry.trieve.ai/6
+  SMTP_EMAIL_ADDRESS: noreply@trieve.ai
+  SMTP_PASSWORD: FROM SECRET
+  SMTP_RELAY: smtp.fastmail.com
+  SMTP_USERNAME: noreply@trieve.ai
+  SPARSE_SERVER_DOC_ORIGIN: http://trieve-embedding-splade-doc
+  SPARSE_SERVER_QUERY_ORIGIN: http://trieve-embedding-splade-query
+  STRIPE_SECRET: ""
+  STRIPE_WEBHOOK_SECRET: ""
+  TIKA_URL: http://tika:9998
+  UNLIMITED: "true"
+  USE_ANALYTICS: "true"
+  VECTOR_SIZES: 384,512,768,1024,1536,3072
+kind: ConfigMap
+metadata:
+  labels:
+    app.kubernetes.io/instance: trieve
+    app.kubernetes.io/name: trieve
+    app.kubernetes.io/part-of: trieve
+  name: trieve-server-config
+  namespace: default
+---
+apiVersion: v1
+data:
+  VITE_ANALYTICS_UI_URL: http://analytics.localtrieve.com
+  VITE_API_HOST: http://api.localtrieve.com/api
+  VITE_BM25_ACTIVE: "true"
+  VITE_CHAT_UI_URL: http://chat.localtrieve.com
+  VITE_DASHBOARD_URL: http://dashboard.localtrieve.com
+  VITE_SEARCH_UI_URL: http://search.localtrieve.com
+kind: ConfigMap
+metadata:
+  labels:
+    app.kubernetes.io/instance: trieve
+    app.kubernetes.io/name: trieve
+    app.kubernetes.io/part-of: trieve
+  name: trieve-ui-config
+  namespace: default
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app.kubernetes.io/component: embedding-bgem3
+    app.kubernetes.io/instance: trieve
+    app.kubernetes.io/name: trieve
+    app.kubernetes.io/part-of: trieve
+  name: trieve-embedding-bgem3
+  namespace: default
+spec:
+  ports:
+  - name: svc
+    port: 80
+    protocol: TCP
+    targetPort: 80
+  selector:
+    app.kubernetes.io/component: embedding-bgem3
+    app.kubernetes.io/instance: trieve
+    app.kubernetes.io/name: trieve
+    app.kubernetes.io/part-of: trieve
+  type: ClusterIP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app.kubernetes.io/component: embedding-jina
+    app.kubernetes.io/instance: trieve
+    app.kubernetes.io/name: trieve
+    app.kubernetes.io/part-of: trieve
+  name: trieve-embedding-jina
+  namespace: default
+spec:
+  ports:
+  - name: svc
+    port: 80
+    protocol: TCP
+    targetPort: 80
+  selector:
+    app.kubernetes.io/component: embedding-jina
+    app.kubernetes.io/instance: trieve
+    app.kubernetes.io/name: trieve
+    app.kubernetes.io/part-of: trieve
+  type: ClusterIP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app.kubernetes.io/component: embedding-reranker
+    app.kubernetes.io/instance: trieve
+    app.kubernetes.io/name: trieve
+    app.kubernetes.io/part-of: trieve
+  name: trieve-embedding-reranker
+  namespace: default
+spec:
+  ports:
+  - name: svc
+    port: 80
+    protocol: TCP
+    targetPort: 80
+  selector:
+    app.kubernetes.io/component: embedding-reranker
+    app.kubernetes.io/instance: trieve
+    app.kubernetes.io/name: trieve
+    app.kubernetes.io/part-of: trieve
+  type: ClusterIP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app.kubernetes.io/component: embedding-splade-doc
+    app.kubernetes.io/instance: trieve
+    app.kubernetes.io/name: trieve
+    app.kubernetes.io/part-of: trieve
+  name: trieve-embedding-splade-doc
+  namespace: default
+spec:
+  ports:
+  - name: svc
+    port: 80
+    protocol: TCP
+    targetPort: 80
+  selector:
+    app.kubernetes.io/component: embedding-splade-doc
+    app.kubernetes.io/instance: trieve
+    app.kubernetes.io/name: trieve
+    app.kubernetes.io/part-of: trieve
+  type: ClusterIP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app.kubernetes.io/component: embedding-splade-query
+    app.kubernetes.io/instance: trieve
+    app.kubernetes.io/name: trieve
+    app.kubernetes.io/part-of: trieve
+  name: trieve-embedding-splade-query
+  namespace: default
+spec:
+  ports:
+  - name: svc
+    port: 80
+    protocol: TCP
+    targetPort: 80
+  selector:
+    app.kubernetes.io/component: embedding-splade-query
+    app.kubernetes.io/instance: trieve
+    app.kubernetes.io/name: trieve
+    app.kubernetes.io/part-of: trieve
+  type: ClusterIP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app.kubernetes.io/component: trieve-server
+    app.kubernetes.io/instance: trieve
+    app.kubernetes.io/name: trieve
+    app.kubernetes.io/part-of: trieve
+  name: trieve-server
+  namespace: default
+spec:
+  ports:
+  - name: server
+    port: 8090
+  selector:
+    app.kubernetes.io/component: trieve-server
+    app.kubernetes.io/instance: trieve
+    app.kubernetes.io/name: trieve
+    app.kubernetes.io/part-of: trieve
+  type: ClusterIP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app.kubernetes.io/component: trieve-ui-analytics
+    app.kubernetes.io/instance: trieve
+    app.kubernetes.io/name: trieve
+    app.kubernetes.io/part-of: trieve
+  name: trieve-ui-analytics
+  namespace: default
+spec:
+  ports:
+  - name: http
+    port: 80
+  selector:
+    app.kubernetes.io/component: trieve-ui-analytics
+    app.kubernetes.io/instance: trieve
+    app.kubernetes.io/name: trieve
+    app.kubernetes.io/part-of: trieve
+  type: ClusterIP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app.kubernetes.io/component: trieve-ui-chat
+    app.kubernetes.io/instance: trieve
+    app.kubernetes.io/name: trieve
+    app.kubernetes.io/part-of: trieve
+  name: trieve-ui-chat
+  namespace: default
+spec:
+  ports:
+  - name: http
+    port: 80
+  selector:
+    app.kubernetes.io/component: trieve-ui-chat
+    app.kubernetes.io/instance: trieve
+    app.kubernetes.io/name: trieve
+    app.kubernetes.io/part-of: trieve
+  type: ClusterIP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app.kubernetes.io/component: trieve-ui-dashboard
+    app.kubernetes.io/instance: trieve
+    app.kubernetes.io/name: trieve
+    app.kubernetes.io/part-of: trieve
+  name: trieve-ui-dashboard
+  namespace: default
+spec:
+  ports:
+  - name: http
+    port: 80
+  selector:
+    app.kubernetes.io/component: trieve-ui-dashboard
+    app.kubernetes.io/instance: trieve
+    app.kubernetes.io/name: trieve
+    app.kubernetes.io/part-of: trieve
+  type: ClusterIP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app.kubernetes.io/component: trieve-ui-search
+    app.kubernetes.io/instance: trieve
+    app.kubernetes.io/name: trieve
+    app.kubernetes.io/part-of: trieve
+  name: trieve-ui-search
+  namespace: default
+spec:
+  ports:
+  - name: http
+    port: 80
+  selector:
+    app.kubernetes.io/component: trieve-ui-search
+    app.kubernetes.io/instance: trieve
+    app.kubernetes.io/name: trieve
+    app.kubernetes.io/part-of: trieve
+  type: ClusterIP
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app.kubernetes.io/component: embedding-bgem3
+    app.kubernetes.io/instance: trieve
+    app.kubernetes.io/name: trieve
+    app.kubernetes.io/part-of: trieve
+  name: trieve-embedding-bgem3
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/component: embedding-bgem3
+      app.kubernetes.io/instance: trieve
+      app.kubernetes.io/name: trieve
+      app.kubernetes.io/part-of: trieve
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/component: embedding-bgem3
+        app.kubernetes.io/instance: trieve
+        app.kubernetes.io/name: trieve
+        app.kubernetes.io/part-of: trieve
+    spec:
+      containers:
+      - args:
+        - --model-id
+        - BAAI/bge-m3
+        image: ghcr.io/huggingface/text-embeddings-inference:cpu-1.4
+        name: embedding
+        ports:
+        - containerPort: 80
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 80
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app.kubernetes.io/component: embedding-jina
+    app.kubernetes.io/instance: trieve
+    app.kubernetes.io/name: trieve
+    app.kubernetes.io/part-of: trieve
+  name: trieve-embedding-jina
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/component: embedding-jina
+      app.kubernetes.io/instance: trieve
+      app.kubernetes.io/name: trieve
+      app.kubernetes.io/part-of: trieve
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/component: embedding-jina
+        app.kubernetes.io/instance: trieve
+        app.kubernetes.io/name: trieve
+        app.kubernetes.io/part-of: trieve
+    spec:
+      containers:
+      - args:
+        - --model-id
+        - jinaai/jina-embeddings-v2-base-en
+        - --revision
+        - main
+        image: ghcr.io/huggingface/text-embeddings-inference:cpu-1.4
+        name: embedding
+        ports:
+        - containerPort: 80
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 80
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app.kubernetes.io/component: embedding-reranker
+    app.kubernetes.io/instance: trieve
+    app.kubernetes.io/name: trieve
+    app.kubernetes.io/part-of: trieve
+  name: trieve-embedding-reranker
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/component: embedding-reranker
+      app.kubernetes.io/instance: trieve
+      app.kubernetes.io/name: trieve
+      app.kubernetes.io/part-of: trieve
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/component: embedding-reranker
+        app.kubernetes.io/instance: trieve
+        app.kubernetes.io/name: trieve
+        app.kubernetes.io/part-of: trieve
+    spec:
+      containers:
+      - args:
+        - --model-id
+        - BAAI/bge-reranker-base
+        - --revision
+        - main
+        image: ghcr.io/huggingface/text-embeddings-inference:cpu-1.4
+        name: embedding
+        ports:
+        - containerPort: 80
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 80
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app.kubernetes.io/component: embedding-splade-doc
+    app.kubernetes.io/instance: trieve
+    app.kubernetes.io/name: trieve
+    app.kubernetes.io/part-of: trieve
+  name: trieve-embedding-splade-doc
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/component: embedding-splade-doc
+      app.kubernetes.io/instance: trieve
+      app.kubernetes.io/name: trieve
+      app.kubernetes.io/part-of: trieve
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/component: embedding-splade-doc
+        app.kubernetes.io/instance: trieve
+        app.kubernetes.io/name: trieve
+        app.kubernetes.io/part-of: trieve
+    spec:
+      containers:
+      - args:
+        - --model-id
+        - naver/efficient-splade-VI-BT-large-doc
+        - --revision
+        - main
+        - --pooling
+        - splade
+        image: ghcr.io/huggingface/text-embeddings-inference:cpu-1.4
+        name: embedding
+        ports:
+        - containerPort: 80
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 80
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app.kubernetes.io/component: embedding-splade-query
+    app.kubernetes.io/instance: trieve
+    app.kubernetes.io/name: trieve
+    app.kubernetes.io/part-of: trieve
+  name: trieve-embedding-splade-query
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/component: embedding-splade-query
+      app.kubernetes.io/instance: trieve
+      app.kubernetes.io/name: trieve
+      app.kubernetes.io/part-of: trieve
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/component: embedding-splade-query
+        app.kubernetes.io/instance: trieve
+        app.kubernetes.io/name: trieve
+        app.kubernetes.io/part-of: trieve
+    spec:
+      containers:
+      - args:
+        - --model-id
+        - naver/efficient-splade-VI-BT-large-query
+        - --revision
+        - main
+        - --pooling
+        - splade
+        image: ghcr.io/huggingface/text-embeddings-inference:cpu-1.4
+        name: embedding
+        ports:
+        - containerPort: 80
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 80
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app.kubernetes.io/component: trieve-server
+    app.kubernetes.io/instance: trieve
+    app.kubernetes.io/name: trieve
+    app.kubernetes.io/part-of: trieve
+  name: trieve-server
+  namespace: default
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/component: trieve-server
+      app.kubernetes.io/instance: trieve
+      app.kubernetes.io/name: trieve
+      app.kubernetes.io/part-of: trieve
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/component: trieve-server
+        app.kubernetes.io/instance: trieve
+        app.kubernetes.io/name: trieve
+        app.kubernetes.io/part-of: trieve
+    spec:
+      containers:
+      - env:
+        - name: DATABASE_URL
+          valueFrom:
+            secretKeyRef:
+              key: uri
+              name: trieve-postgresql-server-app
+        - name: QDRANT_API_KEY
+          valueFrom:
+            secretKeyRef:
+              key: api-key
+              name: trieve-qdrant-qdrant-apikey
+        envFrom:
+        - configMapRef:
+            name: trieve-server-config
+        image: trieve/server:sha-d8b18ca
+        name: server
+        ports:
+        - containerPort: 8090
+        resources:
+          requests:
+            cpu: "1"
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app.kubernetes.io/component: trieve-ui-analytics
+    app.kubernetes.io/instance: trieve
+    app.kubernetes.io/name: trieve
+    app.kubernetes.io/part-of: trieve
+  name: trieve-ui-analytics
+  namespace: default
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/component: trieve-ui-analytics
+      app.kubernetes.io/instance: trieve
+      app.kubernetes.io/name: trieve
+      app.kubernetes.io/part-of: trieve
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/component: trieve-ui-analytics
+        app.kubernetes.io/instance: trieve
+        app.kubernetes.io/name: trieve
+        app.kubernetes.io/part-of: trieve
+    spec:
+      containers:
+      - envFrom:
+        - configMapRef:
+            name: trieve-ui-config
+        image: trieve/analytics-site:sha-ed22f21
+        name: ui
+        ports:
+        - containerPort: 80
+        resources: {}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app.kubernetes.io/component: trieve-ui-chat
+    app.kubernetes.io/instance: trieve
+    app.kubernetes.io/name: trieve
+    app.kubernetes.io/part-of: trieve
+  name: trieve-ui-chat
+  namespace: default
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/component: trieve-ui-chat
+      app.kubernetes.io/instance: trieve
+      app.kubernetes.io/name: trieve
+      app.kubernetes.io/part-of: trieve
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/component: trieve-ui-chat
+        app.kubernetes.io/instance: trieve
+        app.kubernetes.io/name: trieve
+        app.kubernetes.io/part-of: trieve
+    spec:
+      containers:
+      - envFrom:
+        - configMapRef:
+            name: trieve-ui-config
+        image: trieve/chat:sha-ed22f21
+        name: ui
+        ports:
+        - containerPort: 80
+        resources: {}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app.kubernetes.io/component: trieve-ui-dashboard
+    app.kubernetes.io/instance: trieve
+    app.kubernetes.io/name: trieve
+    app.kubernetes.io/part-of: trieve
+  name: trieve-ui-dashboard
+  namespace: default
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/component: trieve-ui-dashboard
+      app.kubernetes.io/instance: trieve
+      app.kubernetes.io/name: trieve
+      app.kubernetes.io/part-of: trieve
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/component: trieve-ui-dashboard
+        app.kubernetes.io/instance: trieve
+        app.kubernetes.io/name: trieve
+        app.kubernetes.io/part-of: trieve
+    spec:
+      containers:
+      - envFrom:
+        - configMapRef:
+            name: trieve-ui-config
+        image: trieve/dashboard:sha-ed22f21
+        name: ui
+        ports:
+        - containerPort: 80
+        resources: {}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app.kubernetes.io/component: trieve-ui-search
+    app.kubernetes.io/instance: trieve
+    app.kubernetes.io/name: trieve
+    app.kubernetes.io/part-of: trieve
+  name: trieve-ui-search
+  namespace: default
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/component: trieve-ui-search
+      app.kubernetes.io/instance: trieve
+      app.kubernetes.io/name: trieve
+      app.kubernetes.io/part-of: trieve
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/component: trieve-ui-search
+        app.kubernetes.io/instance: trieve
+        app.kubernetes.io/name: trieve
+        app.kubernetes.io/part-of: trieve
+    spec:
+      containers:
+      - envFrom:
+        - configMapRef:
+            name: trieve-ui-config
+        image: trieve/search:sha-ed22f21
+        name: ui
+        ports:
+        - containerPort: 80
+        resources: {}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app.kubernetes.io/component: worker-bktree
+    app.kubernetes.io/instance: trieve
+    app.kubernetes.io/name: trieve
+    app.kubernetes.io/part-of: trieve
+  name: trieve-worker-bktree
+  namespace: default
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/component: worker-bktree
+      app.kubernetes.io/instance: trieve
+      app.kubernetes.io/name: trieve
+      app.kubernetes.io/part-of: trieve
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/component: worker-bktree
+        app.kubernetes.io/instance: trieve
+        app.kubernetes.io/name: trieve
+        app.kubernetes.io/part-of: trieve
+    spec:
+      containers:
+      - env:
+        - name: DATABASE_URL
+          valueFrom:
+            secretKeyRef:
+              key: uri
+              name: trieve-postgresql-server-app
+        - name: QDRANT_API_KEY
+          valueFrom:
+            secretKeyRef:
+              key: api-key
+              name: trieve-qdrant-qdrant-apikey
+        envFrom:
+        - configMapRef:
+            name: trieve-server-config
+        image: trieve/bktree-worker
+        name: worker
+        ports:
+        - containerPort: 80
+        resources:
+          limits:
+            cpu: "1"
+            memory: 200Mi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app.kubernetes.io/component: worker-queuebm25
+    app.kubernetes.io/instance: trieve
+    app.kubernetes.io/name: trieve
+    app.kubernetes.io/part-of: trieve
+  name: trieve-worker-bm25
+  namespace: default
+spec:
+  replicas: 0
+  selector:
+    matchLabels:
+      app.kubernetes.io/component: worker-queuebm25
+      app.kubernetes.io/instance: trieve
+      app.kubernetes.io/name: trieve
+      app.kubernetes.io/part-of: trieve
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/component: worker-queuebm25
+        app.kubernetes.io/instance: trieve
+        app.kubernetes.io/name: trieve
+        app.kubernetes.io/part-of: trieve
+    spec:
+      containers:
+      - env:
+        - name: DATABASE_URL
+          valueFrom:
+            secretKeyRef:
+              key: uri
+              name: trieve-postgresql-server-app
+        - name: QDRANT_API_KEY
+          valueFrom:
+            secretKeyRef:
+              key: api-key
+              name: trieve-qdrant-qdrant-apikey
+        envFrom:
+        - configMapRef:
+            name: trieve-server-config
+        image: trieve/queue-bm25-migration
+        name: worker
+        ports:
+        - containerPort: 80
+        resources:
+          limits:
+            cpu: "1"
+            memory: 200Mi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app.kubernetes.io/component: worker-delete
+    app.kubernetes.io/instance: trieve
+    app.kubernetes.io/name: trieve
+    app.kubernetes.io/part-of: trieve
+  name: trieve-worker-delete
+  namespace: default
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/component: worker-delete
+      app.kubernetes.io/instance: trieve
+      app.kubernetes.io/name: trieve
+      app.kubernetes.io/part-of: trieve
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/component: worker-delete
+        app.kubernetes.io/instance: trieve
+        app.kubernetes.io/name: trieve
+        app.kubernetes.io/part-of: trieve
+    spec:
+      containers:
+      - env:
+        - name: DATABASE_URL
+          valueFrom:
+            secretKeyRef:
+              key: uri
+              name: trieve-postgresql-server-app
+        - name: QDRANT_API_KEY
+          valueFrom:
+            secretKeyRef:
+              key: api-key
+              name: trieve-qdrant-qdrant-apikey
+        envFrom:
+        - configMapRef:
+            name: trieve-server-config
+        image: trieve/delete_worker:sha-d8b18ca
+        name: worker
+        ports:
+        - containerPort: 80
+        resources:
+          limits:
+            cpu: "1"
+            memory: 200Mi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app.kubernetes.io/component: worker-file
+    app.kubernetes.io/instance: trieve
+    app.kubernetes.io/name: trieve
+    app.kubernetes.io/part-of: trieve
+  name: trieve-worker-file
+  namespace: default
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/component: worker-file
+      app.kubernetes.io/instance: trieve
+      app.kubernetes.io/name: trieve
+      app.kubernetes.io/part-of: trieve
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/component: worker-file
+        app.kubernetes.io/instance: trieve
+        app.kubernetes.io/name: trieve
+        app.kubernetes.io/part-of: trieve
+    spec:
+      containers:
+      - env:
+        - name: DATABASE_URL
+          valueFrom:
+            secretKeyRef:
+              key: uri
+              name: trieve-postgresql-server-app
+        - name: QDRANT_API_KEY
+          valueFrom:
+            secretKeyRef:
+              key: api-key
+              name: trieve-qdrant-qdrant-apikey
+        envFrom:
+        - configMapRef:
+            name: trieve-server-config
+        image: trieve/file_worker:sha-d8b18ca
+        name: worker
+        ports:
+        - containerPort: 80
+        resources:
+          limits:
+            cpu: "1"
+            memory: 200Mi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app.kubernetes.io/component: worker-file
+    app.kubernetes.io/instance: trieve
+    app.kubernetes.io/name: trieve
+    app.kubernetes.io/part-of: trieve
+  name: trieve-worker-group
+  namespace: default
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/component: worker-file
+      app.kubernetes.io/instance: trieve
+      app.kubernetes.io/name: trieve
+      app.kubernetes.io/part-of: trieve
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/component: worker-file
+        app.kubernetes.io/instance: trieve
+        app.kubernetes.io/name: trieve
+        app.kubernetes.io/part-of: trieve
+    spec:
+      containers:
+      - env:
+        - name: DATABASE_URL
+          valueFrom:
+            secretKeyRef:
+              key: uri
+              name: trieve-postgresql-server-app
+        - name: QDRANT_API_KEY
+          valueFrom:
+            secretKeyRef:
+              key: api-key
+              name: trieve-qdrant-qdrant-apikey
+        envFrom:
+        - configMapRef:
+            name: trieve-server-config
+        image: trieve/group_worker:sha-d8b18ca
+        name: worker
+        ports:
+        - containerPort: 80
+        resources:
+          limits:
+            cpu: "1"
+            memory: 200Mi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app.kubernetes.io/component: worker-file
+    app.kubernetes.io/instance: trieve
+    app.kubernetes.io/name: trieve
+    app.kubernetes.io/part-of: trieve
+  name: trieve-worker-ingest
+  namespace: default
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/component: worker-file
+      app.kubernetes.io/instance: trieve
+      app.kubernetes.io/name: trieve
+      app.kubernetes.io/part-of: trieve
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/component: worker-file
+        app.kubernetes.io/instance: trieve
+        app.kubernetes.io/name: trieve
+        app.kubernetes.io/part-of: trieve
+    spec:
+      containers:
+      - env:
+        - name: DATABASE_URL
+          valueFrom:
+            secretKeyRef:
+              key: uri
+              name: trieve-postgresql-server-app
+        - name: QDRANT_API_KEY
+          valueFrom:
+            secretKeyRef:
+              key: api-key
+              name: trieve-qdrant-qdrant-apikey
+        envFrom:
+        - configMapRef:
+            name: trieve-server-config
+        image: trieve/ingest:sha-d8b18ca
+        name: worker
+        ports:
+        - containerPort: 80
+        resources:
+          limits:
+            cpu: "1"
+            memory: 200Mi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app.kubernetes.io/component: worker-reindexer
+    app.kubernetes.io/instance: trieve
+    app.kubernetes.io/name: trieve
+    app.kubernetes.io/part-of: trieve
+  name: trieve-worker-reindexer
+  namespace: default
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/component: worker-reindexer
+      app.kubernetes.io/instance: trieve
+      app.kubernetes.io/name: trieve
+      app.kubernetes.io/part-of: trieve
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/component: worker-reindexer
+        app.kubernetes.io/instance: trieve
+        app.kubernetes.io/name: trieve
+        app.kubernetes.io/part-of: trieve
+    spec:
+      containers:
+      - env:
+        - name: DATABASE_URL
+          valueFrom:
+            secretKeyRef:
+              key: uri
+              name: trieve-postgresql-server-app
+        - name: QDRANT_API_KEY
+          valueFrom:
+            secretKeyRef:
+              key: api-key
+              name: trieve-qdrant-qdrant-apikey
+        envFrom:
+        - configMapRef:
+            name: trieve-server-config
+        image: trieve/reindex-worker
+        name: worker
+        ports:
+        - containerPort: 80
+        resources:
+          limits:
+            cpu: "1"
+            memory: 200Mi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app.kubernetes.io/component: worker-sync-qdrant
+    app.kubernetes.io/instance: trieve
+    app.kubernetes.io/name: trieve
+    app.kubernetes.io/part-of: trieve
+  name: trieve-worker-sync-qdrant
+  namespace: default
+spec:
+  replicas: 0
+  selector:
+    matchLabels:
+      app.kubernetes.io/component: worker-sync-qdrant
+      app.kubernetes.io/instance: trieve
+      app.kubernetes.io/name: trieve
+      app.kubernetes.io/part-of: trieve
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/component: worker-sync-qdrant
+        app.kubernetes.io/instance: trieve
+        app.kubernetes.io/name: trieve
+        app.kubernetes.io/part-of: trieve
+    spec:
+      containers:
+      - env:
+        - name: DATABASE_URL
+          valueFrom:
+            secretKeyRef:
+              key: uri
+              name: trieve-postgresql-server-app
+        - name: QDRANT_API_KEY
+          valueFrom:
+            secretKeyRef:
+              key: api-key
+              name: trieve-qdrant-qdrant-apikey
+        envFrom:
+        - configMapRef:
+            name: trieve-server-config
+        image: trieve/sync_qdrant:sha-d8b18ca
+        name: worker
+        ports:
+        - containerPort: 80
+        resources:
+          limits:
+            cpu: "1"
+            memory: 200Mi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app.kubernetes.io/component: worker-words
+    app.kubernetes.io/instance: trieve
+    app.kubernetes.io/name: trieve
+    app.kubernetes.io/part-of: trieve
+  name: trieve-worker-word
+  namespace: default
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/component: worker-words
+      app.kubernetes.io/instance: trieve
+      app.kubernetes.io/name: trieve
+      app.kubernetes.io/part-of: trieve
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/component: worker-words
+        app.kubernetes.io/instance: trieve
+        app.kubernetes.io/name: trieve
+        app.kubernetes.io/part-of: trieve
+    spec:
+      containers:
+      - env:
+        - name: DATABASE_URL
+          valueFrom:
+            secretKeyRef:
+              key: uri
+              name: trieve-postgresql-server-app
+        - name: QDRANT_API_KEY
+          valueFrom:
+            secretKeyRef:
+              key: api-key
+              name: trieve-qdrant-qdrant-apikey
+        envFrom:
+        - configMapRef:
+            name: trieve-server-config
+        image: trieve/word-worker
+        name: worker
+        ports:
+        - containerPort: 80
+        resources:
+          limits:
+            cpu: "1"
+            memory: 200Mi
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  labels:
+    app.kubernetes.io/instance: trieve
+    app.kubernetes.io/name: trieve
+    app.kubernetes.io/part-of: trieve
+  name: cluster-queries-cronjob
+  namespace: default
+spec:
+  concurrencyPolicy: Forbid
+  jobTemplate:
+    metadata:
+      labels:
+        app.kubernetes.io/instance: trieve
+        app.kubernetes.io/name: trieve
+        app.kubernetes.io/part-of: trieve
+    spec:
+      template:
+        metadata:
+          labels:
+            app.kubernetes.io/instance: trieve
+            app.kubernetes.io/name: trieve
+            app.kubernetes.io/part-of: trieve
+        spec:
+          containers:
+          - env:
+            - name: ANTHROPIC_API_KEY
+              valueFrom:
+                configMapKeyRef:
+                  key: ANTHROPIC_API_KEY
+                  name: trieve-server-config
+            - name: CLICKHOUSE_DSN
+              valueFrom:
+                configMapKeyRef:
+                  key: CLICKHOUSE_DSN
+                  name: trieve-server-config
+            image: trieve/clickhouse-clustering:sha-e55860a
+            imagePullPolicy: IfNotPresent
+            name: cluster-queries
+          restartPolicy: Never
+  schedule: 1 * * * *
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  labels:
+    app.kubernetes.io/instance: trieve
+    app.kubernetes.io/name: trieve
+    app.kubernetes.io/part-of: trieve
+  name: collapsing-queries-cronjob
+  namespace: default
+spec:
+  concurrencyPolicy: Forbid
+  jobTemplate:
+    metadata:
+      labels:
+        app.kubernetes.io/instance: trieve
+        app.kubernetes.io/name: trieve
+        app.kubernetes.io/part-of: trieve
+    spec:
+      template:
+        metadata:
+          labels:
+            app.kubernetes.io/instance: trieve
+            app.kubernetes.io/name: trieve
+            app.kubernetes.io/part-of: trieve
+        spec:
+          containers:
+          - env:
+            - name: CLICKHOUSE_DSN
+              valueFrom:
+                configMapKeyRef:
+                  key: CLICKHOUSE_DSN
+                  name: trieve-server-config
+            image: trieve/clickhouse-collapse-query-script:sha-5cdcd38
+            imagePullPolicy: IfNotPresent
+            name: collapsing-queries
+          restartPolicy: Never
+  schedule: '*/30 * * * *'
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  labels:
+    app.kubernetes.io/instance: trieve
+    app.kubernetes.io/name: trieve
+    app.kubernetes.io/part-of: trieve
+  name: trieve-word-id-cronjob
+  namespace: default
+spec:
+  concurrencyPolicy: Forbid
+  jobTemplate:
+    metadata:
+      labels:
+        app.kubernetes.io/instance: trieve
+        app.kubernetes.io/name: trieve
+        app.kubernetes.io/part-of: trieve
+    spec:
+      template:
+        metadata:
+          labels:
+            app.kubernetes.io/instance: trieve
+            app.kubernetes.io/name: trieve
+            app.kubernetes.io/part-of: trieve
+        spec:
+          containers:
+          - env:
+            - name: DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  key: uri
+                  name: trieve-postgresql-server-app
+            - name: QDRANT_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  key: api-key
+                  name: trieve-qdrant-qdrant-apikey
+            envFrom:
+            - configMapRef:
+                name: trieve-server-config
+            image: trieve/word-id-cronjob:sha-d8b18ca
+            name: word-id-cronjob
+            ports:
+            - containerPort: 8090
+          restartPolicy: OnFailure
+  schedule: 0 0 * * *
+---
+apiVersion: clickhouse.altinity.com/v1
+kind: ClickHouseInstallation
+metadata:
+  labels:
+    app.kubernetes.io/instance: trieve
+    app.kubernetes.io/name: trieve
+    app.kubernetes.io/part-of: trieve
+  name: trieve-clickhouse
+  namespace: default
+spec:
+  configuration:
+    clusters:
+    - layout:
+        replicasCount: 1
+        shardsCount: 1
+      name: cluster1
+      templates:
+        podTemplate: clickhouse-pod-template
+    settings:
+      user_defined_executable_functions_config: /opt/user_functions/*_function.xml
+      user_scripts_path: /opt/user_scripts
+    users:
+      default/networks/ip:
+      - 0.0.0.0/0
+      default/password: password
+  templates:
+    podTemplates:
+    - name: clickhouse-pod-template
+      spec:
+        containers:
+        - env:
+          - name: CLICKHOUSE_ALWAYS_RUN_INITDB_SCRIPTS
+            value: "true"
+          - name: EMBEDDING_SERVER_URL
+            value: http://trieve-embedding-bgem3
+          - name: CLICKHOUSE_ADMIN_PASSWORD
+            value: password
+          image: clickhouse/clickhouse-server:24.8
+          name: clickhouse
+          volumeMounts:
+          - mountPath: /opt/user_scripts
+            name: trieve-clickhouse-userscripts
+          - mountPath: /var/lib/clickhouse
+            name: trieve-clickhouse-data
+          - mountPath: /var/log/clickhouse-server
+            name: trieve-clickhouse-logs
+          - mountPath: /docker-entrypoint-initdb.d
+            name: trieve-clickhouse-scripts
+            readOnly: true
+          - mountPath: /opt/user_functions/
+            name: trieve-clickhouse-functions
+            readOnly: true
+        volumes:
+        - configMap:
+            defaultMode: 365
+            name: trieve-clickhouse-scripts
+          name: trieve-clickhouse-scripts
+        - configMap:
+            defaultMode: 365
+            name: trieve-clickhouse-functions
+          name: trieve-clickhouse-functions
+    volumeClaimTemplates:
+    - name: trieve-clickhouse-userscripts
+      spec:
+        accessModes:
+        - ReadWriteOnce
+        resources:
+          requests:
+            storage: 1Gi
+    - name: trieve-clickhouse-data
+      spec:
+        accessModes:
+        - ReadWriteOnce
+        resources:
+          requests:
+            storage: 2Gi
+    - name: trieve-clickhouse-logs
+      spec:
+        accessModes:
+        - ReadWriteOnce
+        resources:
+          requests:
+            storage: 2Gi
+---
+apiVersion: k8s.keycloak.org/v2alpha1
+kind: Keycloak
+metadata:
+  labels:
+    app.kubernetes.io/component: keycloak
+    app.kubernetes.io/instance: trieve
+    app.kubernetes.io/name: trieve
+    app.kubernetes.io/part-of: trieve
+  name: trieve-keycloak
+  namespace: default
+spec:
+  db:
+    host: trieve-keycloak-db-rw
+    passwordSecret:
+      key: password
+      name: trieve-keycloak-db-app
+    usernameSecret:
+      key: username
+      name: trieve-keycloak-db-app
+    vendor: postgres
+  hostname:
+    hostname: http://trieve-keycloak-service:8080
+    strict: false
+  http:
+    httpEnabled: true
+  instances: 1
+  proxy:
+    headers: xforwarded
+---
+apiVersion: k8s.keycloak.org/v2alpha1
+kind: KeycloakRealmImport
+metadata:
+  labels:
+    app.kubernetes.io/component: keycloak
+    app.kubernetes.io/instance: trieve
+    app.kubernetes.io/name: trieve
+    app.kubernetes.io/part-of: trieve
+  name: trieve-realm
+  namespace: default
+spec:
+  keycloakCRName: trieve-keycloak
+  realm:
+    accessCodeLifespan: 60
+    accessCodeLifespanLogin: 1800
+    accessCodeLifespanUserAction: 300
+    accessTokenLifespan: 300
+    accessTokenLifespanForImplicitFlow: 900
+    actionTokenGeneratedByAdminLifespan: 43200
+    actionTokenGeneratedByUserLifespan: 300
+    adminEventsDetailsEnabled: false
+    adminEventsEnabled: false
+    attributes:
+      cibaAuthRequestedUserHint: login_hint
+      cibaBackchannelTokenDeliveryMode: poll
+      cibaExpiresIn: "120"
+      cibaInterval: "5"
+      clientOfflineSessionIdleTimeout: "0"
+      clientOfflineSessionMaxLifespan: "0"
+      clientSessionIdleTimeout: "0"
+      clientSessionMaxLifespan: "0"
+      oauth2DeviceCodeLifespan: "600"
+      oauth2DevicePollingInterval: "5"
+      parRequestUriLifespan: "60"
+      realmReusableOtpCode: "false"
+    authenticationFlows:
+    - alias: Account verification options
+      authenticationExecutions:
+      - authenticator: idp-email-verification
+        authenticatorFlow: false
+        autheticatorFlow: false
+        priority: 10
+        requirement: ALTERNATIVE
+        userSetupAllowed: false
+      - authenticatorFlow: true
+        autheticatorFlow: true
+        flowAlias: Verify Existing Account by Re-authentication
+        priority: 20
+        requirement: ALTERNATIVE
+        userSetupAllowed: false
+      builtIn: true
+      description: Method with which to verity the existing account
+      id: de2f487f-2550-4592-8d88-173d31b66ae7
+      providerId: basic-flow
+      topLevel: false
+    - alias: Browser - Conditional OTP
+      authenticationExecutions:
+      - authenticator: conditional-user-configured
+        authenticatorFlow: false
+        autheticatorFlow: false
+        priority: 10
+        requirement: REQUIRED
+        userSetupAllowed: false
+      - authenticator: auth-otp-form
+        authenticatorFlow: false
+        autheticatorFlow: false
+        priority: 20
+        requirement: REQUIRED
+        userSetupAllowed: false
+      builtIn: true
+      description: Flow to determine if the OTP is required for the authentication
+      id: 438c4ac3-ecbe-45dc-8ef8-1025627241fd
+      providerId: basic-flow
+      topLevel: false
+    - alias: Direct Grant - Conditional OTP
+      authenticationExecutions:
+      - authenticator: conditional-user-configured
+        authenticatorFlow: false
+        autheticatorFlow: false
+        priority: 10
+        requirement: REQUIRED
+        userSetupAllowed: false
+      - authenticator: direct-grant-validate-otp
+        authenticatorFlow: false
+        autheticatorFlow: false
+        priority: 20
+        requirement: REQUIRED
+        userSetupAllowed: false
+      builtIn: true
+      description: Flow to determine if the OTP is required for the authentication
+      id: 395923eb-81b0-41a7-ac4f-2e0a57dd9cea
+      providerId: basic-flow
+      topLevel: false
+    - alias: First broker login - Conditional OTP
+      authenticationExecutions:
+      - authenticator: conditional-user-configured
+        authenticatorFlow: false
+        autheticatorFlow: false
+        priority: 10
+        requirement: REQUIRED
+        userSetupAllowed: false
+      - authenticator: auth-otp-form
+        authenticatorFlow: false
+        autheticatorFlow: false
+        priority: 20
+        requirement: REQUIRED
+        userSetupAllowed: false
+      builtIn: true
+      description: Flow to determine if the OTP is required for the authentication
+      id: 35ee01b8-25ba-40b9-9666-5d00065b78f2
+      providerId: basic-flow
+      topLevel: false
+    - alias: Handle Existing Account
+      authenticationExecutions:
+      - authenticator: idp-confirm-link
+        authenticatorFlow: false
+        autheticatorFlow: false
+        priority: 10
+        requirement: REQUIRED
+        userSetupAllowed: false
+      - authenticatorFlow: true
+        autheticatorFlow: true
+        flowAlias: Account verification options
+        priority: 20
+        requirement: REQUIRED
+        userSetupAllowed: false
+      builtIn: true
+      description: Handle what to do if there is existing account with same email/username
+        like authenticated identity provider
+      id: d8b8c15c-d317-475d-8c05-496dcf9054a6
+      providerId: basic-flow
+      topLevel: false
+    - alias: Reset - Conditional OTP
+      authenticationExecutions:
+      - authenticator: conditional-user-configured
+        authenticatorFlow: false
+        autheticatorFlow: false
+        priority: 10
+        requirement: REQUIRED
+        userSetupAllowed: false
+      - authenticator: reset-otp
+        authenticatorFlow: false
+        autheticatorFlow: false
+        priority: 20
+        requirement: REQUIRED
+        userSetupAllowed: false
+      builtIn: true
+      description: Flow to determine if the OTP should be reset or not. Set to REQUIRED
+        to force.
+      id: 96b56190-bbd3-4679-8f5a-cb2b8c391c43
+      providerId: basic-flow
+      topLevel: false
+    - alias: User creation or linking
+      authenticationExecutions:
+      - authenticator: idp-create-user-if-unique
+        authenticatorConfig: create unique user config
+        authenticatorFlow: false
+        autheticatorFlow: false
+        priority: 10
+        requirement: ALTERNATIVE
+        userSetupAllowed: false
+      - authenticatorFlow: true
+        autheticatorFlow: true
+        flowAlias: Handle Existing Account
+        priority: 20
+        requirement: ALTERNATIVE
+        userSetupAllowed: false
+      builtIn: true
+      description: Flow for the existing/non-existing user alternatives
+      id: 1ae4f391-128c-4c0e-b872-ecadedb21bef
+      providerId: basic-flow
+      topLevel: false
+    - alias: Verify Existing Account by Re-authentication
+      authenticationExecutions:
+      - authenticator: idp-username-password-form
+        authenticatorFlow: false
+        autheticatorFlow: false
+        priority: 10
+        requirement: REQUIRED
+        userSetupAllowed: false
+      - authenticatorFlow: true
+        autheticatorFlow: true
+        flowAlias: First broker login - Conditional OTP
+        priority: 20
+        requirement: CONDITIONAL
+        userSetupAllowed: false
+      builtIn: true
+      description: Reauthentication of existing account
+      id: 4bd8c972-0e6d-4e89-82c6-ce8f52ce2bfb
+      providerId: basic-flow
+      topLevel: false
+    - alias: browser
+      authenticationExecutions:
+      - authenticator: auth-cookie
+        authenticatorFlow: false
+        autheticatorFlow: false
+        priority: 10
+        requirement: ALTERNATIVE
+        userSetupAllowed: false
+      - authenticator: auth-spnego
+        authenticatorFlow: false
+        autheticatorFlow: false
+        priority: 20
+        requirement: DISABLED
+        userSetupAllowed: false
+      - authenticator: identity-provider-redirector
+        authenticatorFlow: false
+        autheticatorFlow: false
+        priority: 25
+        requirement: ALTERNATIVE
+        userSetupAllowed: false
+      - authenticatorFlow: true
+        autheticatorFlow: true
+        flowAlias: forms
+        priority: 30
+        requirement: ALTERNATIVE
+        userSetupAllowed: false
+      builtIn: true
+      description: browser based authentication
+      id: 87ea120d-0e86-40da-b667-51fe07f9a898
+      providerId: basic-flow
+      topLevel: true
+    - alias: clients
+      authenticationExecutions:
+      - authenticator: client-secret
+        authenticatorFlow: false
+        autheticatorFlow: false
+        priority: 10
+        requirement: ALTERNATIVE
+        userSetupAllowed: false
+      - authenticator: client-jwt
+        authenticatorFlow: false
+        autheticatorFlow: false
+        priority: 20
+        requirement: ALTERNATIVE
+        userSetupAllowed: false
+      - authenticator: client-secret-jwt
+        authenticatorFlow: false
+        autheticatorFlow: false
+        priority: 30
+        requirement: ALTERNATIVE
+        userSetupAllowed: false
+      - authenticator: client-x509
+        authenticatorFlow: false
+        autheticatorFlow: false
+        priority: 40
+        requirement: ALTERNATIVE
+        userSetupAllowed: false
+      builtIn: true
+      description: Base authentication for clients
+      id: 7495c5b3-856e-4afa-bc7f-7670fba47538
+      providerId: client-flow
+      topLevel: true
+    - alias: direct grant
+      authenticationExecutions:
+      - authenticator: direct-grant-validate-username
+        authenticatorFlow: false
+        autheticatorFlow: false
+        priority: 10
+        requirement: REQUIRED
+        userSetupAllowed: false
+      - authenticator: direct-grant-validate-password
+        authenticatorFlow: false
+        autheticatorFlow: false
+        priority: 20
+        requirement: REQUIRED
+        userSetupAllowed: false
+      - authenticatorFlow: true
+        autheticatorFlow: true
+        flowAlias: Direct Grant - Conditional OTP
+        priority: 30
+        requirement: CONDITIONAL
+        userSetupAllowed: false
+      builtIn: true
+      description: OpenID Connect Resource Owner Grant
+      id: bb66c8a4-5bdc-4aaf-9a3c-92cbc1e611e5
+      providerId: basic-flow
+      topLevel: true
+    - alias: docker auth
+      authenticationExecutions:
+      - authenticator: docker-http-basic-authenticator
+        authenticatorFlow: false
+        autheticatorFlow: false
+        priority: 10
+        requirement: REQUIRED
+        userSetupAllowed: false
+      builtIn: true
+      description: Used by Docker clients to authenticate against the IDP
+      id: 7d9767b7-2410-42bd-9d22-0da964fd05b0
+      providerId: basic-flow
+      topLevel: true
+    - alias: first broker login
+      authenticationExecutions:
+      - authenticator: idp-review-profile
+        authenticatorConfig: review profile config
+        authenticatorFlow: false
+        autheticatorFlow: false
+        priority: 10
+        requirement: REQUIRED
+        userSetupAllowed: false
+      - authenticatorFlow: true
+        autheticatorFlow: true
+        flowAlias: User creation or linking
+        priority: 20
+        requirement: REQUIRED
+        userSetupAllowed: false
+      builtIn: true
+      description: Actions taken after first broker login with identity provider account,
+        which is not yet linked to any Keycloak account
+      id: e6d09572-c4e2-4540-a292-830a0683a741
+      providerId: basic-flow
+      topLevel: true
+    - alias: forms
+      authenticationExecutions:
+      - authenticator: auth-username-password-form
+        authenticatorFlow: false
+        autheticatorFlow: false
+        priority: 10
+        requirement: REQUIRED
+        userSetupAllowed: false
+      - authenticatorFlow: true
+        autheticatorFlow: true
+        flowAlias: Browser - Conditional OTP
+        priority: 20
+        requirement: CONDITIONAL
+        userSetupAllowed: false
+      builtIn: true
+      description: Username, password, otp and other auth forms.
+      id: 40f3b564-90f7-4914-bd05-18e42162cb9f
+      providerId: basic-flow
+      topLevel: false
+    - alias: registration
+      authenticationExecutions:
+      - authenticator: registration-page-form
+        authenticatorFlow: true
+        autheticatorFlow: true
+        flowAlias: registration form
+        priority: 10
+        requirement: REQUIRED
+        userSetupAllowed: false
+      builtIn: true
+      description: registration flow
+      id: 6ed3f0b7-fcde-48be-ad7c-5d68bb028e35
+      providerId: basic-flow
+      topLevel: true
+    - alias: registration form
+      authenticationExecutions:
+      - authenticator: registration-user-creation
+        authenticatorFlow: false
+        autheticatorFlow: false
+        priority: 20
+        requirement: REQUIRED
+        userSetupAllowed: false
+      - authenticator: registration-password-action
+        authenticatorFlow: false
+        autheticatorFlow: false
+        priority: 50
+        requirement: REQUIRED
+        userSetupAllowed: false
+      - authenticator: registration-recaptcha-action
+        authenticatorFlow: false
+        autheticatorFlow: false
+        priority: 60
+        requirement: DISABLED
+        userSetupAllowed: false
+      builtIn: true
+      description: registration form
+      id: 3eddb01d-1dd2-473c-8ed3-861846430d42
+      providerId: form-flow
+      topLevel: false
+    - alias: reset credentials
+      authenticationExecutions:
+      - authenticator: reset-credentials-choose-user
+        authenticatorFlow: false
+        autheticatorFlow: false
+        priority: 10
+        requirement: REQUIRED
+        userSetupAllowed: false
+      - authenticator: reset-credential-email
+        authenticatorFlow: false
+        autheticatorFlow: false
+        priority: 20
+        requirement: REQUIRED
+        userSetupAllowed: false
+      - authenticator: reset-password
+        authenticatorFlow: false
+        autheticatorFlow: false
+        priority: 30
+        requirement: REQUIRED
+        userSetupAllowed: false
+      - authenticatorFlow: true
+        autheticatorFlow: true
+        flowAlias: Reset - Conditional OTP
+        priority: 40
+        requirement: CONDITIONAL
+        userSetupAllowed: false
+      builtIn: true
+      description: Reset credentials for a user if they forgot their password or something
+      id: 9a6ca2a8-a533-478e-aa47-93274b91ca16
+      providerId: basic-flow
+      topLevel: true
+    - alias: saml ecp
+      authenticationExecutions:
+      - authenticator: http-basic-authenticator
+        authenticatorFlow: false
+        autheticatorFlow: false
+        priority: 10
+        requirement: REQUIRED
+        userSetupAllowed: false
+      builtIn: true
+      description: SAML ECP Profile Authentication Flow
+      id: b794d7ec-d301-4816-8d43-47ae824af4e8
+      providerId: basic-flow
+      topLevel: true
+    authenticatorConfig:
+    - alias: create unique user config
+      config:
+        require.password.update.after.registration: "false"
+      id: 0c5e4a1c-ce11-45ca-bf9b-81ef6a15e6fc
+    - alias: review profile config
+      config:
+        update.profile.on.first.login: missing
+      id: 5cb1f47e-96d2-4d9b-94f3-1805f55ceaf6
+    browserFlow: browser
+    browserSecurityHeaders:
+      contentSecurityPolicy: frame-src 'self'; frame-ancestors 'self'; object-src
+        'none';
+      contentSecurityPolicyReportOnly: ""
+      referrerPolicy: no-referrer
+      strictTransportSecurity: max-age=31536000; includeSubDomains
+      xContentTypeOptions: nosniff
+      xFrameOptions: SAMEORIGIN
+      xRobotsTag: none
+      xXSSProtection: 1; mode=block
+    bruteForceProtected: false
+    clientAuthenticationFlow: clients
+    clientOfflineSessionIdleTimeout: 0
+    clientOfflineSessionMaxLifespan: 0
+    clientPolicies:
+      policies: []
+    clientProfiles:
+      profiles: []
+    clientScopeMappings:
+      account:
+      - client: account-console
+        roles:
+        - manage-account
+        - view-groups
+    clientScopes:
+    - attributes:
+        consent.screen.text: ${profileScopeConsentText}
+        display.on.consent.screen: "true"
+        include.in.token.scope: "true"
+      description: 'OpenID Connect built-in scope: profile'
+      id: f535ab0e-5a4c-4fc0-a55b-ef9ae24b9012
+      name: profile
+      protocol: openid-connect
+      protocolMappers:
+      - config:
+          access.token.claim: "true"
+          claim.name: gender
+          id.token.claim: "true"
+          introspection.token.claim: "true"
+          jsonType.label: String
+          user.attribute: gender
+          userinfo.token.claim: "true"
+        consentRequired: false
+        id: 39447277-2a62-4103-82d3-c5f84718ae8d
+        name: gender
+        protocol: openid-connect
+        protocolMapper: oidc-usermodel-attribute-mapper
+      - config:
+          access.token.claim: "true"
+          claim.name: profile
+          id.token.claim: "true"
+          introspection.token.claim: "true"
+          jsonType.label: String
+          user.attribute: profile
+          userinfo.token.claim: "true"
+        consentRequired: false
+        id: 1b41e747-f660-4d27-a87d-f22779cd6a1e
+        name: profile
+        protocol: openid-connect
+        protocolMapper: oidc-usermodel-attribute-mapper
+      - config:
+          access.token.claim: "true"
+          claim.name: picture
+          id.token.claim: "true"
+          introspection.token.claim: "true"
+          jsonType.label: String
+          user.attribute: picture
+          userinfo.token.claim: "true"
+        consentRequired: false
+        id: a51f74df-4c3f-44e1-a819-2e8dba88f313
+        name: picture
+        protocol: openid-connect
+        protocolMapper: oidc-usermodel-attribute-mapper
+      - config:
+          access.token.claim: "true"
+          claim.name: middle_name
+          id.token.claim: "true"
+          introspection.token.claim: "true"
+          jsonType.label: String
+          user.attribute: middleName
+          userinfo.token.claim: "true"
+        consentRequired: false
+        id: 79f40696-70b8-44fe-80bb-96b697fdff5c
+        name: middle name
+        protocol: openid-connect
+        protocolMapper: oidc-usermodel-attribute-mapper
+      - config:
+          access.token.claim: "true"
+          claim.name: locale
+          id.token.claim: "true"
+          introspection.token.claim: "true"
+          jsonType.label: String
+          user.attribute: locale
+          userinfo.token.claim: "true"
+        consentRequired: false
+        id: c5fbf16e-974e-4700-aad5-e0ad5d82c3fa
+        name: locale
+        protocol: openid-connect
+        protocolMapper: oidc-usermodel-attribute-mapper
+      - config:
+          access.token.claim: "true"
+          claim.name: family_name
+          id.token.claim: "true"
+          introspection.token.claim: "true"
+          jsonType.label: String
+          user.attribute: lastName
+          userinfo.token.claim: "true"
+        consentRequired: false
+        id: df88a306-9b73-4b46-b655-fc80edddaa3f
+        name: family name
+        protocol: openid-connect
+        protocolMapper: oidc-usermodel-attribute-mapper
+      - config:
+          access.token.claim: "true"
+          claim.name: nickname
+          id.token.claim: "true"
+          introspection.token.claim: "true"
+          jsonType.label: String
+          user.attribute: nickname
+          userinfo.token.claim: "true"
+        consentRequired: false
+        id: 7f41a45f-0548-4750-823e-b7ab66661e8b
+        name: nickname
+        protocol: openid-connect
+        protocolMapper: oidc-usermodel-attribute-mapper
+      - config:
+          access.token.claim: "true"
+          claim.name: website
+          id.token.claim: "true"
+          introspection.token.claim: "true"
+          jsonType.label: String
+          user.attribute: website
+          userinfo.token.claim: "true"
+        consentRequired: false
+        id: a346cecc-864c-4089-ba72-35d2ae2e8119
+        name: website
+        protocol: openid-connect
+        protocolMapper: oidc-usermodel-attribute-mapper
+      - config:
+          access.token.claim: "true"
+          claim.name: updated_at
+          id.token.claim: "true"
+          introspection.token.claim: "true"
+          jsonType.label: long
+          user.attribute: updatedAt
+          userinfo.token.claim: "true"
+        consentRequired: false
+        id: 19e87518-5f15-49ea-9921-2228db644054
+        name: updated at
+        protocol: openid-connect
+        protocolMapper: oidc-usermodel-attribute-mapper
+      - config:
+          access.token.claim: "true"
+          id.token.claim: "true"
+          introspection.token.claim: "true"
+          userinfo.token.claim: "true"
+        consentRequired: false
+        id: 91774c94-3d79-4d12-8b1b-b39929bbe9ee
+        name: full name
+        protocol: openid-connect
+        protocolMapper: oidc-full-name-mapper
+      - config:
+          access.token.claim: "true"
+          claim.name: birthdate
+          id.token.claim: "true"
+          introspection.token.claim: "true"
+          jsonType.label: String
+          user.attribute: birthdate
+          userinfo.token.claim: "true"
+        consentRequired: false
+        id: a7efee9f-657f-46be-8cc6-0e8c1b0e154c
+        name: birthdate
+        protocol: openid-connect
+        protocolMapper: oidc-usermodel-attribute-mapper
+      - config:
+          access.token.claim: "true"
+          claim.name: given_name
+          id.token.claim: "true"
+          introspection.token.claim: "true"
+          jsonType.label: String
+          user.attribute: firstName
+          userinfo.token.claim: "true"
+        consentRequired: false
+        id: d56be991-b3ba-497a-ae3a-6acfb9b6f579
+        name: given name
+        protocol: openid-connect
+        protocolMapper: oidc-usermodel-attribute-mapper
+      - config:
+          access.token.claim: "true"
+          claim.name: zoneinfo
+          id.token.claim: "true"
+          introspection.token.claim: "true"
+          jsonType.label: String
+          user.attribute: zoneinfo
+          userinfo.token.claim: "true"
+        consentRequired: false
+        id: fe814e86-ee34-4826-be9d-ad99b78c10aa
+        name: zoneinfo
+        protocol: openid-connect
+        protocolMapper: oidc-usermodel-attribute-mapper
+      - config:
+          access.token.claim: "true"
+          claim.name: preferred_username
+          id.token.claim: "true"
+          introspection.token.claim: "true"
+          jsonType.label: String
+          user.attribute: username
+          userinfo.token.claim: "true"
+        consentRequired: false
+        id: 259e5eae-f9a9-4a78-8b1b-78c959afd6bf
+        name: username
+        protocol: openid-connect
+        protocolMapper: oidc-usermodel-attribute-mapper
+    - attributes:
+        display.on.consent.screen: "false"
+        include.in.token.scope: "true"
+      description: Microprofile - JWT built-in scope
+      id: e065a209-bc32-4cb0-98f7-bcdc605e1843
+      name: microprofile-jwt
+      protocol: openid-connect
+      protocolMappers:
+      - config:
+          access.token.claim: "true"
+          claim.name: groups
+          id.token.claim: "true"
+          introspection.token.claim: "true"
+          jsonType.label: String
+          multivalued: "true"
+          user.attribute: foo
+          userinfo.token.claim: "true"
+        consentRequired: false
+        id: a5515c2b-8769-42b2-9a7d-acde9555c14f
+        name: groups
+        protocol: openid-connect
+        protocolMapper: oidc-usermodel-realm-role-mapper
+      - config:
+          access.token.claim: "true"
+          claim.name: upn
+          id.token.claim: "true"
+          introspection.token.claim: "true"
+          jsonType.label: String
+          user.attribute: username
+          userinfo.token.claim: "true"
+        consentRequired: false
+        id: 4815d634-ae9c-4482-869d-520792447b47
+        name: upn
+        protocol: openid-connect
+        protocolMapper: oidc-usermodel-attribute-mapper
+    - attributes:
+        consent.screen.text: ${samlRoleListScopeConsentText}
+        display.on.consent.screen: "true"
+      description: SAML role list
+      id: 5a4a2195-6ecc-4c13-9f10-ea0dc397d7d6
+      name: role_list
+      protocol: saml
+      protocolMappers:
+      - config:
+          attribute.name: Role
+          attribute.nameformat: Basic
+          single: "false"
+        consentRequired: false
+        id: 8f29ec81-b65c-438d-bb6b-04855803e6e4
+        name: role list
+        protocol: saml
+        protocolMapper: saml-role-list-mapper
+    - attributes:
+        consent.screen.text: ${rolesScopeConsentText}
+        display.on.consent.screen: "true"
+        include.in.token.scope: "false"
+      description: OpenID Connect scope for add user roles to the access token
+      id: 3f208658-8178-44c6-93e8-fb2c30ea472e
+      name: roles
+      protocol: openid-connect
+      protocolMappers:
+      - config:
+          access.token.claim: "true"
+          claim.name: resource_access.${client_id}.roles
+          introspection.token.claim: "true"
+          jsonType.label: String
+          multivalued: "true"
+          user.attribute: foo
+        consentRequired: false
+        id: e7d69eec-0d9c-40b4-ac2c-15086f6799d1
+        name: client roles
+        protocol: openid-connect
+        protocolMapper: oidc-usermodel-client-role-mapper
+      - config:
+          access.token.claim: "true"
+          introspection.token.claim: "true"
+        consentRequired: false
+        id: 7f9bf6e8-1baf-4ba1-b7f2-626299032fa0
+        name: audience resolve
+        protocol: openid-connect
+        protocolMapper: oidc-audience-resolve-mapper
+      - config:
+          access.token.claim: "true"
+          claim.name: realm_access.roles
+          introspection.token.claim: "true"
+          jsonType.label: String
+          multivalued: "true"
+          user.attribute: foo
+        consentRequired: false
+        id: 2757b094-8fd2-4bed-a194-ed8360e7b219
+        name: realm roles
+        protocol: openid-connect
+        protocolMapper: oidc-usermodel-realm-role-mapper
+    - attributes:
+        display.on.consent.screen: "false"
+        include.in.token.scope: "false"
+      description: OpenID Connect scope for add acr (authentication context class
+        reference) to the token
+      id: 57ebdd9c-a22c-47c3-bc52-d61730c36a1b
+      name: acr
+      protocol: openid-connect
+      protocolMappers:
+      - config:
+          access.token.claim: "true"
+          id.token.claim: "true"
+          introspection.token.claim: "true"
+          userinfo.token.claim: "true"
+        consentRequired: false
+        id: 6f5352b0-3d85-4ae2-8184-4954864815b0
+        name: acr loa level
+        protocol: openid-connect
+        protocolMapper: oidc-acr-mapper
+    - attributes:
+        consent.screen.text: ${emailScopeConsentText}
+        display.on.consent.screen: "true"
+        include.in.token.scope: "true"
+      description: 'OpenID Connect built-in scope: email'
+      id: 0f7bca97-2ced-4c2d-9c0d-2e9e4f926c21
+      name: email
+      protocol: openid-connect
+      protocolMappers:
+      - config:
+          access.token.claim: "true"
+          claim.name: email
+          id.token.claim: "true"
+          introspection.token.claim: "true"
+          jsonType.label: String
+          user.attribute: email
+          userinfo.token.claim: "true"
+        consentRequired: false
+        id: 8bf84a78-f63e-4208-974a-55400c52c285
+        name: email
+        protocol: openid-connect
+        protocolMapper: oidc-usermodel-attribute-mapper
+      - config:
+          access.token.claim: "true"
+          claim.name: email_verified
+          id.token.claim: "true"
+          introspection.token.claim: "true"
+          jsonType.label: boolean
+          user.attribute: emailVerified
+          userinfo.token.claim: "true"
+        consentRequired: false
+        id: db6e78cf-c2e2-4c1a-8c04-19396d8aa7f8
+        name: email verified
+        protocol: openid-connect
+        protocolMapper: oidc-usermodel-property-mapper
+    - attributes:
+        consent.screen.text: ${addressScopeConsentText}
+        display.on.consent.screen: "true"
+        include.in.token.scope: "true"
+      description: 'OpenID Connect built-in scope: address'
+      id: bcfac10f-0dbe-424c-8fbc-a2429475dd20
+      name: address
+      protocol: openid-connect
+      protocolMappers:
+      - config:
+          access.token.claim: "true"
+          id.token.claim: "true"
+          introspection.token.claim: "true"
+          user.attribute.country: country
+          user.attribute.formatted: formatted
+          user.attribute.locality: locality
+          user.attribute.postal_code: postal_code
+          user.attribute.region: region
+          user.attribute.street: street
+          userinfo.token.claim: "true"
+        consentRequired: false
+        id: f99d03a1-52d1-430e-9036-5f6579b96e27
+        name: address
+        protocol: openid-connect
+        protocolMapper: oidc-address-mapper
+    - attributes:
+        consent.screen.text: ${offlineAccessScopeConsentText}
+        display.on.consent.screen: "true"
+      description: 'OpenID Connect built-in scope: offline_access'
+      id: 318c6124-31a2-4d82-9237-38c53540c21e
+      name: offline_access
+      protocol: openid-connect
+    - attributes:
+        consent.screen.text: ${phoneScopeConsentText}
+        display.on.consent.screen: "true"
+        include.in.token.scope: "true"
+      description: 'OpenID Connect built-in scope: phone'
+      id: d4c2944a-02fa-4bec-8f84-ae2fd54eea97
+      name: phone
+      protocol: openid-connect
+      protocolMappers:
+      - config:
+          access.token.claim: "true"
+          claim.name: phone_number
+          id.token.claim: "true"
+          introspection.token.claim: "true"
+          jsonType.label: String
+          user.attribute: phoneNumber
+          userinfo.token.claim: "true"
+        consentRequired: false
+        id: 1aeec4b1-fd57-41fb-b090-37cc58b5fe97
+        name: phone number
+        protocol: openid-connect
+        protocolMapper: oidc-usermodel-attribute-mapper
+      - config:
+          access.token.claim: "true"
+          claim.name: phone_number_verified
+          id.token.claim: "true"
+          introspection.token.claim: "true"
+          jsonType.label: boolean
+          user.attribute: phoneNumberVerified
+          userinfo.token.claim: "true"
+        consentRequired: false
+        id: a42e1546-2164-44d5-a218-5502b90db043
+        name: phone number verified
+        protocol: openid-connect
+        protocolMapper: oidc-usermodel-attribute-mapper
+    - attributes:
+        display.on.consent.screen: "false"
+        include.in.token.scope: "false"
+      description: OpenID Connect scope for add all basic claims to the token
+      id: ee557e57-b7db-42cb-baa7-d691ec26670e
+      name: basic
+      protocol: openid-connect
+      protocolMappers:
+      - config:
+          access.token.claim: "true"
+          claim.name: auth_time
+          id.token.claim: "true"
+          introspection.token.claim: "true"
+          jsonType.label: long
+          user.session.note: AUTH_TIME
+        consentRequired: false
+        id: 50356505-1ab0-4ca9-a14f-beae86302f46
+        name: auth_time
+        protocol: openid-connect
+        protocolMapper: oidc-usersessionmodel-note-mapper
+      - config:
+          access.token.claim: "true"
+          introspection.token.claim: "true"
+        consentRequired: false
+        id: 2acf69ec-1105-4fae-95b6-528fab4f7a12
+        name: sub
+        protocol: openid-connect
+        protocolMapper: oidc-sub-mapper
+    - attributes:
+        consent.screen.text: ""
+        display.on.consent.screen: "false"
+        include.in.token.scope: "false"
+      description: OpenID Connect scope for add allowed web origins to the access
+        token
+      id: 72d15810-c693-4d4a-824a-ab03404021d2
+      name: web-origins
+      protocol: openid-connect
+      protocolMappers:
+      - config:
+          access.token.claim: "true"
+          introspection.token.claim: "true"
+        consentRequired: false
+        id: cd1ea28b-d696-41b5-b1c6-c4af74632fc9
+        name: allowed web origins
+        protocol: openid-connect
+        protocolMapper: oidc-allowed-origins-mapper
+    clientSessionIdleTimeout: 0
+    clientSessionMaxLifespan: 0
+    clients:
+    - alwaysDisplayInConsole: false
+      attributes:
+        post.logout.redirect.uris: +
+      authenticationFlowBindingOverrides: {}
+      baseUrl: /realms/trieve/account/
+      bearerOnly: false
+      clientAuthenticatorType: client-secret
+      clientId: account
+      consentRequired: false
+      defaultClientScopes:
+      - web-origins
+      - acr
+      - profile
+      - roles
+      - basic
+      - email
+      directAccessGrantsEnabled: false
+      enabled: true
+      frontchannelLogout: false
+      fullScopeAllowed: false
+      id: 9b276326-3e28-474e-ba58-7d1b6ca1801c
+      implicitFlowEnabled: false
+      name: ${client_account}
+      nodeReRegistrationTimeout: 0
+      notBefore: 0
+      optionalClientScopes:
+      - address
+      - phone
+      - offline_access
+      - microprofile-jwt
+      protocol: openid-connect
+      publicClient: true
+      redirectUris:
+      - /realms/trieve/account/*
+      rootUrl: ${authBaseUrl}
+      serviceAccountsEnabled: false
+      standardFlowEnabled: true
+      surrogateAuthRequired: false
+      webOrigins: []
+    - alwaysDisplayInConsole: false
+      attributes:
+        pkce.code.challenge.method: S256
+        post.logout.redirect.uris: +
+      authenticationFlowBindingOverrides: {}
+      baseUrl: /realms/trieve/account/
+      bearerOnly: false
+      clientAuthenticatorType: client-secret
+      clientId: account-console
+      consentRequired: false
+      defaultClientScopes:
+      - web-origins
+      - acr
+      - profile
+      - roles
+      - basic
+      - email
+      directAccessGrantsEnabled: false
+      enabled: true
+      frontchannelLogout: false
+      fullScopeAllowed: false
+      id: 5d951454-ddd7-47c9-b003-c7c20f04407e
+      implicitFlowEnabled: false
+      name: ${client_account-console}
+      nodeReRegistrationTimeout: 0
+      notBefore: 0
+      optionalClientScopes:
+      - address
+      - phone
+      - offline_access
+      - microprofile-jwt
+      protocol: openid-connect
+      protocolMappers:
+      - config: {}
+        consentRequired: false
+        id: 02e8c346-df53-4e16-9507-46089b62270e
+        name: audience resolve
+        protocol: openid-connect
+        protocolMapper: oidc-audience-resolve-mapper
+      publicClient: true
+      redirectUris:
+      - /realms/trieve/account/*
+      rootUrl: ${authBaseUrl}
+      serviceAccountsEnabled: false
+      standardFlowEnabled: true
+      surrogateAuthRequired: false
+      webOrigins: []
+    - alwaysDisplayInConsole: false
+      attributes:
+        post.logout.redirect.uris: +
+      authenticationFlowBindingOverrides: {}
+      bearerOnly: false
+      clientAuthenticatorType: client-secret
+      clientId: admin-cli
+      consentRequired: false
+      defaultClientScopes:
+      - web-origins
+      - acr
+      - profile
+      - roles
+      - basic
+      - email
+      directAccessGrantsEnabled: true
+      enabled: true
+      frontchannelLogout: false
+      fullScopeAllowed: false
+      id: f2368491-bb33-4c88-909c-1bb8e25a2955
+      implicitFlowEnabled: false
+      name: ${client_admin-cli}
+      nodeReRegistrationTimeout: 0
+      notBefore: 0
+      optionalClientScopes:
+      - address
+      - phone
+      - offline_access
+      - microprofile-jwt
+      protocol: openid-connect
+      publicClient: true
+      redirectUris: []
+      serviceAccountsEnabled: false
+      standardFlowEnabled: false
+      surrogateAuthRequired: false
+      webOrigins: []
+    - alwaysDisplayInConsole: false
+      attributes:
+        post.logout.redirect.uris: +
+      authenticationFlowBindingOverrides: {}
+      bearerOnly: true
+      clientAuthenticatorType: client-secret
+      clientId: broker
+      consentRequired: false
+      defaultClientScopes:
+      - web-origins
+      - acr
+      - profile
+      - roles
+      - email
+      directAccessGrantsEnabled: false
+      enabled: true
+      frontchannelLogout: false
+      fullScopeAllowed: false
+      id: 52a7a498-5f2e-43fc-a27c-268e9e439113
+      implicitFlowEnabled: false
+      name: ${client_broker}
+      nodeReRegistrationTimeout: 0
+      notBefore: 0
+      optionalClientScopes:
+      - address
+      - phone
+      - offline_access
+      - microprofile-jwt
+      protocol: openid-connect
+      publicClient: false
+      redirectUris: []
+      serviceAccountsEnabled: false
+      standardFlowEnabled: true
+      surrogateAuthRequired: false
+      webOrigins: []
+    - alwaysDisplayInConsole: false
+      attributes:
+        post.logout.redirect.uris: +
+      authenticationFlowBindingOverrides: {}
+      bearerOnly: true
+      clientAuthenticatorType: client-secret
+      clientId: realm-management
+      consentRequired: false
+      defaultClientScopes:
+      - web-origins
+      - acr
+      - profile
+      - roles
+      - email
+      directAccessGrantsEnabled: false
+      enabled: true
+      frontchannelLogout: false
+      fullScopeAllowed: false
+      id: 4a393392-46f5-469d-add8-0ff115e2d5fe
+      implicitFlowEnabled: false
+      name: ${client_realm-management}
+      nodeReRegistrationTimeout: 0
+      notBefore: 0
+      optionalClientScopes:
+      - address
+      - phone
+      - offline_access
+      - microprofile-jwt
+      protocol: openid-connect
+      publicClient: false
+      redirectUris: []
+      serviceAccountsEnabled: false
+      standardFlowEnabled: true
+      surrogateAuthRequired: false
+      webOrigins: []
+    - alwaysDisplayInConsole: false
+      attributes:
+        pkce.code.challenge.method: S256
+        post.logout.redirect.uris: +
+      authenticationFlowBindingOverrides: {}
+      baseUrl: /admin/trieve/console/
+      bearerOnly: false
+      clientAuthenticatorType: client-secret
+      clientId: security-admin-console
+      consentRequired: false
+      defaultClientScopes:
+      - web-origins
+      - acr
+      - profile
+      - roles
+      - basic
+      - email
+      directAccessGrantsEnabled: false
+      enabled: true
+      frontchannelLogout: false
+      fullScopeAllowed: false
+      id: 5f6124c4-e746-4712-9d8a-13768ea2a2a4
+      implicitFlowEnabled: false
+      name: ${client_security-admin-console}
+      nodeReRegistrationTimeout: 0
+      notBefore: 0
+      optionalClientScopes:
+      - address
+      - phone
+      - offline_access
+      - microprofile-jwt
+      protocol: openid-connect
+      protocolMappers:
+      - config:
+          access.token.claim: "true"
+          claim.name: locale
+          id.token.claim: "true"
+          introspection.token.claim: "true"
+          jsonType.label: String
+          user.attribute: locale
+          userinfo.token.claim: "true"
+        consentRequired: false
+        id: d5b8b81b-81e7-4ea1-acb9-b148b27a1b8d
+        name: locale
+        protocol: openid-connect
+        protocolMapper: oidc-usermodel-attribute-mapper
+      publicClient: true
+      redirectUris:
+      - /admin/trieve/console/*
+      rootUrl: ${authAdminUrl}
+      serviceAccountsEnabled: false
+      standardFlowEnabled: true
+      surrogateAuthRequired: false
+      webOrigins:
+      - +
+    - adminUrl: ""
+      alwaysDisplayInConsole: false
+      attributes:
+        backchannel.logout.revoke.offline.tokens: "false"
+        backchannel.logout.session.required: "true"
+        client.secret.creation.time: "1702168106"
+        oauth2.device.authorization.grant.enabled: "false"
+        oidc.ciba.grant.enabled: "false"
+        post.logout.redirect.uris: +
+      authenticationFlowBindingOverrides: {}
+      baseUrl: ""
+      bearerOnly: false
+      clientAuthenticatorType: client-secret
+      clientId: trieve
+      consentRequired: false
+      defaultClientScopes:
+      - web-origins
+      - acr
+      - profile
+      - roles
+      - basic
+      - email
+      description: ""
+      directAccessGrantsEnabled: true
+      enabled: true
+      frontchannelLogout: true
+      fullScopeAllowed: true
+      id: cd16f176-0417-4449-a5b5-31da6056b634
+      implicitFlowEnabled: false
+      name: ""
+      nodeReRegistrationTimeout: -1
+      notBefore: 0
+      optionalClientScopes:
+      - address
+      - phone
+      - offline_access
+      - microprofile-jwt
+      protocol: openid-connect
+      publicClient: false
+      redirectUris:
+      - http://api.localtrieve.com/*
+      - http://dashboard.localtrieve.com/*
+      - http://chat.localtrieve.com/*
+      - http://search.localtrieve.com/*
+      - http://analytics.localtrieve.com/*
+      rootUrl: ""
+      secret: YllmLDTy67MbsUBrUAWvQ7z9aMq0QcKx
+      serviceAccountsEnabled: false
+      standardFlowEnabled: true
+      surrogateAuthRequired: false
+      webOrigins:
+      - http://analytics.localtrieve.com
+      - http://chat.localtrieve.com
+      - http://api.localtrieve.com
+      - http://search.localtrieve.com
+      - http://dashboard.localtrieve.com
+    components:
+      org.keycloak.keys.KeyProvider:
+      - config:
+          priority:
+          - "100"
+        id: 9e361714-2e57-459e-b5cd-8c2e2f6b237d
+        name: aes-generated
+        providerId: aes-generated
+        subComponents: {}
+      - config:
+          algorithm:
+          - RSA-OAEP
+          priority:
+          - "100"
+        id: 4ced0c28-2000-4b79-a0ae-d55eb5e03e19
+        name: rsa-enc-generated
+        providerId: rsa-enc-generated
+        subComponents: {}
+      - config:
+          priority:
+          - "100"
+        id: d3c9dfd9-70a8-4e34-a044-84335b73be12
+        name: rsa-generated
+        providerId: rsa-generated
+        subComponents: {}
+      - config:
+          algorithm:
+          - HS256
+          priority:
+          - "100"
+        id: 8f408cd4-27a6-4988-9b2e-5f5179280cc7
+        name: hmac-generated
+        providerId: hmac-generated
+        subComponents: {}
+      - config:
+          algorithm:
+          - HS512
+          priority:
+          - "100"
+        id: 1a443a09-d75e-46c2-b4cf-f34e13073182
+        name: hmac-generated-hs512
+        providerId: hmac-generated
+        subComponents: {}
+      org.keycloak.services.clientregistration.policy.ClientRegistrationPolicy:
+      - config: {}
+        id: d3fe4159-71fe-48ba-a4b0-93d95ac3feb7
+        name: Full Scope Disabled
+        providerId: scope
+        subComponents: {}
+        subType: anonymous
+      - config:
+          client-uris-must-match:
+          - "true"
+          host-sending-registration-request-must-match:
+          - "true"
+        id: 529fdd4d-93f7-40a4-a2bc-4bc61bf5765c
+        name: Trusted Hosts
+        providerId: trusted-hosts
+        subComponents: {}
+        subType: anonymous
+      - config:
+          allow-default-scopes:
+          - "true"
+        id: 9ff3d6e1-3051-4eb8-a745-780f9de2b79f
+        name: Allowed Client Scopes
+        providerId: allowed-client-templates
+        subComponents: {}
+        subType: anonymous
+      - config:
+          max-clients:
+          - "200"
+        id: 67f11ec2-e17d-44e2-a842-7e427812ee60
+        name: Max Clients Limit
+        providerId: max-clients
+        subComponents: {}
+        subType: anonymous
+      - config: {}
+        id: 7410c0a1-3dd6-4b86-8abc-7e387dbc6303
+        name: Consent Required
+        providerId: consent-required
+        subComponents: {}
+        subType: anonymous
+      - config:
+          allowed-protocol-mapper-types:
+          - oidc-usermodel-attribute-mapper
+          - oidc-address-mapper
+          - saml-user-property-mapper
+          - saml-user-attribute-mapper
+          - oidc-usermodel-property-mapper
+          - saml-role-list-mapper
+          - oidc-full-name-mapper
+          - oidc-sha256-pairwise-sub-mapper
+        id: 4410d5c8-1957-4375-a2c3-d775868c11bb
+        name: Allowed Protocol Mapper Types
+        providerId: allowed-protocol-mappers
+        subComponents: {}
+        subType: authenticated
+      - config:
+          allowed-protocol-mapper-types:
+          - saml-role-list-mapper
+          - oidc-address-mapper
+          - saml-user-attribute-mapper
+          - oidc-sha256-pairwise-sub-mapper
+          - saml-user-property-mapper
+          - oidc-full-name-mapper
+          - oidc-usermodel-attribute-mapper
+          - oidc-usermodel-property-mapper
+        id: 7796ed68-9a88-4c20-ae1c-5d050b71764b
+        name: Allowed Protocol Mapper Types
+        providerId: allowed-protocol-mappers
+        subComponents: {}
+        subType: anonymous
+      - config:
+          allow-default-scopes:
+          - "true"
+        id: 35eef69e-de14-41d9-85e7-1a2cd7d5e276
+        name: Allowed Client Scopes
+        providerId: allowed-client-templates
+        subComponents: {}
+        subType: authenticated
+      org.keycloak.userprofile.UserProfileProvider:
+      - config:
+          kc.user.profile.config:
+          - '{"attributes":[{"name":"username","displayName":"${username}","validations":{"length":{"min":3,"max":255},"username-prohibited-characters":{},"up-username-not-idn-homograph":{}},"permissions":{"view":["admin","user"],"edit":["admin","user"]},"multivalued":false},{"name":"email","displayName":"${email}","validations":{"email":{},"length":{"max":255}},"required":{"roles":["user"]},"permissions":{"view":["admin","user"],"edit":["admin","user"]},"multivalued":false},{"name":"firstName","displayName":"${firstName}","validations":{"length":{"max":255},"person-name-prohibited-characters":{}},"required":{"roles":["user"]},"permissions":{"view":["admin","user"],"edit":["admin","user"]},"multivalued":false},{"name":"lastName","displayName":"${lastName}","validations":{"length":{"max":255},"person-name-prohibited-characters":{}},"required":{"roles":["user"]},"permissions":{"view":["admin","user"],"edit":["admin","user"]},"multivalued":false}],"groups":[{"name":"user-metadata","displayHeader":"User
+            metadata","displayDescription":"Attributes, which refer to user metadata"}],"unmanagedAttributePolicy":"ENABLED"}'
+        id: 3331a0c4-082d-476f-bde3-1d209dd3f6a5
+        providerId: declarative-user-profile
+        subComponents: {}
+    defaultDefaultClientScopes:
+    - role_list
+    - profile
+    - email
+    - roles
+    - web-origins
+    - acr
+    - basic
+    defaultOptionalClientScopes:
+    - offline_access
+    - address
+    - phone
+    - microprofile-jwt
+    defaultRole:
+      clientRole: false
+      composite: true
+      containerId: 531033cd-c690-4255-9641-4eb0aca669f7
+      description: ${role_default-roles}
+      id: 1b1bd16f-0b5a-408b-98c5-af9a0da03d47
+      name: default-roles-trieve
+    defaultSignatureAlgorithm: RS256
+    directGrantFlow: direct grant
+    dockerAuthenticationFlow: docker auth
+    duplicateEmailsAllowed: false
+    editUsernameAllowed: false
+    enabled: true
+    enabledEventTypes: []
+    eventsEnabled: false
+    eventsListeners:
+    - jboss-logging
+    failureFactor: 30
+    firstBrokerLoginFlow: first broker login
+    groups: []
+    id: 531033cd-c690-4255-9641-4eb0aca669f7
+    identityProviderMappers: []
+    identityProviders:
+    - addReadTokenRoleOnCreate: false
+      alias: google
+      authenticateByDefault: false
+      config:
+        acceptsPromptNoneForwardFromClient: "false"
+        clientId: '45112953303-vl3ek5l6oaea945c9qts5hd2i3i55nsr.apps.googleusercontent.com '
+        clientSecret: '**********'
+        disableUserInfo: "false"
+        filteredByClaim: "false"
+        guiOrder: "0"
+        hideOnLoginPage: "false"
+        syncMode: IMPORT
+      enabled: true
+      firstBrokerLoginFlowAlias: first broker login
+      internalId: 3666ee7a-9543-4e7e-80e5-c7c05da9e29d
+      linkOnly: false
+      providerId: google
+      storeToken: false
+      trustEmail: true
+      updateProfileFirstLoginMode: "on"
+    - addReadTokenRoleOnCreate: false
+      alias: github
+      authenticateByDefault: false
+      config:
+        acceptsPromptNoneForwardFromClient: "false"
+        clientId: 2974442c1f1f2b364090
+        clientSecret: '**********'
+        disableUserInfo: "false"
+        filteredByClaim: "false"
+        hideOnLoginPage: "false"
+        syncMode: IMPORT
+      enabled: true
+      firstBrokerLoginFlowAlias: first broker login
+      internalId: c46c3eeb-d255-4efd-bd46-f919f68b9609
+      linkOnly: false
+      providerId: github
+      storeToken: false
+      trustEmail: true
+      updateProfileFirstLoginMode: "on"
+    internationalizationEnabled: false
+    keycloakVersion: 25.0.2
+    localizationTexts: {}
+    loginWithEmailAllowed: true
+    maxDeltaTimeSeconds: 43200
+    maxFailureWaitSeconds: 900
+    maxTemporaryLockouts: 0
+    minimumQuickLoginWaitSeconds: 60
+    notBefore: 0
+    oauth2DeviceCodeLifespan: 600
+    oauth2DevicePollingInterval: 5
+    offlineSessionIdleTimeout: 2592000
+    offlineSessionMaxLifespan: 5184000
+    offlineSessionMaxLifespanEnabled: false
+    organizationsEnabled: false
+    otpPolicyAlgorithm: HmacSHA1
+    otpPolicyCodeReusable: false
+    otpPolicyDigits: 6
+    otpPolicyInitialCounter: 0
+    otpPolicyLookAheadWindow: 1
+    otpPolicyPeriod: 30
+    otpPolicyType: totp
+    otpSupportedApplications:
+    - totpAppFreeOTPName
+    - totpAppGoogleName
+    - totpAppMicrosoftAuthenticatorName
+    permanentLockout: false
+    quickLoginCheckMilliSeconds: 1000
+    realm: trieve
+    refreshTokenMaxReuse: 0
+    registrationAllowed: true
+    registrationEmailAsUsername: true
+    registrationFlow: registration
+    rememberMe: true
+    requiredActions:
+    - alias: CONFIGURE_TOTP
+      config: {}
+      defaultAction: false
+      enabled: true
+      name: Configure OTP
+      priority: 10
+      providerId: CONFIGURE_TOTP
+    - alias: TERMS_AND_CONDITIONS
+      config: {}
+      defaultAction: false
+      enabled: false
+      name: Terms and Conditions
+      priority: 20
+      providerId: TERMS_AND_CONDITIONS
+    - alias: UPDATE_PASSWORD
+      config: {}
+      defaultAction: false
+      enabled: true
+      name: Update Password
+      priority: 30
+      providerId: UPDATE_PASSWORD
+    - alias: UPDATE_PROFILE
+      config: {}
+      defaultAction: false
+      enabled: true
+      name: Update Profile
+      priority: 40
+      providerId: UPDATE_PROFILE
+    - alias: VERIFY_EMAIL
+      config: {}
+      defaultAction: false
+      enabled: true
+      name: Verify Email
+      priority: 50
+      providerId: VERIFY_EMAIL
+    - alias: delete_account
+      config: {}
+      defaultAction: false
+      enabled: false
+      name: Delete Account
+      priority: 60
+      providerId: delete_account
+    - alias: webauthn-register
+      config: {}
+      defaultAction: false
+      enabled: true
+      name: Webauthn Register
+      priority: 70
+      providerId: webauthn-register
+    - alias: webauthn-register-passwordless
+      config: {}
+      defaultAction: false
+      enabled: true
+      name: Webauthn Register Passwordless
+      priority: 80
+      providerId: webauthn-register-passwordless
+    - alias: delete_credential
+      config: {}
+      defaultAction: false
+      enabled: true
+      name: Delete Credential
+      priority: 100
+      providerId: delete_credential
+    - alias: update_user_locale
+      config: {}
+      defaultAction: false
+      enabled: true
+      name: Update User Locale
+      priority: 1000
+      providerId: update_user_locale
+    requiredCredentials:
+    - password
+    resetCredentialsFlow: reset credentials
+    resetPasswordAllowed: false
+    revokeRefreshToken: false
+    roles:
+      client:
+        account:
+        - attributes: {}
+          clientRole: true
+          composite: true
+          composites:
+            client:
+              account:
+              - manage-account-links
+          containerId: 9b276326-3e28-474e-ba58-7d1b6ca1801c
+          description: ${role_manage-account}
+          id: 3bdcff89-e132-455c-bce1-2ce62ce528cc
+          name: manage-account
+        - attributes: {}
+          clientRole: true
+          composite: false
+          containerId: 9b276326-3e28-474e-ba58-7d1b6ca1801c
+          description: ${role_view-groups}
+          id: 1259017c-20fd-46d5-aa72-9a8b08f12ce1
+          name: view-groups
+        - attributes: {}
+          clientRole: true
+          composite: true
+          composites:
+            client:
+              account:
+              - view-consent
+          containerId: 9b276326-3e28-474e-ba58-7d1b6ca1801c
+          description: ${role_manage-consent}
+          id: 33ac9e6b-32eb-4422-8024-b08575f7af93
+          name: manage-consent
+        - attributes: {}
+          clientRole: true
+          composite: false
+          containerId: 9b276326-3e28-474e-ba58-7d1b6ca1801c
+          description: ${role_view-applications}
+          id: c4600a95-643a-479e-adc6-213dc51ab0c6
+          name: view-applications
+        - attributes: {}
+          clientRole: true
+          composite: false
+          containerId: 9b276326-3e28-474e-ba58-7d1b6ca1801c
+          description: ${role_delete-account}
+          id: c24ae6bf-cd5d-4018-a6f4-3c4f838da241
+          name: delete-account
+        - attributes: {}
+          clientRole: true
+          composite: false
+          containerId: 9b276326-3e28-474e-ba58-7d1b6ca1801c
+          description: ${role_view-profile}
+          id: ed17f784-a5ae-4e36-8ded-ffed116c95a0
+          name: view-profile
+        - attributes: {}
+          clientRole: true
+          composite: false
+          containerId: 9b276326-3e28-474e-ba58-7d1b6ca1801c
+          description: ${role_manage-account-links}
+          id: 8a3d6f57-b3f5-4089-b470-968ff481cb5c
+          name: manage-account-links
+        - attributes: {}
+          clientRole: true
+          composite: false
+          containerId: 9b276326-3e28-474e-ba58-7d1b6ca1801c
+          description: ${role_view-consent}
+          id: 38455d21-f159-482d-b779-541c715c0961
+          name: view-consent
+        account-console: []
+        admin-cli: []
+        broker:
+        - attributes: {}
+          clientRole: true
+          composite: false
+          containerId: 52a7a498-5f2e-43fc-a27c-268e9e439113
+          description: ${role_read-token}
+          id: 5aeefc4a-a89d-431c-a48f-63d5dd3ae37c
+          name: read-token
+        realm-management:
+        - attributes: {}
+          clientRole: true
+          composite: false
+          containerId: 4a393392-46f5-469d-add8-0ff115e2d5fe
+          description: ${role_manage-clients}
+          id: a5988596-2dff-4f10-bcbe-191b7a750d33
+          name: manage-clients
+        - attributes: {}
+          clientRole: true
+          composite: false
+          containerId: 4a393392-46f5-469d-add8-0ff115e2d5fe
+          description: ${role_query-users}
+          id: 08e3babd-fc58-4c19-8ccb-1171da72bc6d
+          name: query-users
+        - attributes: {}
+          clientRole: true
+          composite: true
+          composites:
+            client:
+              realm-management:
+              - query-users
+              - manage-clients
+              - query-clients
+              - view-realm
+              - manage-events
+              - view-authorization
+              - query-realms
+              - manage-identity-providers
+              - manage-authorization
+              - create-client
+              - view-events
+              - manage-users
+              - view-clients
+              - impersonation
+              - view-users
+              - view-identity-providers
+              - query-groups
+              - manage-realm
+          containerId: 4a393392-46f5-469d-add8-0ff115e2d5fe
+          description: ${role_realm-admin}
+          id: 444adf15-2aca-43d1-bf2b-f6200119e079
+          name: realm-admin
+        - attributes: {}
+          clientRole: true
+          composite: false
+          containerId: 4a393392-46f5-469d-add8-0ff115e2d5fe
+          description: ${role_query-clients}
+          id: 26aded60-83bc-46b8-8831-ad12ccabdab1
+          name: query-clients
+        - attributes: {}
+          clientRole: true
+          composite: false
+          containerId: 4a393392-46f5-469d-add8-0ff115e2d5fe
+          description: ${role_manage-events}
+          id: 540e2999-709d-4084-ada5-38dec9dab9b1
+          name: manage-events
+        - attributes: {}
+          clientRole: true
+          composite: false
+          containerId: 4a393392-46f5-469d-add8-0ff115e2d5fe
+          description: ${role_view-realm}
+          id: 536c17b0-a24d-4394-bdaa-5c1667959061
+          name: view-realm
+        - attributes: {}
+          clientRole: true
+          composite: false
+          containerId: 4a393392-46f5-469d-add8-0ff115e2d5fe
+          description: ${role_view-authorization}
+          id: b245b142-0387-40ae-ba64-9b664d448091
+          name: view-authorization
+        - attributes: {}
+          clientRole: true
+          composite: false
+          containerId: 4a393392-46f5-469d-add8-0ff115e2d5fe
+          description: ${role_query-realms}
+          id: 397e56ed-8ea1-4ba0-84aa-1e37ade7d9d3
+          name: query-realms
+        - attributes: {}
+          clientRole: true
+          composite: false
+          containerId: 4a393392-46f5-469d-add8-0ff115e2d5fe
+          description: ${role_manage-authorization}
+          id: 76d5e94b-5d33-4094-b1d2-54b3ddd05d7c
+          name: manage-authorization
+        - attributes: {}
+          clientRole: true
+          composite: false
+          containerId: 4a393392-46f5-469d-add8-0ff115e2d5fe
+          description: ${role_manage-identity-providers}
+          id: 0d3f7392-14e8-4d43-bc8b-6d23af210139
+          name: manage-identity-providers
+        - attributes: {}
+          clientRole: true
+          composite: false
+          containerId: 4a393392-46f5-469d-add8-0ff115e2d5fe
+          description: ${role_create-client}
+          id: e6b7da8d-7425-43b7-a563-16dcdc9e6394
+          name: create-client
+        - attributes: {}
+          clientRole: true
+          composite: false
+          containerId: 4a393392-46f5-469d-add8-0ff115e2d5fe
+          description: ${role_view-events}
+          id: 5ef48e8a-e949-4ece-a928-745e1d16b6d6
+          name: view-events
+        - attributes: {}
+          clientRole: true
+          composite: false
+          containerId: 4a393392-46f5-469d-add8-0ff115e2d5fe
+          description: ${role_manage-users}
+          id: 7ad86194-ab30-4d6c-aed6-db5d15b9ee2c
+          name: manage-users
+        - attributes: {}
+          clientRole: true
+          composite: true
+          composites:
+            client:
+              realm-management:
+              - query-clients
+          containerId: 4a393392-46f5-469d-add8-0ff115e2d5fe
+          description: ${role_view-clients}
+          id: 7edab984-ed9c-4974-805c-45f553b2c5e9
+          name: view-clients
+        - attributes: {}
+          clientRole: true
+          composite: false
+          containerId: 4a393392-46f5-469d-add8-0ff115e2d5fe
+          description: ${role_impersonation}
+          id: 89a35f45-4e94-4882-b848-d886bea342ed
+          name: impersonation
+        - attributes: {}
+          clientRole: true
+          composite: true
+          composites:
+            client:
+              realm-management:
+              - query-users
+              - query-groups
+          containerId: 4a393392-46f5-469d-add8-0ff115e2d5fe
+          description: ${role_view-users}
+          id: a81b5827-ab7b-40ca-b1b6-c02595eeffb3
+          name: view-users
+        - attributes: {}
+          clientRole: true
+          composite: false
+          containerId: 4a393392-46f5-469d-add8-0ff115e2d5fe
+          description: ${role_view-identity-providers}
+          id: fa419d9e-494f-422a-8bb5-3c87dd4316d2
+          name: view-identity-providers
+        - attributes: {}
+          clientRole: true
+          composite: false
+          containerId: 4a393392-46f5-469d-add8-0ff115e2d5fe
+          description: ${role_query-groups}
+          id: 4f790b62-f9ea-432b-bb65-c4e4c30bc6b6
+          name: query-groups
+        - attributes: {}
+          clientRole: true
+          composite: false
+          containerId: 4a393392-46f5-469d-add8-0ff115e2d5fe
+          description: ${role_manage-realm}
+          id: def34bce-5250-4f83-90d4-d8a41a6f7042
+          name: manage-realm
+        security-admin-console: []
+        trieve: []
+      realm:
+      - attributes: {}
+        clientRole: false
+        composite: false
+        containerId: 531033cd-c690-4255-9641-4eb0aca669f7
+        description: ${role_uma_authorization}
+        id: e4b1f494-b23c-4193-a616-7f3896ed1739
+        name: uma_authorization
+      - attributes: {}
+        clientRole: false
+        composite: true
+        composites:
+          client:
+            account:
+            - manage-account
+            - view-profile
+          realm:
+          - offline_access
+          - uma_authorization
+        containerId: 531033cd-c690-4255-9641-4eb0aca669f7
+        description: ${role_default-roles}
+        id: 1b1bd16f-0b5a-408b-98c5-af9a0da03d47
+        name: default-roles-trieve
+      - attributes: {}
+        clientRole: false
+        composite: false
+        containerId: 531033cd-c690-4255-9641-4eb0aca669f7
+        description: ${role_offline-access}
+        id: 95e8dc66-13f2-4d07-acf2-191d0f16eae9
+        name: offline_access
+    scopeMappings:
+    - clientScope: offline_access
+      roles:
+      - offline_access
+    smtpServer: {}
+    sslRequired: external
+    ssoSessionIdleTimeout: 1800
+    ssoSessionIdleTimeoutRememberMe: 0
+    ssoSessionMaxLifespan: 36000
+    ssoSessionMaxLifespanRememberMe: 0
+    supportedLocales: []
+    userManagedAccessAllowed: false
+    verifyEmail: false
+    waitIncrementSeconds: 60
+    webAuthnPolicyAcceptableAaguids: []
+    webAuthnPolicyAttestationConveyancePreference: not specified
+    webAuthnPolicyAuthenticatorAttachment: not specified
+    webAuthnPolicyAvoidSameAuthenticatorRegister: false
+    webAuthnPolicyCreateTimeout: 0
+    webAuthnPolicyExtraOrigins: []
+    webAuthnPolicyPasswordlessAcceptableAaguids: []
+    webAuthnPolicyPasswordlessAttestationConveyancePreference: not specified
+    webAuthnPolicyPasswordlessAuthenticatorAttachment: not specified
+    webAuthnPolicyPasswordlessAvoidSameAuthenticatorRegister: false
+    webAuthnPolicyPasswordlessCreateTimeout: 0
+    webAuthnPolicyPasswordlessExtraOrigins: []
+    webAuthnPolicyPasswordlessRequireResidentKey: not specified
+    webAuthnPolicyPasswordlessRpEntityName: keycloak
+    webAuthnPolicyPasswordlessRpId: ""
+    webAuthnPolicyPasswordlessSignatureAlgorithms:
+    - ES256
+    webAuthnPolicyPasswordlessUserVerificationRequirement: not specified
+    webAuthnPolicyRequireResidentKey: not specified
+    webAuthnPolicyRpEntityName: keycloak
+    webAuthnPolicyRpId: ""
+    webAuthnPolicySignatureAlgorithms:
+    - ES256
+    webAuthnPolicyUserVerificationRequirement: not specified
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  labels:
+    app.kubernetes.io/component: trieve-server
+    app.kubernetes.io/instance: trieve
+    app.kubernetes.io/name: trieve
+    app.kubernetes.io/part-of: trieve
+  name: trieve-server
+  namespace: default
+spec:
+  rules:
+  - host: api.localtrieve.com
+    http:
+      paths:
+      - backend:
+          service:
+            name: trieve-server
+            port:
+              name: server
+        path: /
+        pathType: Prefix
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  labels:
+    app.kubernetes.io/component: trieve-ui-analytics
+    app.kubernetes.io/instance: trieve
+    app.kubernetes.io/name: trieve
+    app.kubernetes.io/part-of: trieve
+  name: trieve-ui-analytics
+  namespace: default
+spec:
+  rules:
+  - host: analytics.localtrieve.com
+    http:
+      paths:
+      - backend:
+          service:
+            name: trieve-ui-analytics
+            port:
+              name: http
+        path: /
+        pathType: Prefix
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  labels:
+    app.kubernetes.io/component: trieve-ui-chat
+    app.kubernetes.io/instance: trieve
+    app.kubernetes.io/name: trieve
+    app.kubernetes.io/part-of: trieve
+  name: trieve-ui-chat
+  namespace: default
+spec:
+  rules:
+  - host: chat.localtrieve.com
+    http:
+      paths:
+      - backend:
+          service:
+            name: trieve-ui-chat
+            port:
+              name: http
+        path: /
+        pathType: Prefix
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  labels:
+    app.kubernetes.io/component: trieve-ui-dashboard
+    app.kubernetes.io/instance: trieve
+    app.kubernetes.io/name: trieve
+    app.kubernetes.io/part-of: trieve
+  name: trieve-ui-dashboard
+  namespace: default
+spec:
+  rules:
+  - host: dashboard.localtrieve.com
+    http:
+      paths:
+      - backend:
+          service:
+            name: trieve-ui-dashboard
+            port:
+              name: http
+        path: /
+        pathType: Prefix
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  labels:
+    app.kubernetes.io/component: trieve-ui-search
+    app.kubernetes.io/instance: trieve
+    app.kubernetes.io/name: trieve
+    app.kubernetes.io/part-of: trieve
+  name: trieve-ui-search
+  namespace: default
+spec:
+  rules:
+  - host: search.localtrieve.com
+    http:
+      paths:
+      - backend:
+          service:
+            name: trieve-ui-search
+            port:
+              name: http
+        path: /
+        pathType: Prefix
+---
+apiVersion: postgresql.cnpg.io/v1
+kind: Cluster
+metadata:
+  labels:
+    app.kubernetes.io/component: keycloak
+    app.kubernetes.io/instance: trieve
+    app.kubernetes.io/name: trieve
+    app.kubernetes.io/part-of: trieve
+  name: trieve-keycloak-db
+  namespace: default
+spec:
+  bootstrap:
+    initdb:
+      database: keycloak
+      owner: keycloak
+  enableSuperuserAccess: false
+  instances: 1
+  monitoring:
+    enablePodMonitor: true
+  storage:
+    size: 2Gi
+---
+apiVersion: postgresql.cnpg.io/v1
+kind: Cluster
+metadata:
+  labels:
+    app.kubernetes.io/component: trieve-server
+    app.kubernetes.io/instance: trieve
+    app.kubernetes.io/name: trieve
+    app.kubernetes.io/part-of: trieve
+  name: trieve-postgresql-server
+  namespace: default
+spec:
+  bootstrap:
+    initdb:
+      database: trieve
+      owner: trieve
+  enableSuperuserAccess: false
+  instances: 2
+  monitoring:
+    enablePodMonitor: true
+  storage:
+    size: 2Gi

@@ -1,0 +1,255 @@
+# yaml-language-server: $schema=https://glasskube.dev/schemas/v1/package-manifest.json
+
+name: trieve
+shortDescription: Infrastructure for search, recommendations, RAG, and analytics
+longDescription: |
+  Trieve is all-in-one infrastructure for building hybrid vector search, recommendations,
+  RAG, and analytics offered via API.
+
+  **Make sure to read Glasskube trieve getting started guide:**
+  [https://github.com/devflowinc/trieve/tree/main/glasskube](https://github.com/devflowinc/trieve/tree/main/glasskube)
+
+  If you run trieve in CPU mode you should follow the instructions in the getting started guide.
+scope: Namespaced
+defaultNamespace: default
+iconUrl: https://avatars.githubusercontent.com/u/122049913
+manifests:
+  - url: ./trieve.yaml
+components:
+  - name: keycloak-operator
+    installedName: trieve-keycloak
+  - name: qdrant
+    installedName: trieve-qdrant
+  - name: redis
+    installedName: trieve-redis
+  - name: tika
+    installedName: trieve-tika
+dependencies:
+  - name: clickhouse-operator
+  - name: cloudnative-pg
+valueDefinitions:
+  cpuMode:
+    type: boolean
+    defaultValue: true
+    metadata:
+      label: CPU Mode
+      description: >
+        You can configure trieve to only do semantic search by only using bgem3 embedding server.
+    targets:
+      - patch:
+          op: replace
+          path: /spec/replicas
+        valueTemplate: |
+          {{ if eq . "true" }}0{{ else }}1{{ end }}
+        resource:
+          apiGroup: apps/v1
+          kind: Deployment
+          name: trieve-embedding-bgem3
+      - patch:
+          op: replace
+          path: /spec/replicas
+        valueTemplate: |
+          {{ if eq . "true" }}0{{ else }}1{{ end }}
+        resource:
+          apiGroup: apps/v1
+          kind: Deployment
+          name: trieve-embedding-jina
+      - patch:
+          op: replace
+          path: /spec/replicas
+        valueTemplate: |
+          {{ if eq . "true" }}0{{ else }}1{{ end }}
+        resource:
+          apiGroup: apps/v1
+          kind: Deployment
+          name: trieve-embedding-reranker
+      - patch:
+          op: replace
+          path: /spec/replicas
+        valueTemplate: |
+          {{ if eq . "true" }}0{{ else }}1{{ end }}
+        resource:
+          apiGroup: apps/v1
+          kind: Deployment
+          name: trieve-embedding-splade-doc
+      - patch:
+          op: replace
+          path: /spec/replicas
+        valueTemplate: |
+          {{ if eq . "true" }}0{{ else }}1{{ end }}
+        resource:
+          apiGroup: apps/v1
+          kind: Deployment
+          name: trieve-embedding-splade-doc
+  keyForAnthropicApi:
+    type: text
+    defaultValue: ""
+    metadata:
+      label: Anthropic API Key (optional)
+      description: >
+        Anthropic API key for accessing anthropic hosted models via trieve.
+    targets:
+      - patch:
+          op: replace
+          path: /data/ANTHROPIC_API_KEY
+        resource:
+          apiGroup: v1
+          kind: ConfigMap
+          name: trieve-server-config
+  keyForJinaCodeApi:
+    type: text
+    defaultValue: ""
+    metadata:
+      label: Jina AI API key (optional)
+      description: >
+        Jina Code Api key for accessing jina.ai hosted models via trieve.
+    targets:
+      - patch:
+          op: replace
+          path: /data/JINA_CODE_API_KEY
+        resource:
+          apiGroup: v1
+          kind: ConfigMap
+          name: trieve-server-config
+  keyForLlmApi:
+    type: text
+    defaultValue: ""
+    metadata:
+      label: LLM API Key (optional)
+      description: >
+        LLM API key for accessing third party LLMS.
+    targets:
+      - patch:
+          op: replace
+          path: /data/LLM_API_KEY
+        resource:
+          apiGroup: v1
+          kind: ConfigMap
+          name: trieve-server-config
+  keyForOpenaiApi:
+    type: text
+    defaultValue: ""
+    metadata:
+      label: Open AI API Key (optional)
+      description: >
+        Open AI API Key.
+    targets:
+      - patch:
+          op: replace
+          path: /data/OPENAI_API_KEY
+        resource:
+          apiGroup: v1
+          kind: ConfigMap
+          name: trieve-server-config
+  s3AccessKey:
+    defaultValue: ""
+    type: text
+    metadata:
+      label: S3 Access Key (optional)
+      description: >
+        S3 credentials for uploading data custom data to Trieve
+    targets:
+      - patch:
+          op: replace
+          path: /data/S3_ACCESS_KEY
+        resource:
+          apiGroup: v1
+          kind: ConfigMap
+          name: trieve-server-config
+  s3SecretKey:
+    type: text
+    defaultValue: ""
+    metadata:
+      label: S3 Secret Key (optional)
+      description: >
+        S3 credentials for uploading data custom data to Trieve
+    targets:
+      - patch:
+          op: replace
+          path: /data/S3_BUCKET
+        resource:
+          apiGroup: v1
+          kind: ConfigMap
+          name: trieve-server-config
+  s3Endpoint:
+    type: text
+    defaultValue: ""
+    metadata:
+      label: S3 Endpoint
+      description: >
+        S3 credentials for uploading data custom data to Trieve
+    targets:
+      - patch:
+          op: replace
+          path: /data/S3_ENDPOINT
+        resource:
+          apiGroup: v1
+          kind: ConfigMap
+          name: trieve-server-config
+  smtpEmailAddress:
+    type: text
+    defaultValue: ""
+    metadata:
+      label: SMTP email address
+      description: >
+        SMTP settings for sending out emails via trieve.
+    targets:
+      - patch:
+          op: replace
+          path: /data/SMTP_EMAIL_ADDRESS
+        resource:
+          apiGroup: v1
+          kind: ConfigMap
+          name: trieve-server-config
+  smtpServerUrl:
+    type: text
+    defaultValue: ""
+    metadata:
+      label: SMTP Server Url
+      description: >
+        SMTP settings for sending out emails via trieve.
+    targets:
+      - patch:
+          op: replace
+          path: /data/SMTP_RELAY
+        resource:
+          apiGroup: v1
+          kind: ConfigMap
+          name: trieve-server-config
+  smtpUsername:
+    type: text
+    defaultValue: ""
+    metadata:
+      label: SMTP username
+      description: >
+        SMTP settings for sending out emails via trieve.
+    targets:
+      - patch:
+          op: replace
+          path: /data/SMTP_USERNAME
+        resource:
+          apiGroup: v1
+          kind: ConfigMap
+          name: trieve-server-config
+  smtpUsernamePassword:
+    type: text
+    defaultValue: ""
+    metadata:
+      label: SMTP password
+      description: >
+        SMTP settings for sending out emails via trieve.
+    targets:
+      - patch:
+          op: replace
+          path: /data/SMTP_PASSWORD
+        resource:
+          apiGroup: v1
+          kind: ConfigMap
+          name: trieve-server-config
+references:
+  - label: Website
+    url: https://trieve.ai/
+  - label: Documentation
+    url: https://docs.trieve.ai/
+  - label: GitHub
+    url: https://github.com/devflowinc/trieve
