@@ -19,7 +19,7 @@ manifests:
 transitiveResources:
   - version: v1
     kind: Secret
-    name: tracecat-db-app # ??
+    name: tracecat-db-app # TODO fix once https://github.com/glasskube/glasskube/pull/1211 is merged and released
 valueDefinitions:
   tracecatDomain:
     type: text
