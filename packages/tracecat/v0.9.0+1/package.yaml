@@ -15,42 +15,39 @@ dependencies:
   - name: cloudnative-pg
     version: 1.x.x
 manifests:
-  - url: ./configmap.yaml
-  - url: ./cluster.yaml
-  - url: ./ingress.yaml
-  - url: ./api-deployment.yaml
-  - url: ./api-service.yaml
-  - url: ./ui-deployment.yaml
-  - url: ./ui-service.yaml
-  # - url: ./worker-deployment.yaml
+  - url: ./tracecat.yaml
+transitiveResources:
+  - version: v1
+    kind: Secret
+    name: tracecat-db-app # ??
 valueDefinitions:
   tracecatDomain:
     type: text
     metadata:
       label: Tracecat domain
       description: |
-        DNS name for the Tracecat Ingress – do not include `https` or any paths.
+        DNS name for the Tracecat Ingress
     constraints:
       pattern: ^([a-z0-9]([\-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([\-a-z0-9]*[a-z0-9])?)*)?$
       required: true
     targets:
       - patch:
           op: add
-          path: /data/NEXT_PUBLIC_APP_URL
+          path: /data/PUBLIC_APP_URL
         valueTemplate: |
           "https://{{ . }}"
         resource:
-          apiGroup: core/v1
+          apiGroup: v1
           kind: ConfigMap
           name: tracecat-config
-          namespace: tracecat # TODO!!
+          namespace: tracecat # TODO
       - patch:
           op: add
-          path: /data/NEXT_PUBLIC_API_URL
+          path: /data/PUBLIC_API_URL
         valueTemplate: |
           "https://{{ . }}/api"
         resource:
-          apiGroup: core/v1
+          apiGroup: v1
           kind: ConfigMap
-          name: tracecat-config-test
-          namespace: tracecat # TODO!!
+          name: tracecat-config
+          namespace: tracecat # TODO
