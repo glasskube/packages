@@ -1,5 +1,6 @@
 # yaml-language-server: $schema=https://glasskube.dev/schemas/v1/package-manifest.json
 name: temporal
+scope: Namespaced
 defaultNamespace: default
 manifests:
   - url: ./db.yaml
@@ -54,6 +55,20 @@ helm:
         enabled: true
 dependencies:
   - name: cloudnative-pg
+transformations:
+  - source:
+      path: "{ $.metadata.name }"
+    targets:
+      - chartName: temporal
+        valueTemplate: '"{{.}}-db-superuser"'
+        patch:
+          op: add
+          path: /server/config/persistence/default/sql/existingSecret
+      - chartName: temporal
+        valueTemplate: '"{{.}}-db-superuser"'
+        patch:
+          op: add
+          path: /server/config/persistence/visibility/sql/existingSecret
 references:
   - label: Website
     url: https://temporal.io/
