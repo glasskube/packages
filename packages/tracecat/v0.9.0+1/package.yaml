@@ -49,3 +49,10 @@ valueDefinitions:
           apiGroup: v1
           kind: ConfigMap
           name: tracecat-config
+      - patch:
+          op: add
+          path: /spec/rules/0/host
+        resource:
+          apiGroup: networking.k8s.io/v1
+          kind: Ingress
+          name: tracecat-ingress

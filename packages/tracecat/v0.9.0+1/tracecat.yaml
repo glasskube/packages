@@ -9,6 +9,12 @@ data:
   TRACECAT__DB_SSLMODE: "require" # not sure?
   TRACECAT__API_ROOT_PATH: "/api"
 ---
+apiVersion: v1
+kind: Secret
+type: generic
+metadata:
+  name: tracecat-keys
+---
 kind: Cluster
 apiVersion: postgresql.cnpg.io/v1
 metadata:
@@ -41,9 +47,19 @@ spec:
         app: tracecat-api
     spec:
 #      initContainers:
-#        - name: service-key-generator
-#          image: busybox:1.30
-#          command: [ 'sh', '-c', 'openssl rand -hex 32' ]
+#        - name: init-service-key
+#          image: bitnami/kubectl:latest
+#          command: ['sh', '-c', '
+#            kubectl get secret $SECRET_NAME
+#            if [ 0 != $? ]; then
+#              kubectl create secret generic $SECRET_NAME --from-literal=KEY=`openssl rand -hex 32` --immutable=true
+#            fi']
+#          env:
+#            - name: SECRET_NAME
+#              valueFrom:
+#                configMapKeyRef:
+#                  key: SERVICE_KEY_SECRET_NAME
+#                  name: tracecat-config
       containers:
         - name: tracecat-api
           image: "ghcr.io/tracecathq/tracecat:0.9.0"
@@ -79,6 +95,11 @@ spec:
                 configMapKeyRef:
                   name: tracecat-config
                   key: PUBLIC_API_URL
+            - name: TRACECAT__SERVICE_KEY
+              valueFrom:
+                secretKeyRef:
+                  key: SERVICE_KEY
+                  name: tracecat-keys
 ---
 kind: Service
 apiVersion: v1
@@ -94,10 +115,10 @@ spec:
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: tracecat
+  name: tracecat-ingress
 spec:
   rules:
-    - host: tracecat.local # TODO take from env/configmap
+    - host: ""
       http:
         paths:
           - path: /api
@@ -114,6 +135,7 @@ spec:
                 name: tracecat-ui
                 port:
                   number: 3000
+# TODO TLS?
 ---
 apiVersion: apps/v1
 kind: Deployment
