@@ -92,3 +92,4 @@ references:
 entrypoints:
   - serviceName: temporal-web
     port: 8080
+    localPort: 8448
