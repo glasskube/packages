@@ -2,8 +2,6 @@
 name: temporal
 scope: Namespaced
 defaultNamespace: default
-manifests:
-  - url: ./db.yaml
 helm:
   repositoryUrl: https://go.temporal.io/helm-charts
   chartName: temporal
@@ -54,29 +52,37 @@ helm:
         enabled: true
       update:
         enabled: true
-dependencies:
-  - name: cloudnative-pg
+components:
+  - name: postgresql
+    installedName: db
+    values:
+      enableSuperuserAccess:
+        value: "true"
+      databaseName:
+        value: "temporal"
+      storageSize:
+        value: "10Gi"
 transformations:
   - source:
       path: "{ $.metadata.name }"
     targets:
       - chartName: temporal
-        valueTemplate: '"{{.}}-db-superuser"'
+        valueTemplate: '"{{.}}-db-cluster-superuser"'
         patch:
           op: add
           path: /server/config/persistence/default/sql/existingSecret
       - chartName: temporal
-        valueTemplate: '"{{.}}-db-superuser"'
+        valueTemplate: '"{{.}}-db-cluster-superuser"'
         patch:
           op: add
           path: /server/config/persistence/visibility/sql/existingSecret
       - chartName: temporal
-        valueTemplate: '"{{.}}-db-rw"'
+        valueTemplate: '"{{.}}-db-cluster-rw"'
         patch:
           op: add
           path: /server/config/persistence/default/sql/host
       - chartName: temporal
-        valueTemplate: '"{{.}}-db-rw"'
+        valueTemplate: '"{{.}}-db-cluster-rw"'
         patch:
           op: add
           path: /server/config/persistence/visibility/sql/host
