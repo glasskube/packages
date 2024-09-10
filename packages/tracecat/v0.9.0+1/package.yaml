@@ -17,9 +17,9 @@ dependencies:
 manifests:
   - url: ./tracecat.yaml
 transitiveResources:
-  - version: v1
+  - apiGroup: v1
     kind: Secret
-    name: tracecat-db-app # TODO fix once https://github.com/glasskube/glasskube/pull/1211 is merged and released
+    name: tracecat-db-app
 valueDefinitions:
   tracecatDomain:
     type: text
