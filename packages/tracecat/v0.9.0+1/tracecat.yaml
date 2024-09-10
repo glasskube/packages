@@ -8,6 +8,40 @@ data:
   TRACECAT__AUTH_TYPES: "basic,google_oauth" # not yet configurable
   TRACECAT__DB_SSLMODE: "require" # not sure?
   TRACECAT__API_ROOT_PATH: "/api"
+  KEYS_SECRET_NAME: "" # patched by transformations
+  KEYS_SECRET_NAMESPACE: "" # patched by transformations
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: tracecat-key-generator-role
+rules:
+  - apiGroups:
+      - ""
+    resources:
+      - secrets
+    resourceNames:
+      - tracecat-keys
+    verbs:
+      - patch
+      - get
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: tracecat-key-generator
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: tracecat-key-generator-role-binding
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: tracecat-key-generator-role
+subjects:
+  - kind: ServiceAccount
+    name: tracecat-key-generator
 ---
 apiVersion: v1
 kind: Secret
@@ -46,20 +80,32 @@ spec:
       labels:
         app: tracecat-api
     spec:
-#      initContainers:
-#        - name: init-service-key
-#          image: bitnami/kubectl:latest
-#          command: ['sh', '-c', '
-#            kubectl get secret $SECRET_NAME
-#            if [ 0 != $? ]; then
-#              kubectl create secret generic $SECRET_NAME --from-literal=KEY=`openssl rand -hex 32` --immutable=true
-#            fi']
-#          env:
-#            - name: SECRET_NAME
-#              valueFrom:
-#                configMapKeyRef:
-#                  key: SERVICE_KEY_SECRET_NAME
-#                  name: tracecat-config
+      serviceAccountName: tracecat-key-generator # TODO service account only for init container maybe?
+      initContainers:
+        - name: init-keys-if-not-present
+          image: bitnami/kubectl:latest
+          command: ['bash', '-c', '
+                    serviceKey=`kubectl get secret -n $KEYS_SECRET_NAMESPACE $KEYS_SECRET_NAME -o jsonpath="{.data.SERVICE_KEY}"`;
+                    if [[ 0 == $? ]] && [[ $serviceKey == "" ]]; then
+                      serviceKey=`openssl rand -hex 32 | base64 -w 0`;
+                      kubectl patch secret -n $KEYS_SECRET_NAMESPACE $KEYS_SECRET_NAME -p "{\"data\": {\"SERVICE_KEY\": \"$serviceKey\"}}";
+                    fi;
+                    signingSecret=`kubectl get secret -n $KEYS_SECRET_NAMESPACE $KEYS_SECRET_NAME -o jsonpath="{.data.SIGNING_SECRET}"`;
+                    if [[ 0 == $? ]] && [[ $signingSecret == "" ]]; then
+                      signingSecret=`openssl rand -hex 32 | base64 -w 0`;
+                      kubectl patch secret -n $KEYS_SECRET_NAMESPACE $KEYS_SECRET_NAME -p "{\"data\": {\"SIGNING_SECRET\": \"$signingSecret\"}}";
+                    fi;']
+          env:
+            - name: KEYS_SECRET_NAMESPACE
+              valueFrom:
+                configMapKeyRef:
+                  key: KEYS_SECRET_NAMESPACE
+                  name: tracecat-config
+            - name: KEYS_SECRET_NAME
+              valueFrom:
+                configMapKeyRef:
+                  key: KEYS_SECRET_NAME
+                  name: tracecat-config
       containers:
         - name: tracecat-api
           image: "ghcr.io/tracecathq/tracecat:0.9.0"
@@ -98,8 +144,18 @@ spec:
             - name: TRACECAT__SERVICE_KEY
               valueFrom:
                 secretKeyRef:
-                  key: SERVICE_KEY
+                  key: SERVICE_KEY # patched by the init container if not exists
                   name: tracecat-keys
+            - name: TRACECAT__SIGNING_SECRET
+              valueFrom:
+                secretKeyRef:
+                  key: SIGNING_SECRET # patched by the init container if not exists
+                  name: tracecat-keys
+#            - name: TRACECAT__DB_ENCRYPTION_KEY
+#              valueFrom:
+#                secretKeyRef:
+#                  key: DB_ENCRYPTION_KEY # patched by the init container if not exists
+#                  name: tracecat-keys
 ---
 kind: Service
 apiVersion: v1
@@ -194,30 +250,30 @@ spec:
   selector:
     app: tracecat-ui
 ---
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: tracecat-worker
-  labels:
-    app.kubernetes.io/name: tracecat-worker
-spec:
-  selector:
-    matchLabels:
-      app: tracecat-worker
-  template:
-    metadata:
-      labels:
-        app: tracecat-worker
-    spec:
-      containers:
-        - name: tracecat-worker
-          image: "ghcr.io/tracecathq/tracecat:0.9.0"
-          command: ["python", "tracecat/dsl/worker.py"]
-          envFrom:
-            - secretRef:
-                name: tracecat-db-app
-            - configMapRef:
-                name: tracecat-config
-          env:
-            - name: TRACECAT__DB_URI
-              value: "postgresql+psycopg://$(username):$(password)@$(host):$(port)/$(dbname)"
+#apiVersion: apps/v1
+#kind: Deployment
+#metadata:
+#  name: tracecat-worker
+#  labels:
+#    app.kubernetes.io/name: tracecat-worker
+#spec:
+#  selector:
+#    matchLabels:
+#      app: tracecat-worker
+#  template:
+#    metadata:
+#      labels:
+#        app: tracecat-worker
+#    spec:
+#      containers:
+#        - name: tracecat-worker
+#          image: "ghcr.io/tracecathq/tracecat:0.9.0"
+#          command: ["python", "tracecat/dsl/worker.py"]
+#          envFrom:
+#            - secretRef:
+#                name: tracecat-db-app
+#            - configMapRef:
+#                name: tracecat-config
+#          env:
+#            - name: TRACECAT__DB_URI
+#              value: "postgresql+psycopg://$(username):$(password)@$(host):$(port)/$(dbname)"

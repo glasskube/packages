@@ -56,3 +56,26 @@ valueDefinitions:
           apiGroup: networking.k8s.io/v1
           kind: Ingress
           name: tracecat-ingress
+transformations:
+  - source:
+      path: "{ $.metadata.name }"
+    targets:
+      - patch:
+          op: add
+          path: /data/KEYS_SECRET_NAME
+        valueTemplate: |
+          "{{ . }}-tracecat-keys"
+        resource:
+          apiGroup: v1
+          kind: ConfigMap
+          name: tracecat-config
+  - source:
+      path: "{ $.metadata.namespace }"
+    targets:
+      - patch:
+          op: add
+          path: /data/KEYS_SECRET_NAMESPACE
+        resource:
+          apiGroup: v1
+          kind: ConfigMap
+          name: tracecat-config
