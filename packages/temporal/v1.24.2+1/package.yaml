@@ -47,6 +47,7 @@ helm:
     elasticsearch:
       enabled: false
     schema:
+      ttlSecondsAfterFinished: 10
       createDatabase:
         enabled: true
       setup:
