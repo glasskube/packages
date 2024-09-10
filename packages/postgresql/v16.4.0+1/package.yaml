@@ -1,0 +1,65 @@
+# yaml-language-server: $schema=https://glasskube.dev/schemas/v1/package-manifest.json
+name: postgresql
+scope: Namespaced
+defaultNamespace: default
+iconUrl: https://www.postgresql.org/media/img/about/press/elephant.png
+shortDescription: The World's Most Advanced Open Source Relational Database
+longDescription: |
+  This package creates a PostgreSQL database running in your cluster using the cloudnative-pg operator.
+dependencies:
+  - name: cloudnative-pg
+references:
+  - label: Website
+    url: https://www.postgresql.org/
+manifests:
+  - url: ./manifest.yaml
+valueDefinitions:
+  instances:
+    type: number
+    defaultValue: "1"
+    constraints:
+      min: 0
+    targets:
+      - resource:
+          apiGroup: postgresql.cnpg.io/v1
+          kind: Cluster
+          name: cluster
+        patch:
+          op: add
+          path: /spec/instances
+        valueTemplate: "{{.}}"
+  enableSuperuserAccess:
+    type: boolean
+    targets:
+      - resource:
+          apiGroup: postgresql.cnpg.io/v1
+          kind: Cluster
+          name: cluster
+        patch:
+          op: add
+          path: /spec/enableSuperuserAccess
+        valueTemplate: "{{.}}"
+  databaseName:
+    type: text
+    constraints:
+      required: true
+      minLength: 1
+    targets:
+      - resource:
+          apiGroup: postgresql.cnpg.io/v1
+          kind: Cluster
+          name: cluster
+        patch:
+          op: add
+          path: /spec/bootstrap/initdb/database
+  storageSize:
+    type: text
+    defaultValue: 10Gi
+    targets:
+      - resource:
+          apiGroup: postgresql.cnpg.io/v1
+          kind: Cluster
+          name: cluster
+        patch:
+          op: add
+          path: /spec/storage/size
