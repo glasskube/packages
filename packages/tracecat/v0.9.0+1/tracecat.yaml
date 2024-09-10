@@ -81,9 +81,24 @@ spec:
         app: tracecat-api
     spec:
       serviceAccountName: tracecat-key-generator # TODO service account only for init container maybe?
+      volumes:
+        - name: init-dir
+          emptyDir: {}
       initContainers:
-        - name: init-keys-if-not-present
+        - name: generate-db-encryption-key
+          image: python:3.12-slim-bookworm
+          command: ['bash', '-c', '
+            pip install cryptography >/dev/null 2>&1;
+            python -c "from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())" > /init-dir/db-encryption-key
+          ']
+          volumeMounts:
+            - mountPath: /init-dir
+              name: init-dir
+        - name: set-keys-if-not-present
           image: bitnami/kubectl:latest
+          volumeMounts:
+            - mountPath: /init-dir
+              name: init-dir
           command: ['bash', '-c', '
                     serviceKey=`kubectl get secret -n $KEYS_SECRET_NAMESPACE $KEYS_SECRET_NAME -o jsonpath="{.data.SERVICE_KEY}"`;
                     if [[ 0 == $? ]] && [[ $serviceKey == "" ]]; then
@@ -94,6 +109,11 @@ spec:
                     if [[ 0 == $? ]] && [[ $signingSecret == "" ]]; then
                       signingSecret=`openssl rand -hex 32 | base64 -w 0`;
                       kubectl patch secret -n $KEYS_SECRET_NAMESPACE $KEYS_SECRET_NAME -p "{\"data\": {\"SIGNING_SECRET\": \"$signingSecret\"}}";
+                    fi;
+                    dbEncryptionKey=`kubectl get secret -n $KEYS_SECRET_NAMESPACE $KEYS_SECRET_NAME -o jsonpath="{.data.DB_ENCRYPTION_KEY}"`;
+                    if [[ 0 == $? ]] && [[ $dbEncryptionKey == "" ]]; then
+                      dbEncryptionKey=`cat /init-dir/db-encryption-key | base64 -w 0`;
+                      kubectl patch secret -n $KEYS_SECRET_NAMESPACE $KEYS_SECRET_NAME -p "{\"data\": {\"DB_ENCRYPTION_KEY\": \"$dbEncryptionKey\"}}";
                     fi;']
           env:
             - name: KEYS_SECRET_NAMESPACE
@@ -151,11 +171,11 @@ spec:
                 secretKeyRef:
                   key: SIGNING_SECRET # patched by the init container if not exists
                   name: tracecat-keys
-#            - name: TRACECAT__DB_ENCRYPTION_KEY
-#              valueFrom:
-#                secretKeyRef:
-#                  key: DB_ENCRYPTION_KEY # patched by the init container if not exists
-#                  name: tracecat-keys
+            - name: TRACECAT__DB_ENCRYPTION_KEY
+              valueFrom:
+                secretKeyRef:
+                  key: DB_ENCRYPTION_KEY # patched by the init container if not exists
+                  name: tracecat-keys
 ---
 kind: Service
 apiVersion: v1
