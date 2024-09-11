@@ -88,6 +88,11 @@ packages:
     name: node-feature-discovery
     shortDescription: Detects hardware features available on each node in a
       Kubernetes cluster, and advertises those features using node labels.
+  - iconUrl: https://www.postgresql.org/media/img/about/press/elephant.png
+    latestVersion: v16.4.0+1
+    name: postgresql
+    scope: Namespaced
+    shortDescription: The World's Most Advanced Open Source Relational Database
   - iconUrl: https://avatars.githubusercontent.com/u/73504361
     latestVersion: v1.11.3+1
     name: qdrant
