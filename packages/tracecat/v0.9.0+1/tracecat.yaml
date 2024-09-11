@@ -8,8 +8,6 @@ data:
   TRACECAT__AUTH_TYPES: "basic,google_oauth" # not yet configurable
   TRACECAT__DB_SSLMODE: "require" # not sure?
   TRACECAT__API_ROOT_PATH: "/api"
-  KEYS_SECRET_NAME: "" # patched by transformations
-  KEYS_SECRET_NAMESPACE: "" # patched by transformations
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
@@ -42,12 +40,6 @@ roleRef:
 subjects:
   - kind: ServiceAccount
     name: tracecat-key-generator
----
-apiVersion: v1
-kind: Secret
-type: generic
-metadata:
-  name: tracecat-keys
 ---
 kind: Cluster
 apiVersion: postgresql.cnpg.io/v1
@@ -99,6 +91,8 @@ spec:
           volumeMounts:
             - mountPath: /init-dir
               name: init-dir
+              # TODO move script to config map and let kustomize do generate config map etc
+              # logic should become: get secret. if not exists: create the complete secret (and make immutable?) in one create command
           command: ['bash', '-c', '
                     serviceKey=`kubectl get secret -n $KEYS_SECRET_NAMESPACE $KEYS_SECRET_NAME -o jsonpath="{.data.SERVICE_KEY}"`;
                     if [[ 0 == $? ]] && [[ $serviceKey == "" ]]; then
@@ -118,14 +112,14 @@ spec:
           env:
             - name: KEYS_SECRET_NAMESPACE
               valueFrom:
-                configMapKeyRef:
-                  key: KEYS_SECRET_NAMESPACE
-                  name: tracecat-config
-            - name: KEYS_SECRET_NAME
+                fieldRef:
+                  fieldPath: metadata.namespace
+            - name: GLASSKUBE_INSTANCE_NAME
               valueFrom:
-                configMapKeyRef:
-                  key: KEYS_SECRET_NAME
-                  name: tracecat-config
+                fieldRef:
+                  fieldPath: metadata.labels['packages.glasskube.dev/instance']
+            - name: KEYS_SECRET_NAME
+              value: "$(GLASSKUBE_INSTANCE_NAME)-tracecat-keys"
       containers:
         - name: tracecat-api
           image: "ghcr.io/tracecathq/tracecat:0.9.0"
