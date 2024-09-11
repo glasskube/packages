@@ -2,41 +2,33 @@ apiVersion: v1
 kind: ServiceAccount
 metadata:
   labels:
-    app.kubernetes.io/instance: tracecat
     app.kubernetes.io/name: tracecat
     app.kubernetes.io/part-of: tracecat
   name: tracecat-key-generator
-  namespace: default
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
   labels:
-    app.kubernetes.io/instance: tracecat
     app.kubernetes.io/name: tracecat
     app.kubernetes.io/part-of: tracecat
   name: tracecat-key-generator-role
-  namespace: default
 rules:
 - apiGroups:
   - ""
-  resourceNames:
-  - tracecat-keys
   resources:
   - secrets
   verbs:
-  - patch
+  - create
   - get
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
   labels:
-    app.kubernetes.io/instance: tracecat
     app.kubernetes.io/name: tracecat
     app.kubernetes.io/part-of: tracecat
   name: tracecat-key-generator-role-binding
-  namespace: default
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: Role
@@ -44,7 +36,6 @@ roleRef:
 subjects:
 - kind: ServiceAccount
   name: tracecat-key-generator
-  namespace: default
 ---
 apiVersion: v1
 data:
@@ -56,11 +47,9 @@ data:
 kind: ConfigMap
 metadata:
   labels:
-    app.kubernetes.io/instance: tracecat
     app.kubernetes.io/name: tracecat
     app.kubernetes.io/part-of: tracecat
   name: tracecat-config
-  namespace: default
 ---
 apiVersion: v1
 data:
@@ -73,40 +62,39 @@ data:
     #!/bin/bash
 
     kubectl get secret -n $KEYS_SECRET_NAMESPACE $KEYS_SECRET_NAME
+    # TODO also read the returned secret and check contents?
+    # or maybe check whether the output contains "NotFound" ?
 
     if [[ 0 != $? ]]; then
-      serviceKey=`openssl rand -hex 32 | base64 -w 0`;
-      signingSecret=`openssl rand -hex 32 | base64 -w 0`;
-      dbEncryptionKey=`cat /init-dir/db-encryption-key | base64 -w 0`;
-      kubectl create secret -n $KEYS_SECRET_NAMESPACE $KEYS_SECRET_NAME --immutable=true \
-        --from-literal=TRACECAT__SERVICE_KEY=$serviceKey \
-        --from-literal=TRACECAT__SIGNING_SECRET=$signingSecret \
-        --from-literal=TRACECAT__DB_ENCRYPTION_KEY=$dbEncryptionKey
+      serviceKey=`openssl rand -hex 32`;
+      signingSecret=`openssl rand -hex 32`;
+      dbEncryptionKey=`cat /init-dir/db-encryption-key`;
+      # TODO mark immutable!!
+      kubectl create secret generic -n $KEYS_SECRET_NAMESPACE $KEYS_SECRET_NAME \
+        --from-literal=SERVICE_KEY=$serviceKey \
+        --from-literal=SIGNING_SECRET=$signingSecret \
+        --from-literal=DB_ENCRYPTION_KEY=$dbEncryptionKey
     fi
 kind: ConfigMap
 metadata:
   labels:
-    app.kubernetes.io/instance: tracecat
     app.kubernetes.io/name: tracecat
     app.kubernetes.io/part-of: tracecat
   name: tracecat-key-scripts
-  namespace: default
 ---
 apiVersion: v1
 kind: Service
 metadata:
   labels:
-    app.kubernetes.io/instance: tracecat
+    app.kubernetes.io/component: tracecat-api
     app.kubernetes.io/name: tracecat
     app.kubernetes.io/part-of: tracecat
   name: tracecat-api
-  namespace: default
 spec:
   ports:
   - name: tracecat-api
     port: 8000
   selector:
-    app.kubernetes.io/instance: tracecat
     app.kubernetes.io/name: tracecat
     app.kubernetes.io/part-of: tracecat
 ---
@@ -115,18 +103,15 @@ kind: Service
 metadata:
   labels:
     app.kubernetes.io/component: tracecat-ui
-    app.kubernetes.io/instance: tracecat
     app.kubernetes.io/name: tracecat
     app.kubernetes.io/part-of: tracecat
   name: tracecat-ui
-  namespace: default
 spec:
   ports:
   - name: tracecat-ui
     port: 3000
   selector:
     app.kubernetes.io/component: tracecat-ui
-    app.kubernetes.io/instance: tracecat
     app.kubernetes.io/name: tracecat
     app.kubernetes.io/part-of: tracecat
 ---
@@ -135,21 +120,17 @@ kind: Deployment
 metadata:
   labels:
     app.kubernetes.io/component: tracecat-api
-    app.kubernetes.io/instance: tracecat
     app.kubernetes.io/name: tracecat
     app.kubernetes.io/part-of: tracecat
   name: tracecat-api
-  namespace: default
 spec:
   selector:
     matchLabels:
-      app.kubernetes.io/instance: tracecat
       app.kubernetes.io/name: tracecat
       app.kubernetes.io/part-of: tracecat
   template:
     metadata:
       labels:
-        app.kubernetes.io/instance: tracecat
         app.kubernetes.io/name: tracecat
         app.kubernetes.io/part-of: tracecat
     spec:
@@ -223,7 +204,7 @@ spec:
         - name: GLASSKUBE_INSTANCE_NAME
           valueFrom:
             fieldRef:
-              fieldPath: metadata.labels["packages.glasskube.dev/instance"]
+              fieldPath: metadata.labels['packages.glasskube.dev/instance']
         - name: KEYS_SECRET_NAME
           value: $(GLASSKUBE_INSTANCE_NAME)-tracecat-keys
         image: bitnami/kubectl:1.30.0
@@ -238,7 +219,7 @@ spec:
       - emptyDir: {}
         name: init-dir
       - configMap:
-          defaultMode: 320
+          defaultMode: 493
           name: tracecat-key-scripts
         name: scripts
 ---
@@ -247,23 +228,19 @@ kind: Deployment
 metadata:
   labels:
     app.kubernetes.io/component: tracecat-ui
-    app.kubernetes.io/instance: tracecat
     app.kubernetes.io/name: tracecat
     app.kubernetes.io/part-of: tracecat
   name: tracecat-ui
-  namespace: default
 spec:
   selector:
     matchLabels:
       app.kubernetes.io/component: tracecat-ui
-      app.kubernetes.io/instance: tracecat
       app.kubernetes.io/name: tracecat
       app.kubernetes.io/part-of: tracecat
   template:
     metadata:
       labels:
         app.kubernetes.io/component: tracecat-ui
-        app.kubernetes.io/instance: tracecat
         app.kubernetes.io/name: tracecat
         app.kubernetes.io/part-of: tracecat
     spec:
@@ -302,21 +279,17 @@ kind: Deployment
 metadata:
   labels:
     app.kubernetes.io/component: tracecat-worker
-    app.kubernetes.io/instance: tracecat
     app.kubernetes.io/name: tracecat
     app.kubernetes.io/part-of: tracecat
   name: tracecat-worker
-  namespace: default
 spec:
   selector:
     matchLabels:
-      app.kubernetes.io/instance: tracecat
       app.kubernetes.io/name: tracecat
       app.kubernetes.io/part-of: tracecat
   template:
     metadata:
       labels:
-        app.kubernetes.io/instance: tracecat
         app.kubernetes.io/name: tracecat
         app.kubernetes.io/part-of: tracecat
     spec:
@@ -340,11 +313,9 @@ kind: Ingress
 metadata:
   labels:
     app.kubernetes.io/component: tracecat-ui
-    app.kubernetes.io/instance: tracecat
     app.kubernetes.io/name: tracecat
     app.kubernetes.io/part-of: tracecat
   name: tracecat-ui
-  namespace: default
 spec:
   rules:
   - host: ""
@@ -369,11 +340,9 @@ apiVersion: postgresql.cnpg.io/v1
 kind: Cluster
 metadata:
   labels:
-    app.kubernetes.io/instance: tracecat
     app.kubernetes.io/name: tracecat
     app.kubernetes.io/part-of: tracecat
   name: tracecat-db
-  namespace: default
 spec:
   bootstrap:
     initdb:

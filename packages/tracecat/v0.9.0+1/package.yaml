@@ -58,4 +58,4 @@ valueDefinitions:
         resource:
           apiGroup: networking.k8s.io/v1
           kind: Ingress
-          name: tracecat-ingress
+          name: tracecat-ui
