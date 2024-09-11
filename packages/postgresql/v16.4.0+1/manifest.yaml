@@ -4,6 +4,7 @@ metadata:
   name: cluster
 spec:
   instances: 1
+  imageName: ghcr.io/cloudnative-pg/postgresql:16.4
   bootstrap:
     initdb: {}
   storage: {}
