@@ -14,12 +14,24 @@ references:
 dependencies:
   - name: cloudnative-pg
     version: 1.x.x
+components:
+#  - name: temporal
+#    version: 1.x.x
+  - name: postgresql
+    installedName: tracecat-db
+    values:
+      enableSuperuserAccess:
+        value: "false"
+      databaseName:
+        value: "tracecat"
+      storageSize:
+        value: "10Gi"
 manifests:
   - url: ./tracecat.yaml
 transitiveResources:
   - apiGroup: v1
     kind: Secret
-    name: tracecat-db-app
+    name: tracecat-db-cluster-app
   - apiGroup: v1
     kind: Secret
     name: tracecat-keys

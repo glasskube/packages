@@ -177,7 +177,7 @@ spec:
               name: tracecat-keys
         envFrom:
         - secretRef:
-            name: tracecat-db-app
+            name: tracecat-db-cluster-app
         - configMapRef:
             name: tracecat-config
         image: ghcr.io/tracecathq/tracecat:0.10.1
@@ -335,22 +335,3 @@ spec:
               number: 3000
         path: /
         pathType: Prefix
----
-apiVersion: postgresql.cnpg.io/v1
-kind: Cluster
-metadata:
-  labels:
-    app.kubernetes.io/name: tracecat
-    app.kubernetes.io/part-of: tracecat
-  name: tracecat-db
-spec:
-  bootstrap:
-    initdb:
-      database: tracecat
-      owner: tracecat
-  enableSuperuserAccess: false
-  instances: 1
-  monitoring:
-    enablePodMonitor: true
-  storage:
-    size: 2Gi
