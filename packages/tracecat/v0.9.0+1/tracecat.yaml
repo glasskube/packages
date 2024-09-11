@@ -1,293 +1,387 @@
 apiVersion: v1
-kind: ConfigMap
+kind: ServiceAccount
 metadata:
-  name: tracecat-config
-data:
-  LOG_LEVEL: "INFO"
-  TRACECAT__APP_ENV: "production" # not yet configurable, not sure if that would make sense?
-  TRACECAT__AUTH_TYPES: "basic,google_oauth" # not yet configurable
-  TRACECAT__DB_SSLMODE: "require" # not sure?
-  TRACECAT__API_ROOT_PATH: "/api"
+  labels:
+    app.kubernetes.io/instance: tracecat
+    app.kubernetes.io/name: tracecat
+    app.kubernetes.io/part-of: tracecat
+  name: tracecat-key-generator
+  namespace: default
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
+  labels:
+    app.kubernetes.io/instance: tracecat
+    app.kubernetes.io/name: tracecat
+    app.kubernetes.io/part-of: tracecat
   name: tracecat-key-generator-role
+  namespace: default
 rules:
-  - apiGroups:
-      - ""
-    resources:
-      - secrets
-    resourceNames:
-      - tracecat-keys
-    verbs:
-      - patch
-      - get
----
-apiVersion: v1
-kind: ServiceAccount
-metadata:
-  name: tracecat-key-generator
+- apiGroups:
+  - ""
+  resourceNames:
+  - tracecat-keys
+  resources:
+  - secrets
+  verbs:
+  - patch
+  - get
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
+  labels:
+    app.kubernetes.io/instance: tracecat
+    app.kubernetes.io/name: tracecat
+    app.kubernetes.io/part-of: tracecat
   name: tracecat-key-generator-role-binding
+  namespace: default
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: Role
   name: tracecat-key-generator-role
 subjects:
-  - kind: ServiceAccount
-    name: tracecat-key-generator
+- kind: ServiceAccount
+  name: tracecat-key-generator
+  namespace: default
 ---
-kind: Cluster
-apiVersion: postgresql.cnpg.io/v1
+apiVersion: v1
+data:
+  LOG_LEVEL: INFO
+  TRACECAT__API_ROOT_PATH: /api
+  TRACECAT__APP_ENV: production
+  TRACECAT__AUTH_TYPES: basic,google_oauth
+  TRACECAT__DB_SSLMODE: require
+kind: ConfigMap
 metadata:
-  name: tracecat-db
+  labels:
+    app.kubernetes.io/instance: tracecat
+    app.kubernetes.io/name: tracecat
+    app.kubernetes.io/part-of: tracecat
+  name: tracecat-config
+  namespace: default
+---
+apiVersion: v1
+data:
+  fernet-key-generator.sh: |
+    #!/bin/bash
+
+    pip install cryptography >/dev/null 2>&1;
+    python -c "from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())" > /init-dir/db-encryption-key
+  tracecat-key-manager.sh: |
+    #!/bin/bash
+
+    kubectl get secret -n $KEYS_SECRET_NAMESPACE $KEYS_SECRET_NAME
+
+    if [[ 0 != $? ]]; then
+      serviceKey=`openssl rand -hex 32 | base64 -w 0`;
+      signingSecret=`openssl rand -hex 32 | base64 -w 0`;
+      dbEncryptionKey=`cat /init-dir/db-encryption-key | base64 -w 0`;
+      kubectl create secret -n $KEYS_SECRET_NAMESPACE $KEYS_SECRET_NAME --immutable=true \
+        --from-literal=TRACECAT__SERVICE_KEY=$serviceKey \
+        --from-literal=TRACECAT__SIGNING_SECRET=$signingSecret \
+        --from-literal=TRACECAT__DB_ENCRYPTION_KEY=$dbEncryptionKey
+    fi
+kind: ConfigMap
+metadata:
+  labels:
+    app.kubernetes.io/instance: tracecat
+    app.kubernetes.io/name: tracecat
+    app.kubernetes.io/part-of: tracecat
+  name: tracecat-key-scripts
+  namespace: default
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app.kubernetes.io/instance: tracecat
+    app.kubernetes.io/name: tracecat
+    app.kubernetes.io/part-of: tracecat
+  name: tracecat-api
+  namespace: default
 spec:
-  enableSuperuserAccess: false
-  instances: 1
-  bootstrap:
-    initdb:
-      database: tracecat
-      owner: tracecat
-  storage:
-    size: 2Gi
-  monitoring:
-    enablePodMonitor: true
+  ports:
+  - name: tracecat-api
+    port: 8000
+  selector:
+    app.kubernetes.io/instance: tracecat
+    app.kubernetes.io/name: tracecat
+    app.kubernetes.io/part-of: tracecat
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app.kubernetes.io/component: tracecat-ui
+    app.kubernetes.io/instance: tracecat
+    app.kubernetes.io/name: tracecat
+    app.kubernetes.io/part-of: tracecat
+  name: tracecat-ui
+  namespace: default
+spec:
+  ports:
+  - name: tracecat-ui
+    port: 3000
+  selector:
+    app.kubernetes.io/component: tracecat-ui
+    app.kubernetes.io/instance: tracecat
+    app.kubernetes.io/name: tracecat
+    app.kubernetes.io/part-of: tracecat
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: tracecat-api
   labels:
-    app.kubernetes.io/name: tracecat-api
+    app.kubernetes.io/component: tracecat-api
+    app.kubernetes.io/instance: tracecat
+    app.kubernetes.io/name: tracecat
+    app.kubernetes.io/part-of: tracecat
+  name: tracecat-api
+  namespace: default
 spec:
   selector:
     matchLabels:
-      app: tracecat-api
+      app.kubernetes.io/instance: tracecat
+      app.kubernetes.io/name: tracecat
+      app.kubernetes.io/part-of: tracecat
   template:
     metadata:
       labels:
-        app: tracecat-api
+        app.kubernetes.io/instance: tracecat
+        app.kubernetes.io/name: tracecat
+        app.kubernetes.io/part-of: tracecat
     spec:
-      serviceAccountName: tracecat-key-generator # TODO service account only for init container maybe?
-      volumes:
-        - name: init-dir
-          emptyDir: {}
-      initContainers:
-        - name: generate-db-encryption-key
-          image: python:3.12-slim-bookworm
-          command: ['bash', '-c', '
-            pip install cryptography >/dev/null 2>&1;
-            python -c "from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())" > /init-dir/db-encryption-key
-          ']
-          volumeMounts:
-            - mountPath: /init-dir
-              name: init-dir
-        - name: set-keys-if-not-present
-          image: bitnami/kubectl:latest
-          volumeMounts:
-            - mountPath: /init-dir
-              name: init-dir
-              # TODO move script to config map and let kustomize do generate config map etc
-              # logic should become: get secret. if not exists: create the complete secret (and make immutable?) in one create command
-          command: ['bash', '-c', '
-                    serviceKey=`kubectl get secret -n $KEYS_SECRET_NAMESPACE $KEYS_SECRET_NAME -o jsonpath="{.data.SERVICE_KEY}"`;
-                    if [[ 0 == $? ]] && [[ $serviceKey == "" ]]; then
-                      serviceKey=`openssl rand -hex 32 | base64 -w 0`;
-                      kubectl patch secret -n $KEYS_SECRET_NAMESPACE $KEYS_SECRET_NAME -p "{\"data\": {\"SERVICE_KEY\": \"$serviceKey\"}}";
-                    fi;
-                    signingSecret=`kubectl get secret -n $KEYS_SECRET_NAMESPACE $KEYS_SECRET_NAME -o jsonpath="{.data.SIGNING_SECRET}"`;
-                    if [[ 0 == $? ]] && [[ $signingSecret == "" ]]; then
-                      signingSecret=`openssl rand -hex 32 | base64 -w 0`;
-                      kubectl patch secret -n $KEYS_SECRET_NAMESPACE $KEYS_SECRET_NAME -p "{\"data\": {\"SIGNING_SECRET\": \"$signingSecret\"}}";
-                    fi;
-                    dbEncryptionKey=`kubectl get secret -n $KEYS_SECRET_NAMESPACE $KEYS_SECRET_NAME -o jsonpath="{.data.DB_ENCRYPTION_KEY}"`;
-                    if [[ 0 == $? ]] && [[ $dbEncryptionKey == "" ]]; then
-                      dbEncryptionKey=`cat /init-dir/db-encryption-key | base64 -w 0`;
-                      kubectl patch secret -n $KEYS_SECRET_NAMESPACE $KEYS_SECRET_NAME -p "{\"data\": {\"DB_ENCRYPTION_KEY\": \"$dbEncryptionKey\"}}";
-                    fi;']
-          env:
-            - name: KEYS_SECRET_NAMESPACE
-              valueFrom:
-                fieldRef:
-                  fieldPath: metadata.namespace
-            - name: GLASSKUBE_INSTANCE_NAME
-              valueFrom:
-                fieldRef:
-                  fieldPath: metadata.labels['packages.glasskube.dev/instance']
-            - name: KEYS_SECRET_NAME
-              value: "$(GLASSKUBE_INSTANCE_NAME)-tracecat-keys"
       containers:
-        - name: tracecat-api
-          image: "ghcr.io/tracecathq/tracecat:0.9.0"
-          ports:
-            - containerPort: 8000
-          envFrom:
-            - secretRef:
-                name: tracecat-db-app
-            - configMapRef:
-                name: tracecat-config
-          env:
-            - name: TRACECAT__DB_URI
-              value: "postgresql+psycopg://$(username):$(password)@$(host):$(port)/$(dbname)"
-            - name: RUN_MIGRATIONS
-              value: "true"
-            - name: TRACECAT__PUBLIC_RUNNER_URL
-              valueFrom:
-                configMapKeyRef:
-                  name: tracecat-config
-                  key: PUBLIC_API_URL
-            - name: TRACECAT__ALLOW_ORIGINS
-              valueFrom:
-                configMapKeyRef:
-                  name: tracecat-config
-                  key: PUBLIC_APP_URL
-            - name: TRACECAT__PUBLIC_APP_URL
-              valueFrom:
-                configMapKeyRef:
-                  name: tracecat-config
-                  key: PUBLIC_APP_URL
-            - name: TRACECAT__PUBLIC_API_URL
-              valueFrom:
-                configMapKeyRef:
-                  name: tracecat-config
-                  key: PUBLIC_API_URL
-            - name: TRACECAT__SERVICE_KEY
-              valueFrom:
-                secretKeyRef:
-                  key: SERVICE_KEY # patched by the init container if not exists
-                  name: tracecat-keys
-            - name: TRACECAT__SIGNING_SECRET
-              valueFrom:
-                secretKeyRef:
-                  key: SIGNING_SECRET # patched by the init container if not exists
-                  name: tracecat-keys
-            - name: TRACECAT__DB_ENCRYPTION_KEY
-              valueFrom:
-                secretKeyRef:
-                  key: DB_ENCRYPTION_KEY # patched by the init container if not exists
-                  name: tracecat-keys
+      - env:
+        - name: TRACECAT__DB_URI
+          value: postgresql+psycopg://$(username):$(password)@$(host):$(port)/$(dbname)
+        - name: RUN_MIGRATIONS
+          value: "true"
+        - name: TRACECAT__PUBLIC_RUNNER_URL
+          valueFrom:
+            configMapKeyRef:
+              key: PUBLIC_API_URL
+              name: tracecat-config
+        - name: TRACECAT__ALLOW_ORIGINS
+          valueFrom:
+            configMapKeyRef:
+              key: PUBLIC_APP_URL
+              name: tracecat-config
+        - name: TRACECAT__PUBLIC_APP_URL
+          valueFrom:
+            configMapKeyRef:
+              key: PUBLIC_APP_URL
+              name: tracecat-config
+        - name: TRACECAT__PUBLIC_API_URL
+          valueFrom:
+            configMapKeyRef:
+              key: PUBLIC_API_URL
+              name: tracecat-config
+        - name: TRACECAT__SERVICE_KEY
+          valueFrom:
+            secretKeyRef:
+              key: SERVICE_KEY
+              name: tracecat-keys
+        - name: TRACECAT__SIGNING_SECRET
+          valueFrom:
+            secretKeyRef:
+              key: SIGNING_SECRET
+              name: tracecat-keys
+        - name: TRACECAT__DB_ENCRYPTION_KEY
+          valueFrom:
+            secretKeyRef:
+              key: DB_ENCRYPTION_KEY
+              name: tracecat-keys
+        envFrom:
+        - secretRef:
+            name: tracecat-db-app
+        - configMapRef:
+            name: tracecat-config
+        image: ghcr.io/tracecathq/tracecat:0.9.0
+        name: tracecat-api
+        ports:
+        - containerPort: 8000
+      initContainers:
+      - command:
+        - /scripts/fernet-key-generator.sh
+        image: python:3.12-slim-bookworm
+        name: generate-db-encryption-key
+        volumeMounts:
+        - mountPath: /init-dir
+          name: init-dir
+        - mountPath: /scripts
+          name: scripts
+      - command:
+        - /scripts/tracecat-key-manager.sh
+        env:
+        - name: KEYS_SECRET_NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        - name: GLASSKUBE_INSTANCE_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.labels["packages.glasskube.dev/instance"]
+        - name: KEYS_SECRET_NAME
+          value: $(GLASSKUBE_INSTANCE_NAME)-tracecat-keys
+        image: bitnami/kubectl:1.30.0
+        name: set-keys-if-not-present
+        volumeMounts:
+        - mountPath: /init-dir
+          name: init-dir
+        - mountPath: /scripts
+          name: scripts
+      serviceAccountName: tracecat-key-generator
+      volumes:
+      - emptyDir: {}
+        name: init-dir
+      - configMap:
+          defaultMode: 320
+          name: tracecat-key-scripts
+        name: scripts
 ---
-kind: Service
-apiVersion: v1
+apiVersion: apps/v1
+kind: Deployment
 metadata:
-  name: tracecat-api
+  labels:
+    app.kubernetes.io/component: tracecat-ui
+    app.kubernetes.io/instance: tracecat
+    app.kubernetes.io/name: tracecat
+    app.kubernetes.io/part-of: tracecat
+  name: tracecat-ui
+  namespace: default
 spec:
-  ports:
-    - port: 8000
-      name: tracecat-api
   selector:
-    app: tracecat-api
+    matchLabels:
+      app.kubernetes.io/component: tracecat-ui
+      app.kubernetes.io/instance: tracecat
+      app.kubernetes.io/name: tracecat
+      app.kubernetes.io/part-of: tracecat
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/component: tracecat-ui
+        app.kubernetes.io/instance: tracecat
+        app.kubernetes.io/name: tracecat
+        app.kubernetes.io/part-of: tracecat
+    spec:
+      containers:
+      - env:
+        - name: NODE_ENV
+          valueFrom:
+            configMapKeyRef:
+              key: TRACECAT__APP_ENV
+              name: tracecat-config
+        - name: NEXT_PUBLIC_APP_URL
+          valueFrom:
+            configMapKeyRef:
+              key: PUBLIC_APP_URL
+              name: tracecat-config
+        - name: NEXT_PUBLIC_API_URL
+          valueFrom:
+            configMapKeyRef:
+              key: PUBLIC_API_URL
+              name: tracecat-config
+        - name: NEXT_PUBLIC_APP_ENV
+          valueFrom:
+            configMapKeyRef:
+              key: TRACECAT__APP_ENV
+              name: tracecat-config
+        envFrom:
+        - configMapRef:
+            name: tracecat-config
+        image: ghcr.io/tracecathq/tracecat-ui:0.9.0
+        name: tracecat-ui
+        ports:
+        - containerPort: 3000
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app.kubernetes.io/component: tracecat-worker
+    app.kubernetes.io/instance: tracecat
+    app.kubernetes.io/name: tracecat
+    app.kubernetes.io/part-of: tracecat
+  name: tracecat-worker
+  namespace: default
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/instance: tracecat
+      app.kubernetes.io/name: tracecat
+      app.kubernetes.io/part-of: tracecat
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/instance: tracecat
+        app.kubernetes.io/name: tracecat
+        app.kubernetes.io/part-of: tracecat
+    spec:
+      containers:
+      - command:
+        - python
+        - tracecat/dsl/worker.py
+        env:
+        - name: TRACECAT__DB_URI
+          value: postgresql+psycopg://$(username):$(password)@$(host):$(port)/$(dbname)
+        envFrom:
+        - secretRef:
+            name: tracecat-db-app
+        - configMapRef:
+            name: tracecat-config
+        image: ghcr.io/tracecathq/tracecat:0.9.0
+        name: tracecat-worker
 ---
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: tracecat-ingress
+  labels:
+    app.kubernetes.io/component: tracecat-ui
+    app.kubernetes.io/instance: tracecat
+    app.kubernetes.io/name: tracecat
+    app.kubernetes.io/part-of: tracecat
+  name: tracecat-ui
+  namespace: default
 spec:
   rules:
-    - host: ""
-      http:
-        paths:
-          - path: /api
-            pathType: Prefix
-            backend:
-              service:
-                name: tracecat-api
-                port:
-                  number: 8000
-          - path: /
-            pathType: Prefix
-            backend:
-              service:
-                name: tracecat-ui
-                port:
-                  number: 3000
-# TODO TLS?
+  - host: ""
+    http:
+      paths:
+      - backend:
+          service:
+            name: tracecat-api
+            port:
+              number: 8000
+        path: /api
+        pathType: Prefix
+      - backend:
+          service:
+            name: tracecat-ui
+            port:
+              number: 3000
+        path: /
+        pathType: Prefix
 ---
-apiVersion: apps/v1
-kind: Deployment
+apiVersion: postgresql.cnpg.io/v1
+kind: Cluster
 metadata:
-  name: tracecat-ui
   labels:
-    app.kubernetes.io/name: tracecat-ui
+    app.kubernetes.io/instance: tracecat
+    app.kubernetes.io/name: tracecat
+    app.kubernetes.io/part-of: tracecat
+  name: tracecat-db
+  namespace: default
 spec:
-  selector:
-    matchLabels:
-      app: tracecat-ui
-  template:
-    metadata:
-      labels:
-        app: tracecat-ui
-    spec:
-      containers:
-        - name: tracecat-ui
-          image: "ghcr.io/tracecathq/tracecat-ui:0.9.0"
-          ports:
-            - containerPort: 3000
-          envFrom:
-            - configMapRef:
-                name: tracecat-config
-          env:
-            - name: NODE_ENV
-              valueFrom:
-                configMapKeyRef:
-                  name: tracecat-config
-                  key: TRACECAT__APP_ENV
-            # Important: environment variables prefixed with `NEXT_PUBLIC_` are exposed to the browser client
-            - name: NEXT_PUBLIC_APP_URL
-              valueFrom:
-                configMapKeyRef:
-                  name: tracecat-config
-                  key: PUBLIC_APP_URL
-            - name: NEXT_PUBLIC_API_URL
-              valueFrom:
-                configMapKeyRef:
-                  name: tracecat-config
-                  key: PUBLIC_API_URL
-            - name: NEXT_PUBLIC_APP_ENV
-              valueFrom:
-                configMapKeyRef:
-                  name: tracecat-config
-                  key: TRACECAT__APP_ENV
----
-kind: Service
-apiVersion: v1
-metadata:
-  name: tracecat-ui
-spec:
-  ports:
-    - port: 3000
-      name: tracecat-ui
-  selector:
-    app: tracecat-ui
----
-#apiVersion: apps/v1
-#kind: Deployment
-#metadata:
-#  name: tracecat-worker
-#  labels:
-#    app.kubernetes.io/name: tracecat-worker
-#spec:
-#  selector:
-#    matchLabels:
-#      app: tracecat-worker
-#  template:
-#    metadata:
-#      labels:
-#        app: tracecat-worker
-#    spec:
-#      containers:
-#        - name: tracecat-worker
-#          image: "ghcr.io/tracecathq/tracecat:0.9.0"
-#          command: ["python", "tracecat/dsl/worker.py"]
-#          envFrom:
-#            - secretRef:
-#                name: tracecat-db-app
-#            - configMapRef:
-#                name: tracecat-config
-#          env:
-#            - name: TRACECAT__DB_URI
-#              value: "postgresql+psycopg://$(username):$(password)@$(host):$(port)/$(dbname)"
+  bootstrap:
+    initdb:
+      database: tracecat
+      owner: tracecat
+  enableSuperuserAccess: false
+  instances: 1
+  monitoring:
+    enablePodMonitor: true
+  storage:
+    size: 2Gi
