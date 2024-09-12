@@ -77,7 +77,7 @@ valueDefinitions:
       - chartName: temporal
         patch:
           op: replace
-          path: /server/config/defaultNamespaces/namespaces/0/name
+          path: /server/config/defaultNamespaces/namespace/0/name
       - chartName: temporal
         patch:
           op: replace
