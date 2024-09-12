@@ -639,12 +639,12 @@ spec:
           valueFrom:
             secretKeyRef:
               key: uri
-              name: trieve-postgresql-server-app
+              name: trieve-trieve-postgresql-server-app # patched
         - name: QDRANT_API_KEY
           valueFrom:
             secretKeyRef:
               key: api-key
-              name: trieve-qdrant-qdrant-apikey
+              name: trieve-trieve-qdrant-qdrant-apikey # patched
         envFrom:
         - configMapRef:
             name: trieve-server-config
@@ -827,12 +827,12 @@ spec:
           valueFrom:
             secretKeyRef:
               key: uri
-              name: trieve-postgresql-server-app
+              name: trieve-trieve-postgresql-server-app # patched
         - name: QDRANT_API_KEY
           valueFrom:
             secretKeyRef:
               key: api-key
-              name: trieve-qdrant-qdrant-apikey
+              name: trieve-trieve-qdrant-qdrant-apikey # patched
         envFrom:
         - configMapRef:
             name: trieve-server-config
@@ -877,12 +877,12 @@ spec:
           valueFrom:
             secretKeyRef:
               key: uri
-              name: trieve-postgresql-server-app
+              name: trieve-trieve-postgresql-server-app # patched
         - name: QDRANT_API_KEY
           valueFrom:
             secretKeyRef:
               key: api-key
-              name: trieve-qdrant-qdrant-apikey
+              name: trieve-trieve-qdrant-qdrant-apikey # patched
         envFrom:
         - configMapRef:
             name: trieve-server-config
@@ -926,12 +926,12 @@ spec:
           valueFrom:
             secretKeyRef:
               key: uri
-              name: trieve-postgresql-server-app
+              name: trieve-trieve-postgresql-server-app # patched
         - name: QDRANT_API_KEY
           valueFrom:
             secretKeyRef:
               key: api-key
-              name: trieve-qdrant-qdrant-apikey
+              name: trieve-trieve-qdrant-qdrant-apikey # patched
         envFrom:
         - configMapRef:
             name: trieve-server-config
@@ -975,12 +975,12 @@ spec:
           valueFrom:
             secretKeyRef:
               key: uri
-              name: trieve-postgresql-server-app
+              name: trieve-trieve-postgresql-server-app # patched
         - name: QDRANT_API_KEY
           valueFrom:
             secretKeyRef:
               key: api-key
-              name: trieve-qdrant-qdrant-apikey
+              name: trieve-trieve-qdrant-qdrant-apikey # patched
         envFrom:
         - configMapRef:
             name: trieve-server-config
@@ -1024,12 +1024,12 @@ spec:
           valueFrom:
             secretKeyRef:
               key: uri
-              name: trieve-postgresql-server-app
+              name: trieve-trieve-postgresql-server-app # patched
         - name: QDRANT_API_KEY
           valueFrom:
             secretKeyRef:
               key: api-key
-              name: trieve-qdrant-qdrant-apikey
+              name: trieve-trieve-qdrant-qdrant-apikey # patched
         envFrom:
         - configMapRef:
             name: trieve-server-config
@@ -1073,12 +1073,12 @@ spec:
           valueFrom:
             secretKeyRef:
               key: uri
-              name: trieve-postgresql-server-app
+              name: trieve-trieve-postgresql-server-app # patched
         - name: QDRANT_API_KEY
           valueFrom:
             secretKeyRef:
               key: api-key
-              name: trieve-qdrant-qdrant-apikey
+              name: trieve-trieve-qdrant-qdrant-apikey # patched
         envFrom:
         - configMapRef:
             name: trieve-server-config
@@ -1122,12 +1122,12 @@ spec:
           valueFrom:
             secretKeyRef:
               key: uri
-              name: trieve-postgresql-server-app
+              name: trieve-trieve-postgresql-server-app # patched
         - name: QDRANT_API_KEY
           valueFrom:
             secretKeyRef:
               key: api-key
-              name: trieve-qdrant-qdrant-apikey
+              name: trieve-trieve-qdrant-qdrant-apikey # patched
         envFrom:
         - configMapRef:
             name: trieve-server-config
@@ -1172,12 +1172,12 @@ spec:
           valueFrom:
             secretKeyRef:
               key: uri
-              name: trieve-postgresql-server-app
+              name: trieve-trieve-postgresql-server-app # patched
         - name: QDRANT_API_KEY
           valueFrom:
             secretKeyRef:
               key: api-key
-              name: trieve-qdrant-qdrant-apikey
+              name: trieve-trieve-qdrant-qdrant-apikey # patched
         envFrom:
         - configMapRef:
             name: trieve-server-config
@@ -1221,12 +1221,12 @@ spec:
           valueFrom:
             secretKeyRef:
               key: uri
-              name: trieve-postgresql-server-app
+              name: trieve-trieve-postgresql-server-app # patched
         - name: QDRANT_API_KEY
           valueFrom:
             secretKeyRef:
               key: api-key
-              name: trieve-qdrant-qdrant-apikey
+              name: trieve-trieve-qdrant-qdrant-apikey # patched
         envFrom:
         - configMapRef:
             name: trieve-server-config
@@ -1351,12 +1351,12 @@ spec:
               valueFrom:
                 secretKeyRef:
                   key: uri
-                  name: trieve-postgresql-server-app
+                  name: trieve-trieve-postgresql-server-app # patched
             - name: QDRANT_API_KEY
               valueFrom:
                 secretKeyRef:
                   key: api-key
-                  name: trieve-qdrant-qdrant-apikey
+                  name: trieve-trieve-qdrant-qdrant-apikey # patched
             envFrom:
             - configMapRef:
                 name: trieve-server-config
@@ -1401,49 +1401,49 @@ spec:
           - name: CLICKHOUSE_ALWAYS_RUN_INITDB_SCRIPTS
             value: "true"
           - name: EMBEDDING_SERVER_URL
-            value: http://trieve-embedding-bgem3
+            value: http://trieve-trieve-embedding-bgem3 # patched
           - name: CLICKHOUSE_ADMIN_PASSWORD
             value: password
           image: clickhouse/clickhouse-server:24.8
           name: clickhouse
           volumeMounts:
           - mountPath: /opt/user_scripts
-            name: trieve-clickhouse-userscripts
+            name: trieve-trieve-clickhouse-userscripts # patched
           - mountPath: /var/lib/clickhouse
-            name: trieve-clickhouse-data
+            name: trieve-trieve-clickhouse-data # patched
           - mountPath: /var/log/clickhouse-server
-            name: trieve-clickhouse-logs
+            name: trieve-trieve-clickhouse-logs # patched
           - mountPath: /docker-entrypoint-initdb.d
-            name: trieve-clickhouse-scripts
+            name: trieve-trieve-clickhouse-scripts # patched
             readOnly: true
           - mountPath: /opt/user_functions/
-            name: trieve-clickhouse-functions
+            name: trieve-trieve-clickhouse-functions # patched
             readOnly: true
         volumes:
         - configMap:
             defaultMode: 365
-            name: trieve-clickhouse-scripts
-          name: trieve-clickhouse-scripts
+            name: trieve-trieve-clickhouse-scripts # patched
+          name: trieve-trieve-clickhouse-scripts # patched
         - configMap:
             defaultMode: 365
-            name: trieve-clickhouse-functions
-          name: trieve-clickhouse-functions
+            name: trieve-trieve-clickhouse-functions # patched
+          name: trieve-trieve-clickhouse-functions # patched
     volumeClaimTemplates:
-    - name: trieve-clickhouse-userscripts
+    - name: trieve-trieve-clickhouse-userscripts # patched
       spec:
         accessModes:
         - ReadWriteOnce
         resources:
           requests:
             storage: 1Gi
-    - name: trieve-clickhouse-data
+    - name: trieve-trieve-clickhouse-data # patched
       spec:
         accessModes:
         - ReadWriteOnce
         resources:
           requests:
             storage: 2Gi
-    - name: trieve-clickhouse-logs
+    - name: trieve-trieve-clickhouse-logs # patched
       spec:
         accessModes:
         - ReadWriteOnce
@@ -1472,7 +1472,7 @@ spec:
       name: trieve-keycloak-db-app
     vendor: postgres
   hostname:
-    hostname: http://trieve-keycloak-service:8080
+    hostname: http://trieve-trieve-keycloak-service:8080 # patched
     strict: false
   http:
     httpEnabled: true
