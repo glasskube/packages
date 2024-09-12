@@ -3,9 +3,9 @@ name: temporal
 scope: Namespaced
 defaultNamespace: default
 helm:
-  repositoryUrl: https://go.temporal.io/helm-charts
+  repositoryUrl: https://charts.glasskube.eu
   chartName: temporal
-  chartVersion: "0.44.0"
+  chartVersion: "0.45.2-gk.1"
   values:
     server:
       config:
@@ -32,6 +32,11 @@ helm:
               existingSecret: temporal-db-superuser
               maxConns: 20
               maxConnLifetime: "1h"
+        defaultNamespaces:
+          enabled: true
+          namespace:
+            - name: default
+              retention: 3d
     cassandra:
       enabled: false
     mysql:
@@ -62,6 +67,34 @@ components:
         value: "temporal"
       storageSize:
         value: "10Gi"
+valueDefinitions:
+  defaultNamespace:
+    type: text
+    metadata:
+      label: Default Namespace
+      description: Leave empty to skip namespace creation
+    targets:
+      - chartName: temporal
+        patch:
+          op: replace
+          path: /server/config/defaultNamespaces/namespaces/0/name
+      - chartName: temporal
+        patch:
+          op: replace
+          path: /server/config/defaultNamespaces/enabled
+        valueTemplate: |-
+          {{ if . }}true{{ else }}false{{ end }}
+  defaultNamespaceRetention:
+    type: text
+    metadata:
+      label: Retention of the Default Namespace
+      description: Only takes effect if defaultNamespace is set
+    defaultValue: 3d
+    targets:
+      - chartName: temporal
+        patch:
+          op: replace
+          path: /server/config/defaultNamespaces/namespaces/0/retention
 transformations:
   - source:
       path: "{ $.metadata.name }"
