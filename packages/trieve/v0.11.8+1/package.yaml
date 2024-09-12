@@ -304,14 +304,6 @@ transformations:
           name: trieve-realm
           kind: KeycloakRealmImport
         valueTemplate: '"{{ . }}-trieve-keycloak"'
-#      - patch:
-#          op: replace
-#          path: /spec/template/spec/containers/0/env/0/valueFrom/secretKeyRef/name
-#        resource:
-#          apiGroup: apps/v1
-#          name: trieve-server
-#          kind: Deployment
-#        valueTemplate: '"{{ . }}-trieve-postgresql-server-app"'
       - patch:
           op: replace
           path: /data/CLICKHOUSE_DSN
