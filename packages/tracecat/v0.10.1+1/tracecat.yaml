@@ -2,6 +2,7 @@ apiVersion: v1
 kind: ServiceAccount
 metadata:
   labels:
+    app.kubernetes.io/component: tracecat-api
     app.kubernetes.io/name: tracecat
     app.kubernetes.io/part-of: tracecat
   name: tracecat-key-generator
@@ -10,6 +11,7 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
   labels:
+    app.kubernetes.io/component: tracecat-api
     app.kubernetes.io/name: tracecat
     app.kubernetes.io/part-of: tracecat
   name: tracecat-key-generator-role
@@ -26,6 +28,7 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
   labels:
+    app.kubernetes.io/component: tracecat-api
     app.kubernetes.io/name: tracecat
     app.kubernetes.io/part-of: tracecat
   name: tracecat-key-generator-role-binding
@@ -40,6 +43,16 @@ subjects:
 apiVersion: v1
 data:
   LOG_LEVEL: INFO
+  OAUTH_CLIENT_ID: ""
+  OAUTH_CLIENT_SECRET: ""
+  SMTP_AUTH_ENABLED: "1"
+  SMTP_HOST: ""
+  SMTP_IGNORE_CERT_ERRORS: "0"
+  SMTP_PASS: ""
+  SMTP_PORT: ""
+  SMTP_SSL_ENABLED: ""
+  SMTP_STARTTLS_ENABLED: ""
+  SMTP_USER: ""
   TRACECAT__API_ROOT_PATH: /api
   TRACECAT__APP_ENV: production
   TRACECAT__AUTH_TYPES: basic,google_oauth
@@ -78,6 +91,7 @@ data:
 kind: ConfigMap
 metadata:
   labels:
+    app.kubernetes.io/component: tracecat-api
     app.kubernetes.io/name: tracecat
     app.kubernetes.io/part-of: tracecat
   name: tracecat-key-scripts
@@ -95,6 +109,7 @@ spec:
   - name: tracecat-api
     port: 8000
   selector:
+    app.kubernetes.io/component: tracecat-api
     app.kubernetes.io/name: tracecat
     app.kubernetes.io/part-of: tracecat
 ---
@@ -126,11 +141,13 @@ metadata:
 spec:
   selector:
     matchLabels:
+      app.kubernetes.io/component: tracecat-api
       app.kubernetes.io/name: tracecat
       app.kubernetes.io/part-of: tracecat
   template:
     metadata:
       labels:
+        app.kubernetes.io/component: tracecat-api
         app.kubernetes.io/name: tracecat
         app.kubernetes.io/part-of: tracecat
     spec:
@@ -285,11 +302,13 @@ metadata:
 spec:
   selector:
     matchLabels:
+      app.kubernetes.io/component: tracecat-worker
       app.kubernetes.io/name: tracecat
       app.kubernetes.io/part-of: tracecat
   template:
     metadata:
       labels:
+        app.kubernetes.io/component: tracecat-worker
         app.kubernetes.io/name: tracecat
         app.kubernetes.io/part-of: tracecat
     spec:
@@ -300,9 +319,54 @@ spec:
         env:
         - name: TRACECAT__DB_URI
           value: postgresql+psycopg://$(username):$(password)@$(host):$(port)/$(dbname)
+        - name: TRACECAT__PUBLIC_RUNNER_URL
+          valueFrom:
+            configMapKeyRef:
+              key: PUBLIC_API_URL
+              name: tracecat-config
+        - name: TRACECAT__ALLOW_ORIGINS
+          valueFrom:
+            configMapKeyRef:
+              key: PUBLIC_APP_URL
+              name: tracecat-config
+        - name: TRACECAT__PUBLIC_APP_URL
+          valueFrom:
+            configMapKeyRef:
+              key: PUBLIC_APP_URL
+              name: tracecat-config
+        - name: TRACECAT__PUBLIC_API_URL
+          valueFrom:
+            configMapKeyRef:
+              key: PUBLIC_API_URL
+              name: tracecat-config
+        - name: TRACECAT__SERVICE_KEY
+          valueFrom:
+            secretKeyRef:
+              key: SERVICE_KEY
+              name: tracecat-keys
+        - name: TRACECAT__SIGNING_SECRET
+          valueFrom:
+            secretKeyRef:
+              key: SIGNING_SECRET
+              name: tracecat-keys
+        - name: TRACECAT__DB_ENCRYPTION_KEY
+          valueFrom:
+            secretKeyRef:
+              key: DB_ENCRYPTION_KEY
+              name: tracecat-keys
+        - name: GLASSKUBE_INSTANCE_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.labels['packages.glasskube.dev/instance']
+        - name: TEMPORAL__CLUSTER_URL
+          value: $(GLASSKUBE_INSTANCE_NAME)-temporal-temporal-frontend.tracecat:7233
+        - name: TEMPORAL__CLUSTER_QUEUE
+          value: tracecat-task-queue
+        - name: TEMPORAL__CLUSTER_NAMESPACE
+          value: default
         envFrom:
         - secretRef:
-            name: tracecat-db-app
+            name: tracecat-db-cluster-app
         - configMapRef:
             name: tracecat-config
         image: ghcr.io/tracecathq/tracecat:0.10.1
@@ -311,6 +375,8 @@ spec:
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
+  annotations:
+    nginx.ingress.kubernetes.io/proxy-next-upstream-tries: "10"
   labels:
     app.kubernetes.io/component: tracecat-ui
     app.kubernetes.io/name: tracecat
@@ -335,3 +401,5 @@ spec:
               number: 3000
         path: /
         pathType: Prefix
+  tls:
+  - hosts: []

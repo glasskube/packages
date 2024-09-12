@@ -15,8 +15,8 @@ dependencies:
   - name: cloudnative-pg
     version: 1.x.x
 components:
-#  - name: temporal
-#    version: 1.x.x
+  - name: temporal
+    version: 1.x.x
   - name: postgresql
     installedName: tracecat-db
     values:
@@ -71,3 +71,122 @@ valueDefinitions:
           apiGroup: networking.k8s.io/v1
           kind: Ingress
           name: tracecat-ui
+      - patch:
+          op: add
+          path: /spec/tls/0/hosts/0
+        resource:
+          apiGroup: networking.k8s.io/v1
+          kind: Ingress
+          name: tracecat-ui
+  oauthClientId:
+    type: text
+    metadata:
+      label: OAuth Client ID
+      description: |
+        Leave empty if OAuth is not needed.
+    defaultValue: ""
+    targets:
+      - patch:
+          op: add
+          path: /data/OAUTH_CLIENT_ID
+        resource:
+          apiGroup: v1
+          kind: ConfigMap
+          name: tracecat-config
+  oauthClientSecret:
+    type: text
+    metadata:
+      label: OAuth Client Secret
+      description: |
+        Leave empty if OAuth is not needed.
+    defaultValue: ""
+    targets:
+      - patch:
+          op: add
+          path: /data/OAUTH_CLIENT_SECRET
+        resource:
+          apiGroup: v1
+          kind: ConfigMap
+          name: tracecat-config
+  smtpHost:
+    type: text
+    metadata:
+      label: SMTP Host
+    defaultValue: ""
+    targets:
+      - patch:
+          op: add
+          path: /data/SMTP_HOST
+        resource:
+          apiGroup: v1
+          kind: ConfigMap
+          name: tracecat-config
+  smtpPort:
+    type: number
+    metadata:
+      label: SMTP Port
+    defaultValue: "465"
+    targets:
+      - patch:
+          op: add
+          path: /data/SMTP_PORT
+        resource:
+          apiGroup: v1
+          kind: ConfigMap
+          name: tracecat-config
+  smtpStartTlsEnabled:
+    type: boolean
+    metadata:
+      label: SMTP STARTTLS enabled
+    defaultValue: "true"
+    targets:
+      - patch:
+          op: add
+          path: /data/SMTP_STARTTLS_ENABLED
+        valueTemplate: |
+          {{ if . }}"1"{{else}}"0"{{end}}
+        resource:
+          apiGroup: v1
+          kind: ConfigMap
+          name: tracecat-config
+  smtpSslEnabled:
+    type: boolean
+    metadata:
+      label: SMTP SSL enabled
+    defaultValue: "false"
+    targets:
+      - patch:
+          op: add
+          path: /data/SMTP_SSL_ENABLED
+        valueTemplate: |
+          {{ if . }}"1"{{else}}"0"{{end}}
+        resource:
+          apiGroup: v1
+          kind: ConfigMap
+          name: tracecat-config
+  smtpUser:
+    type: text
+    metadata:
+      label: SMTP User
+    defaultValue: ""
+    targets:
+      - patch:
+          op: add
+          path: /data/SMTP_USER
+        resource:
+          apiGroup: v1
+          kind: ConfigMap
+          name: tracecat-config
+  smtpPassword:
+    type: text
+    metadata:
+      label: SMTP Password
+    defaultValue: ""
+    targets:
+      - patch:
+          op: add
+          path: /data/SMTP_PASS
+        resource:
+          apiGroup: v1
+          kind: ConfigMap
+          name: tracecat-config
