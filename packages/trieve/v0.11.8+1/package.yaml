@@ -1,5 +1,11 @@
 # yaml-language-server: $schema=https://glasskube.dev/schemas/v1/package-manifest.json
 
+
+# todo:
+# - deployment database secret refs (database & qdrant)
+# - clickhouse manually patched
+# - KeyCloak (
+
 name: trieve
 shortDescription: Infrastructure for search, recommendations, RAG, and analytics
 longDescription: |
@@ -83,7 +89,7 @@ valueDefinitions:
           name: trieve-embedding-splade-doc
   keyForAnthropicApi:
     type: text
-    defaultValue: ""
+    defaultValue: " "
     metadata:
       label: Anthropic API Key (optional)
       description: >
@@ -98,7 +104,7 @@ valueDefinitions:
           name: trieve-server-config
   keyForJinaCodeApi:
     type: text
-    defaultValue: ""
+    defaultValue: " "
     metadata:
       label: Jina AI API key (optional)
       description: >
@@ -113,7 +119,7 @@ valueDefinitions:
           name: trieve-server-config
   keyForLlmApi:
     type: text
-    defaultValue: ""
+    defaultValue: " "
     metadata:
       label: LLM API Key (optional)
       description: >
@@ -128,7 +134,7 @@ valueDefinitions:
           name: trieve-server-config
   keyForOpenaiApi:
     type: text
-    defaultValue: ""
+    defaultValue: " "
     metadata:
       label: Open AI API Key (optional)
       description: >
@@ -142,7 +148,7 @@ valueDefinitions:
           kind: ConfigMap
           name: trieve-server-config
   s3AccessKey:
-    defaultValue: ""
+    defaultValue: " "
     type: text
     metadata:
       label: S3 Access Key (optional)
@@ -158,7 +164,7 @@ valueDefinitions:
           name: trieve-server-config
   s3SecretKey:
     type: text
-    defaultValue: ""
+    defaultValue: " "
     metadata:
       label: S3 Secret Key (optional)
       description: >
@@ -173,7 +179,7 @@ valueDefinitions:
           name: trieve-server-config
   s3Endpoint:
     type: text
-    defaultValue: ""
+    defaultValue: " "
     metadata:
       label: S3 Endpoint
       description: >
@@ -188,7 +194,7 @@ valueDefinitions:
           name: trieve-server-config
   smtpEmailAddress:
     type: text
-    defaultValue: ""
+    defaultValue: " "
     metadata:
       label: SMTP email address
       description: >
@@ -203,7 +209,7 @@ valueDefinitions:
           name: trieve-server-config
   smtpServerUrl:
     type: text
-    defaultValue: ""
+    defaultValue: " "
     metadata:
       label: SMTP Server Url
       description: >
@@ -218,7 +224,7 @@ valueDefinitions:
           name: trieve-server-config
   smtpUsername:
     type: text
-    defaultValue: ""
+    defaultValue: " "
     metadata:
       label: SMTP username
       description: >
@@ -233,7 +239,7 @@ valueDefinitions:
           name: trieve-server-config
   smtpUsernamePassword:
     type: text
-    defaultValue: ""
+    defaultValue: " "
     metadata:
       label: SMTP password
       description: >
@@ -253,3 +259,160 @@ references:
     url: https://docs.trieve.ai/
   - label: GitHub
     url: https://github.com/devflowinc/trieve
+
+transformations:
+  - source:
+      path: '{ $.metadata.name }'
+    targets:
+      - patch:
+          op: replace
+          path: /spec/db/host
+        resource:
+          apiGroup: k8s.keycloak.org/v2alpha1
+          name: trieve-keycloak
+          kind: Keycloak
+        valueTemplate: '"{{ . }}-trieve-keycloak-db-rw"'
+      - patch:
+          op: replace
+          path: /spec/db/passwordSecret/name
+        resource:
+          apiGroup: k8s.keycloak.org/v2alpha1
+          name: trieve-keycloak
+          kind: Keycloak
+        valueTemplate: '"{{ . }}-trieve-keycloak-db-app"'
+      - patch:
+          op: replace
+          path: /spec/db/usernameSecret/name
+        resource:
+          apiGroup: k8s.keycloak.org/v2alpha1
+          name: trieve-keycloak
+          kind: Keycloak
+        valueTemplate: '"{{ . }}-trieve-keycloak-db-app"'
+      - patch:
+          op: replace
+          path: /spec/hostname/hostname
+        resource:
+          apiGroup: k8s.keycloak.org/v2alpha1
+          name: trieve-keycloak
+          kind: Keycloak
+        valueTemplate: '"http://{{ . }}-trieve-keycloak-service:8080"'
+      - patch:
+          op: replace
+          path: /spec/keycloakCRName
+        resource:
+          apiGroup: k8s.keycloak.org/v2alpha1
+          name: trieve-realm
+          kind: KeycloakRealmImport
+        valueTemplate: '"{{ . }}-trieve-keycloak"'
+#      - patch:
+#          op: replace
+#          path: /spec/template/spec/containers/0/env/0/valueFrom/secretKeyRef/name
+#        resource:
+#          apiGroup: apps/v1
+#          name: trieve-server
+#          kind: Deployment
+#        valueTemplate: '"{{ . }}-trieve-postgresql-server-app"'
+      - patch:
+          op: replace
+          path: /data/CLICKHOUSE_DSN
+        resource:
+          apiGroup: v1
+          name: trieve-server-config
+          kind: ConfigMap
+        valueTemplate: '"clickhouse://default:password@clickhouse-{{ . }}-trieve-clickhouse:8123/default"'
+      - patch:
+          op: replace
+          path: /data/CLICKHOUSE_URL
+        resource:
+          apiGroup: v1
+          name: trieve-server-config
+          kind: ConfigMap
+        valueTemplate: '"http://clickhouse-{{ . }}-trieve-clickhouse:8123"'
+      - patch:
+          op: replace
+          path: /data/EMBEDDING_SERVER_ORIGIN
+        resource:
+          apiGroup: v1
+          name: trieve-server-config
+          kind: ConfigMap
+        valueTemplate: '"http://{{ . }}-trieve-embedding-bgem3"'
+      - patch:
+          op: replace
+          path: /data/EMBEDDING_SERVER_ORIGIN_BGEM3
+        resource:
+          apiGroup: v1
+          name: trieve-server-config
+          kind: ConfigMap
+        valueTemplate: '"http://{{ . }}-trieve-embedding-bgem3"'
+      - patch:
+          op: replace
+          path: /data/EMBEDDING_SERVER_ORIGIN_JINA_CODE
+        resource:
+          apiGroup: v1
+          name: trieve-server-config
+          kind: ConfigMap
+        valueTemplate: '"http://{{ . }}-trieve-embedding-jina"'
+      - patch:
+          op: replace
+          path: /data/OIDC_AUTH_REDIRECT_URL
+        resource:
+          apiGroup: v1
+          name: trieve-server-config
+          kind: ConfigMap
+        valueTemplate: '"http://{{ . }}-trieve-keycloak-service:8080/realms/trieve/protocol/openid-connect/auth"'
+      - patch:
+          op: replace
+          path: /data/OIDC_ISSUER_URL
+        resource:
+          apiGroup: v1
+          name: trieve-server-config
+          kind: ConfigMap
+        valueTemplate: '"http://{{ . }}-trieve-keycloak-service:8080/realms/trieve"'
+      - patch:
+          op: replace
+          path: /data/QDRANT_URL
+        resource:
+          apiGroup: v1
+          name: trieve-server-config
+          kind: ConfigMap
+        valueTemplate: '"http://{{ . }}-trieve-qdrant-qdrant:6334"'
+      - patch:
+          op: replace
+          path: /data/REDIS_URL
+        resource:
+          apiGroup: v1
+          name: trieve-server-config
+          kind: ConfigMap
+        valueTemplate: '"redis://{{ . }}-trieve-redis-redis:6379"'
+      - patch:
+          op: replace
+          path: /data/RERANKER_SERVER_ORIGIN
+        resource:
+          apiGroup: v1
+          name: trieve-server-config
+          kind: ConfigMap
+        valueTemplate: '"redis://{{ . }}-trieve-embedding-reranker"'
+      - patch:
+          op: replace
+          path: /data/SPARSE_SERVER_DOC_ORIGIN
+        resource:
+          apiGroup: v1
+          name: trieve-server-config
+          kind: ConfigMap
+        valueTemplate: '"redis://{{ . }}-trieve-embedding-splade-doc"'
+      - patch:
+          op: replace
+          path: /data/SPARSE_SERVER_QUERY_ORIGIN
+        resource:
+          apiGroup: v1
+          name: trieve-server-config
+          kind: ConfigMap
+        valueTemplate: '"redis://{{ . }}-trieve-embedding-splade-doc"'
+      - patch:
+          op: replace
+          path: /data/TIKA_URL
+        resource:
+          apiGroup: v1
+          name: trieve-server-config
+          kind: ConfigMap
+        valueTemplate: '"redis://{{ . }}-trieve-tika-tika"'
