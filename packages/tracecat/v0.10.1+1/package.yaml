@@ -17,6 +17,9 @@ dependencies:
 components:
   - name: temporal
     version: 1.x.x
+    values:
+      defaultNamespace:
+        value: "default"
   - name: postgresql
     installedName: tracecat-db
     values:
