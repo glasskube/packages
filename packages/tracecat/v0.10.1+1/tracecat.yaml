@@ -42,6 +42,10 @@ subjects:
 ---
 apiVersion: v1
 data:
+  LDAP_HOST: ""
+  LDAP_PORT: ""
+  LDAP_SSL: ""
+  LDAP_TYPE: ""
   LOG_LEVEL: INFO
   OAUTH_CLIENT_ID: ""
   OAUTH_CLIENT_SECRET: ""

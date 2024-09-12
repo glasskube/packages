@@ -193,3 +193,57 @@ valueDefinitions:
           apiGroup: v1
           kind: ConfigMap
           name: tracecat-config
+  ldapHost:
+    type: text
+    metadata:
+      label: LDAP Host
+    defaultValue: ""
+    targets:
+      - patch:
+          op: add
+          path: /data/LDAP_HOST
+        resource:
+          apiGroup: v1
+          kind: ConfigMap
+          name: tracecat-config
+  ldapPort:
+    type: number
+    metadata:
+      label: LDAP Port
+    defaultValue: "389"
+    targets:
+      - patch:
+          op: add
+          path: /data/LDAP_PORT
+        resource:
+          apiGroup: v1
+          kind: ConfigMap
+          name: tracecat-config
+  ldapSsl:
+    type: boolean
+    metadata:
+      label: LDAP SSL
+    defaultValue: "false"
+    targets:
+      - patch:
+          op: add
+          path: /data/LDAP_SSL
+        valueTemplate: |
+          {{ if . }}"1"{{else}}"0"{{end}}
+        resource:
+          apiGroup: v1
+          kind: ConfigMap
+          name: tracecat-config
+  ldapType:
+    type: text
+    metadata:
+      label: LDAP Type
+    defaultValue: "AD"
+    targets:
+      - patch:
+          op: add
+          path: /data/LDAP_TYPE
+        resource:
+          apiGroup: v1
+          kind: ConfigMap
+          name: tracecat-config
