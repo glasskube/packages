@@ -1,1 +1,1 @@
-"temporal" --use-default=all
+"temporal" --value "defaultNamespace=default"

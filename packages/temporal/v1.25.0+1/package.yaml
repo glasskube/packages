@@ -75,6 +75,7 @@ valueDefinitions:
     metadata:
       label: Default Namespace
       description: Leave empty to skip namespace creation
+    defaultValue: default
     targets:
       - chartName: temporal
         patch:
