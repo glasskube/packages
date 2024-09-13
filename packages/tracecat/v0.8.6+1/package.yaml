@@ -1,0 +1,56 @@
+# yaml-language-server: $schema=https://glasskube.dev/schemas/v1/package-manifest.json
+name: tracecat
+iconUrl: https://avatars.githubusercontent.com/u/137193901
+shortDescription: The open source Tines / Splunk SOAR alternative
+longDescription: |
+  Tracecat is an open-source Tines / Splunk SOAR alternative for security engineers. We're building the features of Tines using enterprise-grade open-source tools.
+defaultNamespace: tracecat
+scope: Namespaced
+references:
+  - label: GitHub
+    url: https://github.com/TracecatHQ/tracecat
+  - label: Website
+    url: https://tracecat.com/
+dependencies:
+  - name: cloudnative-pg
+    version: 1.x.x
+manifests:
+  - url: ./configmap.yaml
+  - url: ./cluster.yaml
+  - url: ./ingress.yaml
+  - url: ./api-deployment.yaml
+  - url: ./api-service.yaml
+  - url: ./ui-deployment.yaml
+  - url: ./ui-service.yaml
+  # - url: ./worker-deployment.yaml
+valueDefinitions:
+  tracecatDomain:
+    type: text
+    metadata:
+      label: Tracecat domain
+      description: |
+        DNS name for the Tracecat Ingress – do not include `https` or any paths.
+    constraints:
+      pattern: ^([a-z0-9]([\-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([\-a-z0-9]*[a-z0-9])?)*)?$
+      required: true
+    targets:
+      - patch:
+          op: add
+          path: /data/NEXT_PUBLIC_APP_URL
+        valueTemplate: |
+          "https://{{ . }}"
+        resource:
+          apiGroup: core/v1
+          kind: ConfigMap
+          name: tracecat-config
+          namespace: tracecat # TODO!!
+      - patch:
+          op: add
+          path: /data/NEXT_PUBLIC_API_URL
+        valueTemplate: |
+          "https://{{ . }}/api"
+        resource:
+          apiGroup: core/v1
+          kind: ConfigMap
+          name: tracecat-config-test
+          namespace: tracecat # TODO!!

@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tracecat-api
+  labels:
+    app.kubernetes.io/name: tracecat-api
+spec:
+  selector:
+    matchLabels:
+      app: tracecat-api
+  template:
+    metadata:
+      labels:
+        app: tracecat-api
+    spec:
+      containers:
+        - name: tracecat-api
+          image: "ghcr.io/tracecathq/tracecat:0.8.6"
+          ports:
+            - containerPort: 8000
+          envFrom:
+            - secretRef:
+                name: tracecat-db-app
+            - configMapRef:
+                name: tracecat-config
+          env:
+            - name: TRACECAT__DB_URI
+              value: "postgresql+psycopg://$(username):$(password)@$(host):$(port)/$(dbname)"
+            - name: RUN_MIGRATIONS
+              value: "true"

@@ -1,0 +1,27 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tracecat-worker
+  labels:
+    app.kubernetes.io/name: tracecat-worker
+spec:
+  selector:
+    matchLabels:
+      app: tracecat-worker
+  template:
+    metadata:
+      labels:
+        app: tracecat-worker
+    spec:
+      containers:
+        - name: tracecat-worker
+          image: "ghcr.io/tracecathq/tracecat:0.8.6"
+          command: ["python", "tracecat/dsl/worker.py"]
+          envFrom:
+            - secretRef:
+                name: tracecat-db-app
+            - configMapRef:
+                name: tracecat-config
+          env:
+            - name: TRACECAT__DB_URI
+              value: "postgresql+psycopg://$(username):$(password)@$(host):$(port)/$(dbname)"

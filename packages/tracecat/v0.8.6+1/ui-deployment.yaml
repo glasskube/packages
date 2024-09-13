@@ -1,0 +1,26 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tracecat-ui
+  labels:
+    app.kubernetes.io/name: tracecat-ui
+spec:
+  selector:
+    matchLabels:
+      app: tracecat-ui
+  template:
+    metadata:
+      labels:
+        app: tracecat-ui
+    spec:
+      containers:
+        - name: tracecat-ui
+          image: "ghcr.io/tracecathq/tracecat-ui:0.8.6"
+          ports:
+            - containerPort: 3000
+          envFrom:
+            - configMapRef:
+                name: tracecat-config # TODO ??
+          env:
+            - name: NODE_ENV
+              value: "production"
