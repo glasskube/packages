@@ -51,7 +51,7 @@ jobs:
       - name: Start minikube cluster
         uses: medyagh/setup-minikube@d8c0eb871f6f455542491d86a574477bd3894533 # v0.0.18
       - name: Bootstrap Glasskube in Minikube cluster
-        run: ./glasskube bootstrap --disable-telemetry --create-default-repository=false
+        run: ./glasskube bootstrap --disable-telemetry --no-progress --create-default-repository=false
       - name: Add local repository
         run: ./glasskube repo add local "http://host.minikube.internal:9090/packages/" --default
       - name: Fetch test config values
