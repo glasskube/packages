@@ -2,6 +2,7 @@
 name: temporal
 scope: Namespaced
 defaultNamespace: default
+iconUrl: https://docs.temporal.io/img/favicon.png
 helm:
   repositoryUrl: https://charts.glasskube.eu
   chartName: temporal
