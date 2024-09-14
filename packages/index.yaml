@@ -125,6 +125,11 @@ packages:
     name: tika
     scope: Namespaced
     shortDescription: Content analysis toolkit
+  - iconUrl: https://avatars.githubusercontent.com/u/137193901
+    latestVersion: v0.10.1+1
+    name: tracecat
+    scope: Namespaced
+    shortDescription: The open source Tines / Splunk SOAR alternative
   - iconUrl: https://avatars.githubusercontent.com/u/122049913
     latestVersion: v0.11.8+1
     name: trieve
