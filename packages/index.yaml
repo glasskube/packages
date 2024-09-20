@@ -125,7 +125,7 @@ packages:
     name: temporal
     scope: Namespaced
   - iconUrl: https://avatars.githubusercontent.com/u/47359
-    latestVersion: v2.9.2+1
+    latestVersion: v2.9.2+2
     name: tika
     scope: Namespaced
     shortDescription: Content analysis toolkit
