@@ -112,7 +112,7 @@ packages:
     name: rabbitmq-operator
     shortDescription: Kubernetes operator to deploy and manage RabbitMQ clusters
   - iconUrl: https://avatars.githubusercontent.com/u/1529926
-    latestVersion: v7.4.0+1
+    latestVersion: v7.4.0+2
     name: redis
     scope: Namespaced
     shortDescription: In-memory database

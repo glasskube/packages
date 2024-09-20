@@ -49,4 +49,3 @@ valueDefinitions:
           namespace: kube-system
         valueTemplate: |
           "--kubelet-insecure-tls={{ . }}"
-

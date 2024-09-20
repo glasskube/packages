@@ -1,0 +1,1 @@
+"redis" --use-default=all

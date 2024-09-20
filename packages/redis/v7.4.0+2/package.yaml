@@ -1,0 +1,35 @@
+# yaml-language-server: $schema=https://glasskube.dev/schemas/v1/package-manifest.json
+name: redis
+iconUrl: https://avatars.githubusercontent.com/u/1529926
+shortDescription: In-memory database
+longDescription: |
+  Redis is an in-memory database that persists on disk.
+  The data model is key-value, but many different kind of values are supported:
+  Strings, Lists, Sets, Sorted Sets, Hashes, Streams, HyperLogLogs, Bitmaps.
+defaultNamespace: default
+scope: Namespaced
+manifests:
+  - url: ./deployment.yaml
+  - url: ./service.yaml
+valueDefinitions:
+  memory:
+    constraints: { }
+    defaultValue: 128Mi
+    type: text
+    metadata:
+      label: Redis memory request and limit
+    targets:
+      - patch:
+          op: replace
+          path: /spec/template/spec/containers/0/resources/requests/memory
+        resource:
+          apiGroup: apps/v1
+          kind: Deployment
+          name: redis
+      - patch:
+          op: replace
+          path: /spec/template/spec/containers/0/resources/limits/memory
+        resource:
+          apiGroup: apps/v1
+          kind: Deployment
+          name: redis
