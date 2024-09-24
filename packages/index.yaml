@@ -93,7 +93,7 @@ packages:
     shortDescription: Detects hardware features available on each node in a
       Kubernetes cluster, and advertises those features using node labels.
   - iconUrl: https://www.postgresql.org/media/img/about/press/elephant.png
-    latestVersion: v16.4.0+1
+    latestVersion: v16.4.0+2
     name: postgresql
     scope: Namespaced
     shortDescription: The World's Most Advanced Open Source Relational Database

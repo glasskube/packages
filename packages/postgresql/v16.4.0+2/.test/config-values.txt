@@ -1,0 +1,1 @@
+"my-postgres" --value "databaseName=my-postgres" --value "storageSize=1Gi" --value "memory=128Mi"
