@@ -43,7 +43,7 @@ components:
     version: 2.9.2+2
   - name: postgresql
     installedName: trieve-keycloak-db
-    # TODO limits memory, requests cpu memory in postgres package
+    version: 16.4.0+2
     values:
       enableSuperuserAccess:
         value: "false"
@@ -53,9 +53,11 @@ components:
         value: "10Gi"
       instances:
         value: "2"
+      memory:
+        value: 256Mi
   - name: postgresql
     installedName: trieve-db
-    # TODO limits memory, requests cpu memory in postgres package
+    version: 16.4.0+2
     values:
       enableSuperuserAccess:
         value: "false"
@@ -65,6 +67,8 @@ components:
         value: "10Gi"
       instances:
         value: "2"
+      memory:
+        value: 256Mi
 dependencies:
   - name: clickhouse-operator
   - name: cloudnative-pg
