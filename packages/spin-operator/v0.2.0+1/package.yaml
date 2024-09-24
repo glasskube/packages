@@ -1,0 +1,22 @@
+# yaml-language-server: $schema=https://glasskube.dev/schemas/v1/package-manifest.json
+
+name: "spin-operator"
+shortDescription: "The Spin Operator enables deploying Spin applications to Kubernetes."
+iconUrl: "https://avatars.githubusercontent.com/u/157650797"
+defaultNamespace: "spin-operator"
+helm:
+  repositoryUrl: "oci://ghcr.io/spinkube/charts"
+  chartName: "spin-operator"
+  chartVersion: "0.2.0"
+manifests:
+  - url: https://github.com/spinkube/spin-operator/releases/download/v0.2.0/spin-operator.crds.yaml
+  - url: https://github.com/spinkube/spin-operator/releases/download/v0.2.0/spin-operator.runtime-class.yaml
+  - url: https://github.com/spinkube/spin-operator/releases/download/v0.2.0/spin-operator.shim-executor.yaml
+dependencies:
+  - name: "cert-manager"
+  - name: "kwasm"
+references:
+  - label: "Website"
+    url: "https://www.spinkube.dev/"
+  - label: "GitHub"
+    url: "https://github.com/spinkube/spin-operator"
