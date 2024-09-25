@@ -26,7 +26,7 @@ components:
     installedName: trieve-keycloak
   - name: qdrant
     installedName: trieve-qdrant
-    version: 1.11.4+3
+    version: 1.11.4
     values:
       instances:
         value: '1'
@@ -34,13 +34,13 @@ components:
         value: "600Mi"
   - name: redis
     installedName: trieve-redis
-    version: 7.4.0+2
+    version: 7.4.0
     values:
       memory:
         value: "100Mi"
   - name: tika
     installedName: trieve-tika
-    version: 2.9.2+2
+    version: 2.9.2
   - name: postgresql
     installedName: trieve-keycloak-db
     version: 16.4.0+2
@@ -72,6 +72,7 @@ components:
 dependencies:
   - name: clickhouse-operator
   - name: cloudnative-pg
+    version: 1.23.x
 valueDefinitions:
   domain:
     type: text
@@ -200,6 +201,120 @@ valueDefinitions:
           apiGroup: networking.k8s.io/v1
           kind: Ingress
           name: trieve-server
+      - patch:
+          op: add
+          path: /spec/rules/0/host
+        valueTemplate: |
+          "auth.{{ . }}"
+        resource:
+          apiGroup: networking.k8s.io/v1
+          kind: Ingress
+          name: trieve-keycloak
+      - patch:
+          op: replace
+          path: /data/OIDC_AUTH_REDIRECT_URL
+        resource:
+          apiGroup: v1
+          name: trieve-server-config
+          kind: ConfigMap
+        valueTemplate: '"http://auth.{{ . }}/realms/trieve/protocol/openid-connect/auth"'
+      - patch:
+          op: replace
+          path: /data/OIDC_ISSUER_URL
+        resource:
+          apiGroup: v1
+          name: trieve-server-config
+          kind: ConfigMap
+        valueTemplate: '"http://auth.{{ . }}/realms/trieve"'
+      - patch:
+          op: replace
+          path: /spec/hostname/hostname
+        resource:
+          apiGroup: k8s.keycloak.org/v2alpha1
+          name: trieve-keycloak
+          kind: Keycloak
+        valueTemplate: '"http://auth.{{ . }}"'
+        # keycloak madness starts here
+      - patch:
+          op: add
+          path: /spec/realm/clients/6/redirectUris/-
+        resource:
+          apiGroup: k8s.keycloak.org/v2alpha1
+          name: trieve-realm
+          kind: KeycloakRealmImport
+        valueTemplate: '"http://api.{{ . }}/*"'
+      - patch:
+          op: add
+          path: /spec/realm/clients/6/redirectUris/-
+        resource:
+          apiGroup: k8s.keycloak.org/v2alpha1
+          name: trieve-realm
+          kind: KeycloakRealmImport
+        valueTemplate: '"http://dashboard.{{ . }}/*"'
+      - patch:
+          op: add
+          path: /spec/realm/clients/6/redirectUris/-
+        resource:
+          apiGroup: k8s.keycloak.org/v2alpha1
+          name: trieve-realm
+          kind: KeycloakRealmImport
+        valueTemplate: '"http://chat.{{ . }}/*"'
+      - patch:
+          op: add
+          path: /spec/realm/clients/6/redirectUris/-
+        resource:
+          apiGroup: k8s.keycloak.org/v2alpha1
+          name: trieve-realm
+          kind: KeycloakRealmImport
+        valueTemplate: '"http://search.{{ . }}/*"'
+      - patch:
+          op: add
+          path: /spec/realm/clients/6/redirectUris/-
+        resource:
+          apiGroup: k8s.keycloak.org/v2alpha1
+          name: trieve-realm
+          kind: KeycloakRealmImport
+        valueTemplate: '"http://analytics.{{ . }}/*"'
+      - patch:
+          op: add
+          path: /spec/realm/clients/6/webOrigins/-
+        resource:
+          apiGroup: k8s.keycloak.org/v2alpha1
+          name: trieve-realm
+          kind: KeycloakRealmImport
+        valueTemplate: '"http://api.{{ . }}"'
+      - patch:
+          op: add
+          path: /spec/realm/clients/6/webOrigins/-
+        resource:
+          apiGroup: k8s.keycloak.org/v2alpha1
+          name: trieve-realm
+          kind: KeycloakRealmImport
+        valueTemplate: '"http://dashboard.{{ . }}"'
+      - patch:
+          op: add
+          path: /spec/realm/clients/6/webOrigins/-
+        resource:
+          apiGroup: k8s.keycloak.org/v2alpha1
+          name: trieve-realm
+          kind: KeycloakRealmImport
+        valueTemplate: '"http://chat.{{ . }}"'
+      - patch:
+          op: add
+          path: /spec/realm/clients/6/webOrigins/-
+        resource:
+          apiGroup: k8s.keycloak.org/v2alpha1
+          name: trieve-realm
+          kind: KeycloakRealmImport
+        valueTemplate: '"http://search.{{ . }}"'
+      - patch:
+          op: add
+          path: /spec/realm/clients/6/webOrigins/-
+        resource:
+          apiGroup: k8s.keycloak.org/v2alpha1
+          name: trieve-realm
+          kind: KeycloakRealmImport
+        valueTemplate: '"http://analytics.{{ . }}"'
   cpuMode:
     type: boolean
     defaultValue: "true"
@@ -442,6 +557,9 @@ transitiveResources:
 #  - apiGroup: v1
 #    kind: ConfigMap
 #    name: trieve-clickhouse-scripts
+  - apiGroup: v1
+    kind: Service
+    name: trieve-keycloak-service
 transformations:
   - source:
       path: '{ $.metadata.name }'
@@ -470,14 +588,6 @@ transformations:
           name: trieve-keycloak
           kind: Keycloak
         valueTemplate: '"{{ . }}-trieve-keycloak-db-cluster-app"'
-      - patch:
-          op: replace
-          path: /spec/hostname/hostname
-        resource:
-          apiGroup: k8s.keycloak.org/v2alpha1
-          name: trieve-keycloak
-          kind: Keycloak
-        valueTemplate: '"http://{{ . }}-trieve-keycloak-service:8080"'
       - patch:
           op: replace
           path: /spec/keycloakCRName
@@ -526,22 +636,6 @@ transformations:
           name: trieve-server-config
           kind: ConfigMap
         valueTemplate: '"http://{{ . }}-trieve-embedding-jina"'
-      - patch:
-          op: replace
-          path: /data/OIDC_AUTH_REDIRECT_URL
-        resource:
-          apiGroup: v1
-          name: trieve-server-config
-          kind: ConfigMap
-        valueTemplate: '"http://{{ . }}-trieve-keycloak-service:8080/realms/trieve/protocol/openid-connect/auth"'
-      - patch:
-          op: replace
-          path: /data/OIDC_ISSUER_URL
-        resource:
-          apiGroup: v1
-          name: trieve-server-config
-          kind: ConfigMap
-        valueTemplate: '"http://{{ . }}-trieve-keycloak-service:8080/realms/trieve"'
       - patch:
           op: replace
           path: /data/QDRANT_URL

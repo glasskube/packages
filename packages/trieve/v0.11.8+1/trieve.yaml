@@ -439,6 +439,11 @@ spec:
           httpGet:
             path: /
             port: 80
+        resources:
+          limits:
+            memory: 3Gi
+          requests:
+            memory: 3Gi
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -480,6 +485,11 @@ spec:
           httpGet:
             path: /
             port: 80
+        resources:
+          limits:
+            memory: 7Gi
+          requests:
+            memory: 7Gi
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -521,6 +531,11 @@ spec:
           httpGet:
             path: /
             port: 80
+        resources:
+          limits:
+            memory: 2Gi
+          requests:
+            memory: 2Gi
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -564,6 +579,11 @@ spec:
           httpGet:
             path: /
             port: 80
+        resources:
+          limits:
+            memory: 1Gi
+          requests:
+            memory: 1Gi
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -607,6 +627,11 @@ spec:
           httpGet:
             path: /
             port: 80
+        resources:
+          limits:
+            memory: 500Mi
+          requests:
+            memory: 500Mi
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -1508,13 +1533,13 @@ metadata:
   namespace: default
 spec:
   db:
-    host: trieve-keycloak-db-rw
+    host: trieve-keycloak-db-cluster-rw
     passwordSecret:
       key: password
-      name: trieve-keycloak-db-app
+      name: trieve-keycloak-db-cluster-app
     usernameSecret:
       key: username
-      name: trieve-keycloak-db-app
+      name: trieve-keycloak-db-cluster-app
     vendor: postgres
   hostname:
     hostname: http://trieve-keycloak-service:8080
@@ -3358,6 +3383,29 @@ spec:
     webAuthnPolicySignatureAlgorithms:
     - ES256
     webAuthnPolicyUserVerificationRequirement: not specified
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  labels:
+    app.kubernetes.io/component: keycloak
+    app.kubernetes.io/instance: trieve
+    app.kubernetes.io/name: trieve
+    app.kubernetes.io/part-of: trieve
+  name: trieve-keycloak
+  namespace: default
+spec:
+  rules:
+  - host: auth.localtrieve.com
+    http:
+      paths:
+      - backend:
+          service:
+            name: trieve-keycloak-service
+            port:
+              number: 8080
+        path: /
+        pathType: Prefix
 ---
 apiVersion: networking.k8s.io/v1
 kind: Ingress
