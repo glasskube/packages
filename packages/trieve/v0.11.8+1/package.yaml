@@ -1,6 +1,5 @@
 # yaml-language-server: $schema=https://glasskube.dev/schemas/v1/package-manifest.json
 
-
 # todo:
 # - deployment database secret refs (database & qdrant)
 # - clickhouse manually patched
@@ -429,10 +428,10 @@ valueDefinitions:
           kind: ConfigMap
           name: trieve-server-config
   s3AccessKey:
-    defaultValue: " "
+    defaultValue: ""
     type: text
     metadata:
-      label: S3 Access Key (optional)
+      label: S3 Access Key
       description: >
         S3 credentials for uploading data custom data to Trieve
     targets:
@@ -445,11 +444,39 @@ valueDefinitions:
           name: trieve-server-config
   s3SecretKey:
     type: text
-    defaultValue: " "
+    defaultValue: ""
     metadata:
-      label: S3 Secret Key (optional)
+      label: S3 Secret Key
       description: >
         S3 credentials for uploading data custom data to Trieve
+    targets:
+      - patch:
+          op: replace
+          path: /data/S3_SECRET_KEY
+        resource:
+          apiGroup: v1
+          kind: ConfigMap
+          name: trieve-server-config
+  s3Endpoint:
+    type: text
+    defaultValue: ""
+    metadata:
+      label: S3 Endpoint
+      description: >
+        For AWS, please use `https://s3.${AWS_REGION}.amazonaws.com`
+    targets:
+      - patch:
+          op: replace
+          path: /data/S3_ENDPOINT
+        resource:
+          apiGroup: v1
+          kind: ConfigMap
+          name: trieve-server-config
+  s3BucketName:
+    type: text
+    defaultValue: ""
+    metadata:
+      label: S3 Bucket Name
     targets:
       - patch:
           op: replace
@@ -458,17 +485,15 @@ valueDefinitions:
           apiGroup: v1
           kind: ConfigMap
           name: trieve-server-config
-  s3Endpoint:
+  s3AwsRegion:
     type: text
-    defaultValue: " "
+    defaultValue: ""
     metadata:
-      label: S3 Endpoint
-      description: >
-        S3 credentials for uploading data custom data to Trieve
+      label: S3 AWS Region
     targets:
       - patch:
-          op: replace
-          path: /data/S3_ENDPOINT
+          op: add
+          path: /data/AWS_REGION
         resource:
           apiGroup: v1
           kind: ConfigMap
@@ -562,7 +587,7 @@ transitiveResources:
     name: trieve-keycloak-service
 transformations:
   - source:
-      path: '{ $.metadata.name }'
+      path: "{ $.metadata.name }"
     targets:
       - patch:
           op: replace
