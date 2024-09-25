@@ -578,10 +578,6 @@ transitiveResources:
   - apiGroup: v1
     kind: Secret
     name: trieve-qdrant-qdrant-apikey
-    # TODO doesn't work yet because it produces a namespace conflict during kustomization?? (removing default namespace did not work)
-#  - apiGroup: v1
-#    kind: ConfigMap
-#    name: trieve-clickhouse-scripts
   - apiGroup: v1
     kind: Service
     name: trieve-keycloak-service
@@ -709,3 +705,19 @@ transformations:
           name: trieve-server-config
           kind: ConfigMap
         valueTemplate: '"redis://{{ . }}-trieve-tika-tika"'
+      - patch:
+          op: replace
+          path: /spec/templates/podTemplates/0/spec/volumes/0/configMap/name
+        resource:
+          apiGroup: clickhouse.altinity.com/v1
+          name: trieve-clickhouse
+          kind: ClickHouseInstallation
+        valueTemplate: '"{{ . }}-trieve-clickhouse-scripts"'
+      - patch:
+          op: replace
+          path: /spec/templates/podTemplates/0/spec/volumes/1/configMap/name
+        resource:
+          apiGroup: clickhouse.altinity.com/v1
+          name: trieve-clickhouse
+          kind: ClickHouseInstallation
+        valueTemplate: '"{{ . }}-trieve-clickhouse-functions"'

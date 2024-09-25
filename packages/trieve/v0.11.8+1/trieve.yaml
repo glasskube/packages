@@ -22,7 +22,6 @@ metadata:
     app.kubernetes.io/name: trieve
     app.kubernetes.io/part-of: trieve
   name: trieve-clickhouse-functions
-  namespace: default
 ---
 apiVersion: v1
 data:
@@ -101,7 +100,6 @@ metadata:
     app.kubernetes.io/name: trieve
     app.kubernetes.io/part-of: trieve
   name: trieve-clickhouse-scripts
-  namespace: default
 ---
 apiVersion: v1
 data:
@@ -162,7 +160,6 @@ metadata:
     app.kubernetes.io/name: trieve
     app.kubernetes.io/part-of: trieve
   name: trieve-server-config
-  namespace: default
 ---
 apiVersion: v1
 data:
@@ -179,7 +176,6 @@ metadata:
     app.kubernetes.io/name: trieve
     app.kubernetes.io/part-of: trieve
   name: trieve-ui-config
-  namespace: default
 ---
 apiVersion: v1
 kind: Service
@@ -190,7 +186,6 @@ metadata:
     app.kubernetes.io/name: trieve
     app.kubernetes.io/part-of: trieve
   name: trieve-embedding-bgem3
-  namespace: default
 spec:
   ports:
   - name: svc
@@ -213,7 +208,6 @@ metadata:
     app.kubernetes.io/name: trieve
     app.kubernetes.io/part-of: trieve
   name: trieve-embedding-jina
-  namespace: default
 spec:
   ports:
   - name: svc
@@ -236,7 +230,6 @@ metadata:
     app.kubernetes.io/name: trieve
     app.kubernetes.io/part-of: trieve
   name: trieve-embedding-reranker
-  namespace: default
 spec:
   ports:
   - name: svc
@@ -259,7 +252,6 @@ metadata:
     app.kubernetes.io/name: trieve
     app.kubernetes.io/part-of: trieve
   name: trieve-embedding-splade-doc
-  namespace: default
 spec:
   ports:
   - name: svc
@@ -282,7 +274,6 @@ metadata:
     app.kubernetes.io/name: trieve
     app.kubernetes.io/part-of: trieve
   name: trieve-embedding-splade-query
-  namespace: default
 spec:
   ports:
   - name: svc
@@ -305,7 +296,6 @@ metadata:
     app.kubernetes.io/name: trieve
     app.kubernetes.io/part-of: trieve
   name: trieve-server
-  namespace: default
 spec:
   ports:
   - name: server
@@ -326,7 +316,6 @@ metadata:
     app.kubernetes.io/name: trieve
     app.kubernetes.io/part-of: trieve
   name: trieve-ui-analytics
-  namespace: default
 spec:
   ports:
   - name: http
@@ -347,7 +336,6 @@ metadata:
     app.kubernetes.io/name: trieve
     app.kubernetes.io/part-of: trieve
   name: trieve-ui-chat
-  namespace: default
 spec:
   ports:
   - name: http
@@ -368,7 +356,6 @@ metadata:
     app.kubernetes.io/name: trieve
     app.kubernetes.io/part-of: trieve
   name: trieve-ui-dashboard
-  namespace: default
 spec:
   ports:
   - name: http
@@ -389,7 +376,6 @@ metadata:
     app.kubernetes.io/name: trieve
     app.kubernetes.io/part-of: trieve
   name: trieve-ui-search
-  namespace: default
 spec:
   ports:
   - name: http
@@ -410,7 +396,6 @@ metadata:
     app.kubernetes.io/name: trieve
     app.kubernetes.io/part-of: trieve
   name: trieve-embedding-bgem3
-  namespace: default
 spec:
   replicas: 1
   selector:
@@ -454,7 +439,6 @@ metadata:
     app.kubernetes.io/name: trieve
     app.kubernetes.io/part-of: trieve
   name: trieve-embedding-jina
-  namespace: default
 spec:
   replicas: 1
   selector:
@@ -500,7 +484,6 @@ metadata:
     app.kubernetes.io/name: trieve
     app.kubernetes.io/part-of: trieve
   name: trieve-embedding-reranker
-  namespace: default
 spec:
   replicas: 1
   selector:
@@ -546,7 +529,6 @@ metadata:
     app.kubernetes.io/name: trieve
     app.kubernetes.io/part-of: trieve
   name: trieve-embedding-splade-doc
-  namespace: default
 spec:
   replicas: 1
   selector:
@@ -594,7 +576,6 @@ metadata:
     app.kubernetes.io/name: trieve
     app.kubernetes.io/part-of: trieve
   name: trieve-embedding-splade-query
-  namespace: default
 spec:
   replicas: 1
   selector:
@@ -642,7 +623,6 @@ metadata:
     app.kubernetes.io/name: trieve
     app.kubernetes.io/part-of: trieve
   name: trieve-server
-  namespace: default
 spec:
   selector:
     matchLabels:
@@ -691,7 +671,6 @@ metadata:
     app.kubernetes.io/name: trieve
     app.kubernetes.io/part-of: trieve
   name: trieve-ui-analytics
-  namespace: default
 spec:
   selector:
     matchLabels:
@@ -731,7 +710,6 @@ metadata:
     app.kubernetes.io/name: trieve
     app.kubernetes.io/part-of: trieve
   name: trieve-ui-chat
-  namespace: default
 spec:
   selector:
     matchLabels:
@@ -771,7 +749,6 @@ metadata:
     app.kubernetes.io/name: trieve
     app.kubernetes.io/part-of: trieve
   name: trieve-ui-dashboard
-  namespace: default
 spec:
   selector:
     matchLabels:
@@ -811,7 +788,6 @@ metadata:
     app.kubernetes.io/name: trieve
     app.kubernetes.io/part-of: trieve
   name: trieve-ui-search
-  namespace: default
 spec:
   selector:
     matchLabels:
@@ -851,7 +827,6 @@ metadata:
     app.kubernetes.io/name: trieve
     app.kubernetes.io/part-of: trieve
   name: trieve-worker-bktree
-  namespace: default
 spec:
   selector:
     matchLabels:
@@ -902,7 +877,6 @@ metadata:
     app.kubernetes.io/name: trieve
     app.kubernetes.io/part-of: trieve
   name: trieve-worker-bm25
-  namespace: default
 spec:
   replicas: 0
   selector:
@@ -954,7 +928,6 @@ metadata:
     app.kubernetes.io/name: trieve
     app.kubernetes.io/part-of: trieve
   name: trieve-worker-delete
-  namespace: default
 spec:
   selector:
     matchLabels:
@@ -1005,7 +978,6 @@ metadata:
     app.kubernetes.io/name: trieve
     app.kubernetes.io/part-of: trieve
   name: trieve-worker-file
-  namespace: default
 spec:
   selector:
     matchLabels:
@@ -1056,7 +1028,6 @@ metadata:
     app.kubernetes.io/name: trieve
     app.kubernetes.io/part-of: trieve
   name: trieve-worker-group
-  namespace: default
 spec:
   selector:
     matchLabels:
@@ -1107,7 +1078,6 @@ metadata:
     app.kubernetes.io/name: trieve
     app.kubernetes.io/part-of: trieve
   name: trieve-worker-ingest
-  namespace: default
 spec:
   selector:
     matchLabels:
@@ -1158,7 +1128,6 @@ metadata:
     app.kubernetes.io/name: trieve
     app.kubernetes.io/part-of: trieve
   name: trieve-worker-reindexer
-  namespace: default
 spec:
   selector:
     matchLabels:
@@ -1209,7 +1178,6 @@ metadata:
     app.kubernetes.io/name: trieve
     app.kubernetes.io/part-of: trieve
   name: trieve-worker-sync-qdrant
-  namespace: default
 spec:
   replicas: 0
   selector:
@@ -1261,7 +1229,6 @@ metadata:
     app.kubernetes.io/name: trieve
     app.kubernetes.io/part-of: trieve
   name: trieve-worker-word
-  namespace: default
 spec:
   selector:
     matchLabels:
@@ -1311,7 +1278,6 @@ metadata:
     app.kubernetes.io/name: trieve
     app.kubernetes.io/part-of: trieve
   name: cluster-queries-cronjob
-  namespace: default
 spec:
   concurrencyPolicy: Forbid
   jobTemplate:
@@ -1354,7 +1320,6 @@ metadata:
     app.kubernetes.io/name: trieve
     app.kubernetes.io/part-of: trieve
   name: collapsing-queries-cronjob
-  namespace: default
 spec:
   concurrencyPolicy: Forbid
   jobTemplate:
@@ -1392,7 +1357,6 @@ metadata:
     app.kubernetes.io/name: trieve
     app.kubernetes.io/part-of: trieve
   name: trieve-word-id-cronjob
-  namespace: default
 spec:
   concurrencyPolicy: Forbid
   jobTemplate:
@@ -1439,7 +1403,6 @@ metadata:
     app.kubernetes.io/name: trieve
     app.kubernetes.io/part-of: trieve
   name: trieve-clickhouse
-  namespace: default
 spec:
   configuration:
     clusters:
@@ -1530,7 +1493,6 @@ metadata:
     app.kubernetes.io/name: trieve
     app.kubernetes.io/part-of: trieve
   name: trieve-keycloak
-  namespace: default
 spec:
   db:
     host: trieve-keycloak-db-cluster-rw
@@ -1565,7 +1527,6 @@ metadata:
     app.kubernetes.io/name: trieve
     app.kubernetes.io/part-of: trieve
   name: trieve-realm
-  namespace: default
 spec:
   keycloakCRName: trieve-keycloak
   realm:
@@ -3393,7 +3354,6 @@ metadata:
     app.kubernetes.io/name: trieve
     app.kubernetes.io/part-of: trieve
   name: trieve-keycloak
-  namespace: default
 spec:
   rules:
   - host: auth.localtrieve.com
@@ -3416,7 +3376,6 @@ metadata:
     app.kubernetes.io/name: trieve
     app.kubernetes.io/part-of: trieve
   name: trieve-server
-  namespace: default
 spec:
   rules:
   - host: api.localtrieve.com
@@ -3439,7 +3398,6 @@ metadata:
     app.kubernetes.io/name: trieve
     app.kubernetes.io/part-of: trieve
   name: trieve-ui-analytics
-  namespace: default
 spec:
   rules:
   - host: analytics.localtrieve.com
@@ -3462,7 +3420,6 @@ metadata:
     app.kubernetes.io/name: trieve
     app.kubernetes.io/part-of: trieve
   name: trieve-ui-chat
-  namespace: default
 spec:
   rules:
   - host: chat.localtrieve.com
@@ -3485,7 +3442,6 @@ metadata:
     app.kubernetes.io/name: trieve
     app.kubernetes.io/part-of: trieve
   name: trieve-ui-dashboard
-  namespace: default
 spec:
   rules:
   - host: dashboard.localtrieve.com
@@ -3508,7 +3464,6 @@ metadata:
     app.kubernetes.io/name: trieve
     app.kubernetes.io/part-of: trieve
   name: trieve-ui-search
-  namespace: default
 spec:
   rules:
   - host: search.localtrieve.com
