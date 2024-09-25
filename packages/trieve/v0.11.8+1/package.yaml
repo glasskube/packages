@@ -1,10 +1,5 @@
 # yaml-language-server: $schema=https://glasskube.dev/schemas/v1/package-manifest.json
 
-# todo:
-# - deployment database secret refs (database & qdrant)
-# - clickhouse manually patched
-# - KeyCloak (
-
 name: trieve
 shortDescription: Infrastructure for search, recommendations, RAG, and analytics
 longDescription: |
