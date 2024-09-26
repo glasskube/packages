@@ -92,6 +92,11 @@ packages:
     name: node-feature-discovery
     shortDescription: Detects hardware features available on each node in a
       Kubernetes cluster, and advertises those features using node labels.
+  - iconUrl: https://avatars.githubusercontent.com/u/124464601
+    latestVersion: v0.10.2+0
+    name: paradedb
+    scope: Namespaced
+    shortDescription: Postgres for Search and Analytics
   - iconUrl: https://www.postgresql.org/media/img/about/press/elephant.png
     latestVersion: v16.4.0+2
     name: postgresql
