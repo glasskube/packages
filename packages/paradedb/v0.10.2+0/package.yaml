@@ -1,0 +1,52 @@
+# yaml-language-server: $schema=https://glasskube.dev/schemas/v1/package-manifest.json
+
+name: paradedb
+shortDescription: Postgres for Search and Analytics
+longDescription: |
+  ParadeDB is a modern Elasticsearch alternative built on Postgres. Built for real-time, update-heavy workloads.
+scope: Namespaced
+defaultNamespace: default
+iconUrl: https://avatars.githubusercontent.com/u/124464601
+dependencies:
+  - name: cloudnative-pg
+helm:
+  chartName: paradedb
+  chartVersion: 0.8.4
+  repositoryUrl: https://paradedb.github.io/charts
+  values:
+    type: paradedb
+    mode: standalone
+    cluster:
+      instances: 2
+      storage:
+        size: 256Mi
+valueDefinitions:
+  instances:
+    type: number
+    defaultValue: "2"
+    constraints:
+      min: 0
+    targets:
+      - chartName: paradedb
+        patch:
+          op: add
+          path: /cluster/instances
+        valueTemplate: "{{.}}"
+  storageSize:
+    type: text
+    defaultValue: 256Mi
+    targets:
+      - chartName: paradedb
+        patch:
+          op: add
+          path: /cluster/storage/size
+
+references:
+  - label: ArtifactHub
+    url: https://artifacthub.io/packages/helm/paradedb/paradedb
+  - label: Website
+    url: https://www.paradedb.com/
+  - label: Documentation
+    url: https://docs.paradedb.com/
+  - label: GitHub
+    url: https://github.com/paradedb/paradedb
