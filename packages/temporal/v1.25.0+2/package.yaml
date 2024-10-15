@@ -5,9 +5,9 @@ scope: Namespaced
 defaultNamespace: default
 iconUrl: https://temporal.io/favicon.svg
 helm:
-  repositoryUrl: https://charts.glasskube.eu
+  repositoryUrl: https://go.temporal.io/helm-charts
   chartName: temporal
-  chartVersion: "0.45.2-gk.1"
+  chartVersion: "0.47.0"
   values:
     server:
       config:
@@ -34,7 +34,7 @@ helm:
               existingSecret: temporal-db-superuser
               maxConns: 20
               maxConnLifetime: "1h"
-        defaultNamespaces:
+        namespaces:
           enabled: true
           namespace:
             - name: default
@@ -52,7 +52,6 @@ helm:
     elasticsearch:
       enabled: false
     schema:
-      ttlSecondsAfterFinished: 10
       createDatabase:
         enabled: true
       setup:
@@ -80,11 +79,11 @@ valueDefinitions:
       - chartName: temporal
         patch:
           op: replace
-          path: /server/config/defaultNamespaces/namespace/0/name
+          path: /server/config/namespaces/namespace/0/name
       - chartName: temporal
         patch:
           op: replace
-          path: /server/config/defaultNamespaces/enabled
+          path: /server/config/namespaces/enabled
         valueTemplate: |-
           {{ if . }}true{{ else }}false{{ end }}
   defaultNamespaceRetention:
@@ -97,7 +96,7 @@ valueDefinitions:
       - chartName: temporal
         patch:
           op: replace
-          path: /server/config/defaultNamespaces/namespace/0/retention
+          path: /server/config/namespaces/namespace/0/retention
 transformations:
   - source:
       path: "{ $.metadata.name }"
