@@ -1,0 +1,25 @@
+# yaml-language-server: $schema=https://glasskube.dev/schemas/v1/package-manifest.json
+
+name: keptn
+shortDescription: Toolkit for cloud-native application lifecycle management
+longDescription: A Helm chart for Keptn, a set of tools to enable cloud-native
+  application lifecycle management
+iconUrl: https://raw.githubusercontent.com/cncf/artwork/main/projects/keptn/icon/color/keptn-icon-color.svg
+defaultNamespace: keptn-system
+helm:
+  chartName: keptn
+  chartVersion: 0.8.0
+  repositoryUrl: https://charts.lifecycle.keptn.sh
+  values:
+    global:
+      certManagerEnabled: false
+      caInjectionAnnotations:
+        cert-manager.io/inject-ca-from: keptn-system/keptn-certs
+manifests:
+  - url: https://glasskube.github.io/packages/packages/keptn/v2.2.0+1/keptn-cert.yaml
+  - url: https://glasskube.github.io/packages/packages/keptn/v2.2.0+1/keptn-issuer.yaml
+dependencies:
+  - name: cert-manager
+references:
+  - label: ArtifactHub
+    url: https://artifacthub.io/packages/helm/lifecycle-toolkit/keptn
