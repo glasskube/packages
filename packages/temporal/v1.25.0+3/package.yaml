@@ -1,0 +1,130 @@
+# yaml-language-server: $schema=https://glasskube.dev/schemas/v1/package-manifest.json
+
+name: temporal
+scope: Namespaced
+defaultNamespace: default
+iconUrl: https://temporal.io/favicon.svg
+helm:
+  repositoryUrl: https://go.temporal.io/helm-charts
+  chartName: temporal
+  chartVersion: "0.47.0"
+  values:
+    server:
+      config:
+        persistence:
+          default:
+            driver: "sql"
+            sql:
+              driver: "postgres12"
+              host: temporal-db-rw
+              port: 5432
+              database: temporal
+              user: postgres
+              existingSecret: temporal-db-superuser
+              maxConns: 20
+              maxConnLifetime: "1h"
+          visibility:
+            driver: "sql"
+            sql:
+              driver: "postgres12"
+              host: temporal-db-rw
+              port: 5432
+              database: temporal_visibility
+              user: postgres
+              existingSecret: temporal-db-superuser
+              maxConns: 20
+              maxConnLifetime: "1h"
+        namespaces:
+          create: true
+          namespace:
+            - name: default
+              retention: 3d
+    cassandra:
+      enabled: false
+    mysql:
+      enabled: false
+    postgresql:
+      enabled: true
+    prometheus:
+      enabled: false
+    grafana:
+      enabled: false
+    elasticsearch:
+      enabled: false
+    schema:
+      createDatabase:
+        enabled: true
+      setup:
+        enabled: true
+      update:
+        enabled: true
+components:
+  - name: postgresql
+    installedName: db
+    values:
+      enableSuperuserAccess:
+        value: "true"
+      databaseName:
+        value: "temporal"
+      storageSize:
+        value: "10Gi"
+valueDefinitions:
+  defaultNamespace:
+    type: text
+    metadata:
+      label: Default Namespace
+      description: Leave empty to skip namespace creation
+    defaultValue: default
+    targets:
+      - chartName: temporal
+        patch:
+          op: replace
+          path: /server/config/namespaces/namespace/0/name
+      - chartName: temporal
+        patch:
+          op: replace
+          path: /server/config/namespaces/create
+        valueTemplate: |-
+          {{ if . }}true{{ else }}false{{ end }}
+  defaultNamespaceRetention:
+    type: text
+    metadata:
+      label: Retention of the Default Namespace
+      description: Only takes effect if defaultNamespace is set
+    defaultValue: 3d
+    targets:
+      - chartName: temporal
+        patch:
+          op: replace
+          path: /server/config/namespaces/namespace/0/retention
+transformations:
+  - source:
+      path: "{ $.metadata.name }"
+    targets:
+      - chartName: temporal
+        valueTemplate: '"{{.}}-db-cluster-superuser"'
+        patch:
+          op: add
+          path: /server/config/persistence/default/sql/existingSecret
+      - chartName: temporal
+        valueTemplate: '"{{.}}-db-cluster-superuser"'
+        patch:
+          op: add
+          path: /server/config/persistence/visibility/sql/existingSecret
+      - chartName: temporal
+        valueTemplate: '"{{.}}-db-cluster-rw"'
+        patch:
+          op: add
+          path: /server/config/persistence/default/sql/host
+      - chartName: temporal
+        valueTemplate: '"{{.}}-db-cluster-rw"'
+        patch:
+          op: add
+          path: /server/config/persistence/visibility/sql/host
+references:
+  - label: Website
+    url: https://temporal.io/
+entrypoints:
+  - serviceName: temporal-web
+    port: 8080
+    localPort: 8448
