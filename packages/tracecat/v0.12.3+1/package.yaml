@@ -1,0 +1,261 @@
+# yaml-language-server: $schema=https://glasskube.dev/schemas/v1/package-manifest.json
+name: tracecat
+iconUrl: https://avatars.githubusercontent.com/u/137193901
+shortDescription: The open source Tines / Splunk SOAR alternative
+longDescription: |
+  Tracecat is an open-source Tines / Splunk SOAR alternative for security engineers. We're building the features of Tines using enterprise-grade open-source tools.
+defaultNamespace: tracecat
+scope: Namespaced
+references:
+  - label: GitHub
+    url: https://github.com/TracecatHQ/tracecat
+  - label: Website
+    url: https://tracecat.com/
+dependencies:
+  - name: cloudnative-pg
+    version: 1.x.x
+components:
+  - name: temporal
+    version: 1.x.x
+    values:
+      defaultNamespace:
+        value: "default"
+  - name: postgresql
+    installedName: tracecat-db
+    values:
+      enableSuperuserAccess:
+        value: "false"
+      databaseName:
+        value: "tracecat"
+      storageSize:
+        value: "10Gi"
+manifests:
+  - url: ./tracecat.yaml
+transitiveResources:
+  - apiGroup: v1
+    kind: Secret
+    name: tracecat-db-cluster-app
+  - apiGroup: v1
+    kind: Secret
+    name: tracecat-keys
+valueDefinitions:
+  tracecatDomain:
+    type: text
+    metadata:
+      label: Tracecat domain
+      description: |
+        DNS name for the Tracecat Ingress
+    constraints:
+      pattern: ^([a-z0-9]([\-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([\-a-z0-9]*[a-z0-9])?)*)?$
+      required: true
+    targets:
+      - patch:
+          op: add
+          path: /data/PUBLIC_APP_URL
+        valueTemplate: |
+          "https://{{ . }}"
+        resource:
+          apiGroup: v1
+          kind: ConfigMap
+          name: tracecat-config
+      - patch:
+          op: add
+          path: /data/PUBLIC_API_URL
+        valueTemplate: |
+          "https://{{ . }}/api"
+        resource:
+          apiGroup: v1
+          kind: ConfigMap
+          name: tracecat-config
+      - patch:
+          op: add
+          path: /spec/rules/0/host
+        resource:
+          apiGroup: networking.k8s.io/v1
+          kind: Ingress
+          name: tracecat-ui
+      - patch:
+          op: add
+          path: /spec/tls/0/hosts/0
+        resource:
+          apiGroup: networking.k8s.io/v1
+          kind: Ingress
+          name: tracecat-ui
+  oauthClientId:
+    type: text
+    metadata:
+      label: OAuth Client ID
+      description: |
+        Leave empty if OAuth is not needed.
+    defaultValue: ""
+    targets:
+      - patch:
+          op: add
+          path: /data/OAUTH_CLIENT_ID
+        resource:
+          apiGroup: v1
+          kind: ConfigMap
+          name: tracecat-config
+  oauthClientSecret:
+    type: text
+    metadata:
+      label: OAuth Client Secret
+      description: |
+        Leave empty if OAuth is not needed.
+    defaultValue: ""
+    targets:
+      - patch:
+          op: add
+          path: /data/OAUTH_CLIENT_SECRET
+        resource:
+          apiGroup: v1
+          kind: ConfigMap
+          name: tracecat-config
+  smtpHost:
+    type: text
+    metadata:
+      label: SMTP Host
+    defaultValue: ""
+    targets:
+      - patch:
+          op: add
+          path: /data/SMTP_HOST
+        resource:
+          apiGroup: v1
+          kind: ConfigMap
+          name: tracecat-config
+  smtpPort:
+    type: number
+    metadata:
+      label: SMTP Port
+    defaultValue: "465"
+    targets:
+      - patch:
+          op: add
+          path: /data/SMTP_PORT
+        resource:
+          apiGroup: v1
+          kind: ConfigMap
+          name: tracecat-config
+  smtpStartTlsEnabled:
+    type: boolean
+    metadata:
+      label: SMTP STARTTLS enabled
+    defaultValue: "true"
+    targets:
+      - patch:
+          op: add
+          path: /data/SMTP_STARTTLS_ENABLED
+        valueTemplate: |
+          {{ if . }}"1"{{else}}"0"{{end}}
+        resource:
+          apiGroup: v1
+          kind: ConfigMap
+          name: tracecat-config
+  smtpSslEnabled:
+    type: boolean
+    metadata:
+      label: SMTP SSL enabled
+    defaultValue: "false"
+    targets:
+      - patch:
+          op: add
+          path: /data/SMTP_SSL_ENABLED
+        valueTemplate: |
+          {{ if . }}"1"{{else}}"0"{{end}}
+        resource:
+          apiGroup: v1
+          kind: ConfigMap
+          name: tracecat-config
+  smtpUser:
+    type: text
+    metadata:
+      label: SMTP User
+    defaultValue: ""
+    targets:
+      - patch:
+          op: add
+          path: /data/SMTP_USER
+        resource:
+          apiGroup: v1
+          kind: ConfigMap
+          name: tracecat-config
+  smtpPassword:
+    type: text
+    metadata:
+      label: SMTP Password
+    defaultValue: ""
+    targets:
+      - patch:
+          op: add
+          path: /data/SMTP_PASS
+        resource:
+          apiGroup: v1
+          kind: ConfigMap
+          name: tracecat-config
+  ldapHost:
+    type: text
+    metadata:
+      label: LDAP Host
+    defaultValue: ""
+    targets:
+      - patch:
+          op: add
+          path: /data/LDAP_HOST
+        resource:
+          apiGroup: v1
+          kind: ConfigMap
+          name: tracecat-config
+  ldapPort:
+    type: number
+    metadata:
+      label: LDAP Port
+    defaultValue: "389"
+    targets:
+      - patch:
+          op: add
+          path: /data/LDAP_PORT
+        resource:
+          apiGroup: v1
+          kind: ConfigMap
+          name: tracecat-config
+  ldapSsl:
+    type: boolean
+    metadata:
+      label: LDAP SSL
+    defaultValue: "false"
+    targets:
+      - patch:
+          op: add
+          path: /data/LDAP_SSL
+        valueTemplate: |
+          {{ if . }}"1"{{else}}"0"{{end}}
+        resource:
+          apiGroup: v1
+          kind: ConfigMap
+          name: tracecat-config
+  ldapType:
+    type: text
+    metadata:
+      label: LDAP Type
+    defaultValue: "AD"
+    targets:
+      - patch:
+          op: add
+          path: /data/LDAP_TYPE
+        resource:
+          apiGroup: v1
+          kind: ConfigMap
+          name: tracecat-config
+transformations:
+  - source:
+      path: "{ $.metadata.name }"
+    targets:
+      - resource:
+          apiGroup: v1
+          kind: ConfigMap
+          name: tracecat-config
+        patch:
+          op: replace
+          path: "/data/TEMPORAL__CLUSTER_URL"
+        valueTemplate: '"http://{{.}}-temporal-temporal-frontend:7233"'
