@@ -1,0 +1,54 @@
+# yaml-language-server: $schema=https://glasskube.dev/schemas/v1/package-manifest.json
+
+name: qdrant
+iconUrl: https://avatars.githubusercontent.com/u/73504361
+shortDescription: High-Performance Vector Search at Scale
+longDescription: Qdrant - Vector Database for the next generation of AI applications.
+defaultNamespace: default
+references:
+  - label: ArtifactHub
+    url: https://artifacthub.io/packages/helm/qdrant/qdrant
+  - label: GitHub
+    url: https://github.com/qdrant/qdrant
+scope: Namespaced
+helm:
+  chartName: qdrant
+  chartVersion: 1.12.2
+  repositoryUrl: https://qdrant.github.io/qdrant-helm
+  values:
+    apiKey: true
+    replicaCount: 1
+    resources:
+      limits:
+        memory: 512Mi
+      requests:
+        cpu: 50m
+        memory: 512Mi
+valueDefinitions:
+  memory:
+    constraints: {}
+    defaultValue: 512Mi
+    metadata:
+      label: qdrant memory request and limit per instance
+    targets:
+      - chartName: qdrant
+        patch:
+          op: replace
+          path: /resources/limits/memory
+      - chartName: qdrant
+        patch:
+          op: replace
+          path: /resources/requests/memory
+    type: text
+  instances:
+    constraints: {}
+    defaultValue: "1"
+    metadata:
+      label: qdrant instance count
+    targets:
+      - chartName: qdrant
+        patch:
+          op: replace
+          path: /replicaCount
+        valueTemplate: "{{.}}"
+    type: number
