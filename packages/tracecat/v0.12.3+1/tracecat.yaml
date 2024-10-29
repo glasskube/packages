@@ -59,6 +59,7 @@ data:
   SMTP_USER: ""
   TEMPORAL__CLUSTER_URL: http://temporal-temporal-frontend:7233
   TRACECAT__API_ROOT_PATH: /api
+  TRACECAT__API_URL: ""
   TRACECAT__APP_ENV: production
   TRACECAT__AUTH_TYPES: basic,google_oauth
   TRACECAT__DB_SSLMODE: require
@@ -343,6 +344,11 @@ spec:
           valueFrom:
             configMapKeyRef:
               key: PUBLIC_API_URL
+              name: tracecat-config
+        - name: TRACECAT__API_URL
+          valueFrom:
+            configMapKeyRef:
+              key: TRACECAT__API_URL
               name: tracecat-config
         - name: TRACECAT__SERVICE_KEY
           valueFrom:

@@ -259,3 +259,11 @@ transformations:
           op: replace
           path: "/data/TEMPORAL__CLUSTER_URL"
         valueTemplate: '"http://{{.}}-temporal-temporal-frontend:7233"'
+      - resource:
+          apiGroup: v1
+          kind: ConfigMap
+          name: tracecat-config
+        patch:
+          op: replace
+          path: "/data/TRACECAT__API_URL"
+        valueTemplate: '"http://{{.}}-tracecat-api:8000"'
