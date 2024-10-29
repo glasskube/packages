@@ -202,7 +202,7 @@ spec:
             name: tracecat-db-cluster-app
         - configMapRef:
             name: tracecat-config
-        image: ghcr.io/tracecathq/tracecat:0.10.1
+        image: ghcr.io/tracecathq/tracecat:0.12.3
         name: tracecat-api
         ports:
         - containerPort: 8000
@@ -291,7 +291,7 @@ spec:
         envFrom:
         - configMapRef:
             name: tracecat-config
-        image: ghcr.io/tracecathq/tracecat-ui:0.10.1
+        image: ghcr.io/tracecathq/tracecat-ui:0.12.3
         name: tracecat-ui
         ports:
         - containerPort: 3000
@@ -374,7 +374,7 @@ spec:
             name: tracecat-db-cluster-app
         - configMapRef:
             name: tracecat-config
-        image: ghcr.io/tracecathq/tracecat:0.10.1
+        image: ghcr.io/tracecathq/tracecat:0.12.3
         name: tracecat-worker
 ---
 apiVersion: networking.k8s.io/v1
