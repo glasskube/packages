@@ -103,7 +103,7 @@ packages:
     scope: Namespaced
     shortDescription: The World's Most Advanced Open Source Relational Database
   - iconUrl: https://avatars.githubusercontent.com/u/73504361
-    latestVersion: v1.11.4+3
+    latestVersion: v1.12.2+1
     name: qdrant
     scope: Namespaced
     shortDescription: High-Performance Vector Search at Scale
