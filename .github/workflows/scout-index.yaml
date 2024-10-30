@@ -6,6 +6,10 @@ on:
     branches:
       - main
 
+concurrency:
+  group: scout-index
+  cancel-in-progress: true
+
 jobs:
   scout-index:
     runs-on: ubuntu-latest
