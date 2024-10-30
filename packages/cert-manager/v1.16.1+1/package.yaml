@@ -1,0 +1,16 @@
+# yaml-language-server: $schema=https://glasskube.dev/schemas/v1/package-manifest.json
+
+name: cert-manager
+shortDescription: X.509 certificate management for Kubernetes and OpenShift
+longDescription: A Helm chart for cert-manager
+iconUrl: https://avatars.githubusercontent.com/u/39950598
+defaultNamespace: cert-manager
+helm:
+  chartName: cert-manager
+  chartVersion: 1.16.1
+  repositoryUrl: https://charts.jetstack.io
+  values:
+    installCRDs: true
+references:
+  - label: ArtifactHub
+    url: https://artifacthub.io/packages/helm/cert-manager/cert-manager
