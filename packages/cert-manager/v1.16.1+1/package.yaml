@@ -10,7 +10,7 @@ helm:
   chartVersion: 1.16.1
   repositoryUrl: https://charts.jetstack.io
   values:
-    installCRDs: "true"
+    installCRDs: true
 references:
   - label: ArtifactHub
     url: https://artifacthub.io/packages/helm/cert-manager/cert-manager
