@@ -126,7 +126,7 @@ packages:
     name: sealed-secrets
     shortDescription: A Kubernetes controller and tool for one-way encrypted Secrets
   - iconUrl: https://temporal.io/favicon.svg
-    latestVersion: v1.25.0+2
+    latestVersion: v1.25.0+3
     name: temporal
     scope: Namespaced
   - iconUrl: https://avatars.githubusercontent.com/u/47359
