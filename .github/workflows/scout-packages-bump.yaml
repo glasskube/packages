@@ -6,6 +6,10 @@ on:
     branches:
       - main
 
+concurrency:
+  group: scout-packages-bump
+  cancel-in-progress: true
+
 jobs:
   setup:
     runs-on: ubuntu-latest
