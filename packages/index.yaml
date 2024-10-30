@@ -5,7 +5,7 @@ packages:
     shortDescription: Akri lets you easily expose heterogeneous leaf devices (such
       as IP cameras and USB devices) as resources in a Kubernetes cluster
   - iconUrl: https://avatars.githubusercontent.com/u/30269780
-    latestVersion: v2.12.3+1
+    latestVersion: v2.12.6+1
     name: argo-cd
     shortDescription: Declarative Continuous Deployment for Kubernetes
   - iconUrl: https://avatars.githubusercontent.com/u/12955528
@@ -14,7 +14,7 @@ packages:
     scope: Cluster
     shortDescription: This is the Kubernetes Ingress Controller for Caddy
   - iconUrl: https://avatars.githubusercontent.com/u/39950598
-    latestVersion: v1.15.3+1
+    latestVersion: v1.16.1+1
     name: cert-manager
     shortDescription: X.509 certificate management for Kubernetes and OpenShift
   - iconUrl: https://avatars.githubusercontent.com/u/54801242
@@ -22,24 +22,24 @@ packages:
     name: clickhouse-operator
     shortDescription: Altinity Kubernetes Operator for ClickHouse
   - iconUrl: https://github.com/glasskube/glasskube/assets/16959694/99f3192a-587f-4eb9-884d-62800c022992
-    latestVersion: v1.23.3+1
+    latestVersion: v1.24.1+1
     name: cloudnative-pg
     shortDescription: A comprehensive platform designed to seamlessly manage PostgreSQL databases
   - iconUrl: https://cyclops-ui.com/img/logo.png
-    latestVersion: v0.13.1+1
+    latestVersion: v0.15.0+1
     name: cyclops
     shortDescription: Developer friendly Kubernetes
   - iconUrl: https://avatars.githubusercontent.com/u/36015203
-    latestVersion: v1.1.0
+    latestVersion: v1.2.0+1
     name: gateway-api
     shortDescription: The Gateway API provides a standardized way to configure and
       manage network traffic routing in Kubernetes clusters.
-  - latestVersion: v0.22.0+1
+  - latestVersion: v0.25.0+1
     name: glasskube-autoupdater
     scope: Cluster
     shortDescription: Opt-in to automatically update your Packages
   - iconUrl: https://avatars.githubusercontent.com/u/1728152
-    latestVersion: v24.6.1+1
+    latestVersion: v24.6.2+1
     name: gpu-operator
     shortDescription: Management of NVIDIA components needed to provision GPU
   - iconUrl: https://avatars.githubusercontent.com/u/122369679
@@ -72,7 +72,7 @@ packages:
     scope: Cluster
     shortDescription: Open Source Identity and Access Management
   - iconUrl: https://avatars.githubusercontent.com/u/66682517
-    latestVersion: v62.7.0+1
+    latestVersion: v65.5.0+1
     name: kube-prometheus-stack
     shortDescription: Use Prometheus to monitor Kubernetes and applications running on Kubernetes
   - iconUrl: https://avatars.githubusercontent.com/u/13629408
@@ -80,7 +80,7 @@ packages:
     name: kubernetes-dashboard
     shortDescription: General-purpose web UI for Kubernetes clusters
   - iconUrl: https://avatars.githubusercontent.com/u/141319696
-    latestVersion: v0.7.2+1
+    latestVersion: v0.8.4+1
     name: kubetail
     shortDescription: Kubetail is a web-based, real-time log viewer for Kubernetes clusters
   - iconUrl: https://avatars.githubusercontent.com/u/13629408
@@ -88,7 +88,7 @@ packages:
     name: metrics-server
     shortDescription: Kubernetes Metrics Server
   - iconUrl: https://avatars.githubusercontent.com/u/13629408
-    latestVersion: v0.16.4+1
+    latestVersion: v0.16.5+1
     name: node-feature-discovery
     shortDescription: Detects hardware features available on each node in a
       Kubernetes cluster, and advertises those features using node labels.
@@ -103,7 +103,7 @@ packages:
     scope: Namespaced
     shortDescription: The World's Most Advanced Open Source Relational Database
   - iconUrl: https://avatars.githubusercontent.com/u/73504361
-    latestVersion: v1.11.4+3
+    latestVersion: v1.12.2+1
     name: qdrant
     scope: Namespaced
     shortDescription: High-Performance Vector Search at Scale
@@ -113,7 +113,7 @@ packages:
     scope: Namespaced
     shortDescription: Cloud-native search engine for observability
   - iconUrl: https://raw.githubusercontent.com/rabbitmq/rabbitmq-website/30967fb4a7c39f28e9a5f591b8d70db185d8fd54/static/img/rabbitmq-logo.svg
-    latestVersion: v2.10.0+1
+    latestVersion: v2.11.0+1
     name: rabbitmq-operator
     shortDescription: Kubernetes operator to deploy and manage RabbitMQ clusters
   - iconUrl: https://avatars.githubusercontent.com/u/1529926
@@ -126,7 +126,7 @@ packages:
     name: sealed-secrets
     shortDescription: A Kubernetes controller and tool for one-way encrypted Secrets
   - iconUrl: https://temporal.io/favicon.svg
-    latestVersion: v1.25.0+2
+    latestVersion: v1.25.0+3
     name: temporal
     scope: Namespaced
   - iconUrl: https://avatars.githubusercontent.com/u/47359

@@ -6,6 +6,10 @@ on:
     branches:
       - main
 
+concurrency:
+  group: scout-index
+  cancel-in-progress: true
+
 jobs:
   scout-index:
     runs-on: ubuntu-latest
@@ -15,7 +19,7 @@ jobs:
       contents: write
     steps:
       - name: Checkout
-        uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
       - uses: glasskube/scout/actions/setup@a46cfc5307c027fbe6b3624c9fa4e0c1dfa86fba # v0.3.5
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
