@@ -16,8 +16,8 @@ helm:
       caInjectionAnnotations:
         cert-manager.io/inject-ca-from: keptn-system/keptn-certs
 manifests:
-  - url: https://glasskube.github.io/packages/packages/keptn/v2.2.0+1/keptn-cert.yaml
-  - url: https://glasskube.github.io/packages/packages/keptn/v2.2.0+1/keptn-issuer.yaml
+  - url: keptn-cert.yaml
+  - url: keptn-issuer.yaml
 dependencies:
   - name: cert-manager
 references:
