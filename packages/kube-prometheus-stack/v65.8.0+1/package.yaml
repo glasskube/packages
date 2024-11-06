@@ -1,0 +1,150 @@
+# yaml-language-server: $schema=https://glasskube.dev/schemas/v1/package-manifest.json
+
+name: kube-prometheus-stack
+defaultNamespace: kube-prometheus-stack
+shortDescription: Use Prometheus to monitor Kubernetes and applications running on Kubernetes
+iconUrl: https://avatars.githubusercontent.com/u/66682517
+references:
+  - label: ArtifactHub
+    url: https://artifacthub.io/packages/helm/prometheus-community/kube-prometheus-stack
+entrypoints:
+  - name: grafana
+    serviceName: kube-prometheus-stack-grafana
+    port: 80
+    localPort: 8888
+helm:
+  chartName: kube-prometheus-stack
+  chartVersion: 65.8.0
+  repositoryUrl: https://prometheus-community.github.io/helm-charts
+  values:
+    alertmanager:
+      enabled: false
+    grafana:
+      grafana.ini:
+        server:
+          root_url: https://%(domain)s/
+        date_formats:
+          default_timezone: browser
+      deploymentStrategy:
+        type: Recreate
+      sidecar:
+        dashboards:
+          multicluster:
+            global:
+              enabled: false
+      ingress:
+        enabled: false
+        annotations:
+          cert-manager.io/cluster-issuer: letsencrypt
+        hosts: []
+        ingressClassName: nginx
+        tls:
+          - hosts: []
+            secretName: grafana-tls
+      persistence:
+        enabled: true
+        size: 10Gi
+    prometheus:
+      prometheusSpec:
+        podMonitorSelectorNilUsesHelmValues: false
+        probeSelectorNilUsesHelmValues: false
+        retention: 14d
+        ruleSelectorNilUsesHelmValues: false
+        serviceMonitorSelectorNilUsesHelmValues: false
+        storageSpec:
+          volumeClaimTemplate:
+            spec:
+              resources:
+                requests:
+                  storage: 20Gi
+        replicaExternalLabelName: __replica__
+    prometheusOperator:
+      prometheusConfigReloader:
+        enableProbe: true
+        resources:
+          requests:
+            cpu: 200m
+            memory: 1Gi
+          limits:
+            cpu: 200m
+            memory: 1.5Gi
+    prometheus-node-exporter: {}
+valueDefinitions:
+  grafanaEnabled:
+    type: boolean
+    defaultValue: "true"
+    metadata:
+      label: Enable Grafana
+    targets:
+      - patch:
+          op: add
+          path: /grafana/enabled
+        chartName: kube-prometheus-stack
+  grafanaDomain:
+    type: text
+    metadata:
+      label: Grafana domain
+      description: |
+        DNS name for the Granfana Ingress.
+        Leave this empty to disable the Ingress.
+    targets:
+      - patch:
+          op: add
+          path: /grafana/ingress/enabled
+        valueTemplate: |
+          {{ if eq . "" }}false{{ else }}true{{ end }}
+        chartName: kube-prometheus-stack
+      - patch:
+          op: add
+          path: /grafana/ingress/hosts/-
+        chartName: kube-prometheus-stack
+      - patch:
+          op: add
+          path: /grafana/ingress/tls/0/hosts/-
+        chartName: kube-prometheus-stack
+      - patch:
+          op: add
+          path: /grafana/grafana.ini/server/domain
+        chartName: kube-prometheus-stack
+  alertmanagerEnabled:
+    type: boolean
+    metadata:
+      label: Enable Alertmanager
+    targets:
+      - patch:
+          op: add
+          path: /alertmanager/enabled
+        chartName: kube-prometheus-stack
+  prometheusRetention:
+    type: text
+    metadata:
+      label: Prometheus retention
+    defaultValue: 30d
+    targets:
+      - patch:
+          op: add
+          path: /prometheus/prometheusSpec/retention
+        chartName: kube-prometheus-stack
+  prometheusStorageSize:
+    type: text
+    metadata:
+      label: Prometheus storage size
+    defaultValue: 10Gi
+    targets:
+      - patch:
+          op: add
+          path: /prometheus/prometheusSpec/storageSpec/volumeClaimTemplate/spec/resources/requests/storage
+        chartName: kube-prometheus-stack
+  prometheusNodeExporterHostNetwork:
+    type: boolean
+    metadata:
+      label: Node Exporter host network
+    targets:
+      - patch:
+          op: add
+          path: /prometheus-node-exporter/hostNetwork
+        chartName: kube-prometheus-stack
+longDescription: kube-prometheus-stack collects Kubernetes manifests, Grafana
+  dashboards, and Prometheus rules combined with documentation and scripts to
+  provide easy to operate end-to-end Kubernetes cluster monitoring with
+  Prometheus using the Prometheus Operator.
