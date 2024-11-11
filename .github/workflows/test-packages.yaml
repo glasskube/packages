@@ -40,7 +40,7 @@ jobs:
       - name: Check glasskube
         run: ./glasskube --version
       - name: Start local webserver
-        uses: Eun/http-server-action@a68db85dc4a7e47241c0830702c3561709f021a2 # v1
+        uses: Eun/http-server-action@f71cec1321f665652a46c40b6852f8e5a68bfcd4 # v1
         with:
           directory: ${{ github.workspace }}
           port: 9090
