@@ -58,7 +58,7 @@ packages:
     name: k8sgpt-operator
     shortDescription: Automatic SRE Superpowers within your Kubernetes cluster
   - iconUrl: https://raw.githubusercontent.com/cncf/artwork/main/projects/keptn/icon/color/keptn-icon-color.svg
-    latestVersion: v2.2.0+1
+    latestVersion: v2.4.0+1
     name: keptn
     shortDescription: Toolkit for cloud-native application lifecycle management
   - iconUrl: https://avatars.githubusercontent.com/u/4921466
