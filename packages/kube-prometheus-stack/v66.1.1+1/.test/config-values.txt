@@ -1,0 +1,1 @@
+--value "grafanaEnabled=true" --value "grafanaDomain=" --value "alertmanagerEnabled=false" --value "prometheusRetention=1d" --value "prometheusStorageSize=1Gi" --value "prometheusNodeExporterHostNetwork=false"
