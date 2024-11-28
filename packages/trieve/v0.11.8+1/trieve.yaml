@@ -22,7 +22,6 @@ metadata:
     app.kubernetes.io/name: trieve
     app.kubernetes.io/part-of: trieve
   name: trieve-clickhouse-functions
-  namespace: default
 ---
 apiVersion: v1
 data:
@@ -101,7 +100,6 @@ metadata:
     app.kubernetes.io/name: trieve
     app.kubernetes.io/part-of: trieve
   name: trieve-clickhouse-scripts
-  namespace: default
 ---
 apiVersion: v1
 data:
@@ -132,7 +130,7 @@ data:
   QDRANT_URL: http://trieve-qdrant-qdrant:6334
   QUANTIZE_VECTORS: "false"
   REDIS_CONNECTIONS: "2"
-  REDIS_URL: redis://redis:6379
+  REDIS_URL: redis://trieve-redis-redis:6379
   REPLICATION_FACTOR: "2"
   RERANKER_SERVER_ORIGIN: http://trieve-embedding-reranker
   RUST_LOG: INFO
@@ -151,7 +149,7 @@ data:
   SPARSE_SERVER_QUERY_ORIGIN: http://trieve-embedding-splade-query
   STRIPE_SECRET: ""
   STRIPE_WEBHOOK_SECRET: ""
-  TIKA_URL: http://tika:9998
+  TIKA_URL: http://trieve-tika-tika:9998
   UNLIMITED: "true"
   USE_ANALYTICS: "true"
   VECTOR_SIZES: 384,512,768,1024,1536,3072
@@ -162,7 +160,6 @@ metadata:
     app.kubernetes.io/name: trieve
     app.kubernetes.io/part-of: trieve
   name: trieve-server-config
-  namespace: default
 ---
 apiVersion: v1
 data:
@@ -179,7 +176,6 @@ metadata:
     app.kubernetes.io/name: trieve
     app.kubernetes.io/part-of: trieve
   name: trieve-ui-config
-  namespace: default
 ---
 apiVersion: v1
 kind: Service
@@ -190,7 +186,6 @@ metadata:
     app.kubernetes.io/name: trieve
     app.kubernetes.io/part-of: trieve
   name: trieve-embedding-bgem3
-  namespace: default
 spec:
   ports:
   - name: svc
@@ -213,7 +208,6 @@ metadata:
     app.kubernetes.io/name: trieve
     app.kubernetes.io/part-of: trieve
   name: trieve-embedding-jina
-  namespace: default
 spec:
   ports:
   - name: svc
@@ -236,7 +230,6 @@ metadata:
     app.kubernetes.io/name: trieve
     app.kubernetes.io/part-of: trieve
   name: trieve-embedding-reranker
-  namespace: default
 spec:
   ports:
   - name: svc
@@ -259,7 +252,6 @@ metadata:
     app.kubernetes.io/name: trieve
     app.kubernetes.io/part-of: trieve
   name: trieve-embedding-splade-doc
-  namespace: default
 spec:
   ports:
   - name: svc
@@ -282,7 +274,6 @@ metadata:
     app.kubernetes.io/name: trieve
     app.kubernetes.io/part-of: trieve
   name: trieve-embedding-splade-query
-  namespace: default
 spec:
   ports:
   - name: svc
@@ -305,7 +296,6 @@ metadata:
     app.kubernetes.io/name: trieve
     app.kubernetes.io/part-of: trieve
   name: trieve-server
-  namespace: default
 spec:
   ports:
   - name: server
@@ -326,7 +316,6 @@ metadata:
     app.kubernetes.io/name: trieve
     app.kubernetes.io/part-of: trieve
   name: trieve-ui-analytics
-  namespace: default
 spec:
   ports:
   - name: http
@@ -347,7 +336,6 @@ metadata:
     app.kubernetes.io/name: trieve
     app.kubernetes.io/part-of: trieve
   name: trieve-ui-chat
-  namespace: default
 spec:
   ports:
   - name: http
@@ -368,7 +356,6 @@ metadata:
     app.kubernetes.io/name: trieve
     app.kubernetes.io/part-of: trieve
   name: trieve-ui-dashboard
-  namespace: default
 spec:
   ports:
   - name: http
@@ -389,7 +376,6 @@ metadata:
     app.kubernetes.io/name: trieve
     app.kubernetes.io/part-of: trieve
   name: trieve-ui-search
-  namespace: default
 spec:
   ports:
   - name: http
@@ -410,7 +396,6 @@ metadata:
     app.kubernetes.io/name: trieve
     app.kubernetes.io/part-of: trieve
   name: trieve-embedding-bgem3
-  namespace: default
 spec:
   replicas: 1
   selector:
@@ -439,6 +424,11 @@ spec:
           httpGet:
             path: /
             port: 80
+        resources:
+          limits:
+            memory: 3Gi
+          requests:
+            memory: 3Gi
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -449,7 +439,6 @@ metadata:
     app.kubernetes.io/name: trieve
     app.kubernetes.io/part-of: trieve
   name: trieve-embedding-jina
-  namespace: default
 spec:
   replicas: 1
   selector:
@@ -480,6 +469,11 @@ spec:
           httpGet:
             path: /
             port: 80
+        resources:
+          limits:
+            memory: 7Gi
+          requests:
+            memory: 7Gi
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -490,7 +484,6 @@ metadata:
     app.kubernetes.io/name: trieve
     app.kubernetes.io/part-of: trieve
   name: trieve-embedding-reranker
-  namespace: default
 spec:
   replicas: 1
   selector:
@@ -521,6 +514,11 @@ spec:
           httpGet:
             path: /
             port: 80
+        resources:
+          limits:
+            memory: 2Gi
+          requests:
+            memory: 2Gi
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -531,7 +529,6 @@ metadata:
     app.kubernetes.io/name: trieve
     app.kubernetes.io/part-of: trieve
   name: trieve-embedding-splade-doc
-  namespace: default
 spec:
   replicas: 1
   selector:
@@ -564,6 +561,11 @@ spec:
           httpGet:
             path: /
             port: 80
+        resources:
+          limits:
+            memory: 1Gi
+          requests:
+            memory: 1Gi
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -574,7 +576,6 @@ metadata:
     app.kubernetes.io/name: trieve
     app.kubernetes.io/part-of: trieve
   name: trieve-embedding-splade-query
-  namespace: default
 spec:
   replicas: 1
   selector:
@@ -607,6 +608,11 @@ spec:
           httpGet:
             path: /
             port: 80
+        resources:
+          limits:
+            memory: 500Mi
+          requests:
+            memory: 500Mi
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -617,7 +623,6 @@ metadata:
     app.kubernetes.io/name: trieve
     app.kubernetes.io/part-of: trieve
   name: trieve-server
-  namespace: default
 spec:
   selector:
     matchLabels:
@@ -639,12 +644,12 @@ spec:
           valueFrom:
             secretKeyRef:
               key: uri
-              name: trieve-trieve-postgresql-server-app # patched
+              name: trieve-db-cluster-app
         - name: QDRANT_API_KEY
           valueFrom:
             secretKeyRef:
               key: api-key
-              name: trieve-trieve-qdrant-qdrant-apikey # patched
+              name: trieve-qdrant-qdrant-apikey
         envFrom:
         - configMapRef:
             name: trieve-server-config
@@ -654,7 +659,8 @@ spec:
         - containerPort: 8090
         resources:
           requests:
-            cpu: "1"
+            cpu: 50m
+            memory: 100Mi
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -665,7 +671,6 @@ metadata:
     app.kubernetes.io/name: trieve
     app.kubernetes.io/part-of: trieve
   name: trieve-ui-analytics
-  namespace: default
 spec:
   selector:
     matchLabels:
@@ -689,7 +694,12 @@ spec:
         name: ui
         ports:
         - containerPort: 80
-        resources: {}
+        resources:
+          limits:
+            memory: 500Mi
+          requests:
+            cpu: 10m
+            memory: 50Mi
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -700,7 +710,6 @@ metadata:
     app.kubernetes.io/name: trieve
     app.kubernetes.io/part-of: trieve
   name: trieve-ui-chat
-  namespace: default
 spec:
   selector:
     matchLabels:
@@ -724,7 +733,12 @@ spec:
         name: ui
         ports:
         - containerPort: 80
-        resources: {}
+        resources:
+          limits:
+            memory: 500Mi
+          requests:
+            cpu: 10m
+            memory: 50Mi
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -735,7 +749,6 @@ metadata:
     app.kubernetes.io/name: trieve
     app.kubernetes.io/part-of: trieve
   name: trieve-ui-dashboard
-  namespace: default
 spec:
   selector:
     matchLabels:
@@ -759,7 +772,12 @@ spec:
         name: ui
         ports:
         - containerPort: 80
-        resources: {}
+        resources:
+          limits:
+            memory: 500Mi
+          requests:
+            cpu: 10m
+            memory: 50Mi
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -770,7 +788,6 @@ metadata:
     app.kubernetes.io/name: trieve
     app.kubernetes.io/part-of: trieve
   name: trieve-ui-search
-  namespace: default
 spec:
   selector:
     matchLabels:
@@ -794,7 +811,12 @@ spec:
         name: ui
         ports:
         - containerPort: 80
-        resources: {}
+        resources:
+          limits:
+            memory: 500Mi
+          requests:
+            cpu: 10m
+            memory: 50Mi
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -805,7 +827,6 @@ metadata:
     app.kubernetes.io/name: trieve
     app.kubernetes.io/part-of: trieve
   name: trieve-worker-bktree
-  namespace: default
 spec:
   selector:
     matchLabels:
@@ -827,12 +848,12 @@ spec:
           valueFrom:
             secretKeyRef:
               key: uri
-              name: trieve-trieve-postgresql-server-app # patched
+              name: trieve-db-cluster-app
         - name: QDRANT_API_KEY
           valueFrom:
             secretKeyRef:
               key: api-key
-              name: trieve-trieve-qdrant-qdrant-apikey # patched
+              name: trieve-qdrant-qdrant-apikey
         envFrom:
         - configMapRef:
             name: trieve-server-config
@@ -844,6 +865,8 @@ spec:
           limits:
             cpu: "1"
             memory: 200Mi
+          requests:
+            cpu: 50m
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -854,7 +877,6 @@ metadata:
     app.kubernetes.io/name: trieve
     app.kubernetes.io/part-of: trieve
   name: trieve-worker-bm25
-  namespace: default
 spec:
   replicas: 0
   selector:
@@ -877,12 +899,12 @@ spec:
           valueFrom:
             secretKeyRef:
               key: uri
-              name: trieve-trieve-postgresql-server-app # patched
+              name: trieve-db-cluster-app
         - name: QDRANT_API_KEY
           valueFrom:
             secretKeyRef:
               key: api-key
-              name: trieve-trieve-qdrant-qdrant-apikey # patched
+              name: trieve-qdrant-qdrant-apikey
         envFrom:
         - configMapRef:
             name: trieve-server-config
@@ -894,6 +916,8 @@ spec:
           limits:
             cpu: "1"
             memory: 200Mi
+          requests:
+            cpu: 50m
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -904,7 +928,6 @@ metadata:
     app.kubernetes.io/name: trieve
     app.kubernetes.io/part-of: trieve
   name: trieve-worker-delete
-  namespace: default
 spec:
   selector:
     matchLabels:
@@ -926,12 +949,12 @@ spec:
           valueFrom:
             secretKeyRef:
               key: uri
-              name: trieve-trieve-postgresql-server-app # patched
+              name: trieve-db-cluster-app
         - name: QDRANT_API_KEY
           valueFrom:
             secretKeyRef:
               key: api-key
-              name: trieve-trieve-qdrant-qdrant-apikey # patched
+              name: trieve-qdrant-qdrant-apikey
         envFrom:
         - configMapRef:
             name: trieve-server-config
@@ -943,6 +966,8 @@ spec:
           limits:
             cpu: "1"
             memory: 200Mi
+          requests:
+            cpu: 50m
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -953,7 +978,6 @@ metadata:
     app.kubernetes.io/name: trieve
     app.kubernetes.io/part-of: trieve
   name: trieve-worker-file
-  namespace: default
 spec:
   selector:
     matchLabels:
@@ -975,12 +999,12 @@ spec:
           valueFrom:
             secretKeyRef:
               key: uri
-              name: trieve-trieve-postgresql-server-app # patched
+              name: trieve-db-cluster-app
         - name: QDRANT_API_KEY
           valueFrom:
             secretKeyRef:
               key: api-key
-              name: trieve-trieve-qdrant-qdrant-apikey # patched
+              name: trieve-qdrant-qdrant-apikey
         envFrom:
         - configMapRef:
             name: trieve-server-config
@@ -992,6 +1016,8 @@ spec:
           limits:
             cpu: "1"
             memory: 200Mi
+          requests:
+            cpu: 50m
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -1002,7 +1028,6 @@ metadata:
     app.kubernetes.io/name: trieve
     app.kubernetes.io/part-of: trieve
   name: trieve-worker-group
-  namespace: default
 spec:
   selector:
     matchLabels:
@@ -1024,12 +1049,12 @@ spec:
           valueFrom:
             secretKeyRef:
               key: uri
-              name: trieve-trieve-postgresql-server-app # patched
+              name: trieve-db-cluster-app
         - name: QDRANT_API_KEY
           valueFrom:
             secretKeyRef:
               key: api-key
-              name: trieve-trieve-qdrant-qdrant-apikey # patched
+              name: trieve-qdrant-qdrant-apikey
         envFrom:
         - configMapRef:
             name: trieve-server-config
@@ -1041,6 +1066,8 @@ spec:
           limits:
             cpu: "1"
             memory: 200Mi
+          requests:
+            cpu: 50m
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -1051,7 +1078,6 @@ metadata:
     app.kubernetes.io/name: trieve
     app.kubernetes.io/part-of: trieve
   name: trieve-worker-ingest
-  namespace: default
 spec:
   selector:
     matchLabels:
@@ -1073,12 +1099,12 @@ spec:
           valueFrom:
             secretKeyRef:
               key: uri
-              name: trieve-trieve-postgresql-server-app # patched
+              name: trieve-db-cluster-app
         - name: QDRANT_API_KEY
           valueFrom:
             secretKeyRef:
               key: api-key
-              name: trieve-trieve-qdrant-qdrant-apikey # patched
+              name: trieve-qdrant-qdrant-apikey
         envFrom:
         - configMapRef:
             name: trieve-server-config
@@ -1090,6 +1116,8 @@ spec:
           limits:
             cpu: "1"
             memory: 200Mi
+          requests:
+            cpu: 50m
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -1100,7 +1128,6 @@ metadata:
     app.kubernetes.io/name: trieve
     app.kubernetes.io/part-of: trieve
   name: trieve-worker-reindexer
-  namespace: default
 spec:
   selector:
     matchLabels:
@@ -1122,12 +1149,12 @@ spec:
           valueFrom:
             secretKeyRef:
               key: uri
-              name: trieve-trieve-postgresql-server-app # patched
+              name: trieve-db-cluster-app
         - name: QDRANT_API_KEY
           valueFrom:
             secretKeyRef:
               key: api-key
-              name: trieve-trieve-qdrant-qdrant-apikey # patched
+              name: trieve-qdrant-qdrant-apikey
         envFrom:
         - configMapRef:
             name: trieve-server-config
@@ -1139,6 +1166,8 @@ spec:
           limits:
             cpu: "1"
             memory: 200Mi
+          requests:
+            cpu: 50m
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -1149,7 +1178,6 @@ metadata:
     app.kubernetes.io/name: trieve
     app.kubernetes.io/part-of: trieve
   name: trieve-worker-sync-qdrant
-  namespace: default
 spec:
   replicas: 0
   selector:
@@ -1172,12 +1200,12 @@ spec:
           valueFrom:
             secretKeyRef:
               key: uri
-              name: trieve-trieve-postgresql-server-app # patched
+              name: trieve-db-cluster-app
         - name: QDRANT_API_KEY
           valueFrom:
             secretKeyRef:
               key: api-key
-              name: trieve-trieve-qdrant-qdrant-apikey # patched
+              name: trieve-qdrant-qdrant-apikey
         envFrom:
         - configMapRef:
             name: trieve-server-config
@@ -1189,6 +1217,8 @@ spec:
           limits:
             cpu: "1"
             memory: 200Mi
+          requests:
+            cpu: 50m
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -1199,7 +1229,6 @@ metadata:
     app.kubernetes.io/name: trieve
     app.kubernetes.io/part-of: trieve
   name: trieve-worker-word
-  namespace: default
 spec:
   selector:
     matchLabels:
@@ -1221,12 +1250,12 @@ spec:
           valueFrom:
             secretKeyRef:
               key: uri
-              name: trieve-trieve-postgresql-server-app # patched
+              name: trieve-db-cluster-app
         - name: QDRANT_API_KEY
           valueFrom:
             secretKeyRef:
               key: api-key
-              name: trieve-trieve-qdrant-qdrant-apikey # patched
+              name: trieve-qdrant-qdrant-apikey
         envFrom:
         - configMapRef:
             name: trieve-server-config
@@ -1238,6 +1267,8 @@ spec:
           limits:
             cpu: "1"
             memory: 200Mi
+          requests:
+            cpu: 50m
 ---
 apiVersion: batch/v1
 kind: CronJob
@@ -1247,7 +1278,6 @@ metadata:
     app.kubernetes.io/name: trieve
     app.kubernetes.io/part-of: trieve
   name: cluster-queries-cronjob
-  namespace: default
 spec:
   concurrencyPolicy: Forbid
   jobTemplate:
@@ -1290,7 +1320,6 @@ metadata:
     app.kubernetes.io/name: trieve
     app.kubernetes.io/part-of: trieve
   name: collapsing-queries-cronjob
-  namespace: default
 spec:
   concurrencyPolicy: Forbid
   jobTemplate:
@@ -1328,7 +1357,6 @@ metadata:
     app.kubernetes.io/name: trieve
     app.kubernetes.io/part-of: trieve
   name: trieve-word-id-cronjob
-  namespace: default
 spec:
   concurrencyPolicy: Forbid
   jobTemplate:
@@ -1351,12 +1379,12 @@ spec:
               valueFrom:
                 secretKeyRef:
                   key: uri
-                  name: trieve-trieve-postgresql-server-app # patched
+                  name: trieve-db-cluster-app
             - name: QDRANT_API_KEY
               valueFrom:
                 secretKeyRef:
                   key: api-key
-                  name: trieve-trieve-qdrant-qdrant-apikey # patched
+                  name: trieve-qdrant-qdrant-apikey
             envFrom:
             - configMapRef:
                 name: trieve-server-config
@@ -1375,7 +1403,6 @@ metadata:
     app.kubernetes.io/name: trieve
     app.kubernetes.io/part-of: trieve
   name: trieve-clickhouse
-  namespace: default
 spec:
   configuration:
     clusters:
@@ -1401,49 +1428,55 @@ spec:
           - name: CLICKHOUSE_ALWAYS_RUN_INITDB_SCRIPTS
             value: "true"
           - name: EMBEDDING_SERVER_URL
-            value: http://trieve-trieve-embedding-bgem3 # patched
+            value: http://trieve-embedding-bgem3
           - name: CLICKHOUSE_ADMIN_PASSWORD
             value: password
           image: clickhouse/clickhouse-server:24.8
           name: clickhouse
+          resources:
+            limits:
+              memory: 2Gi
+            requests:
+              cpu: 100m
+              memory: 500Mi
           volumeMounts:
           - mountPath: /opt/user_scripts
-            name: trieve-trieve-clickhouse-userscripts # patched
+            name: trieve-clickhouse-userscripts
           - mountPath: /var/lib/clickhouse
-            name: trieve-trieve-clickhouse-data # patched
+            name: trieve-clickhouse-data
           - mountPath: /var/log/clickhouse-server
-            name: trieve-trieve-clickhouse-logs # patched
+            name: trieve-clickhouse-logs
           - mountPath: /docker-entrypoint-initdb.d
-            name: trieve-trieve-clickhouse-scripts # patched
+            name: trieve-clickhouse-scripts
             readOnly: true
           - mountPath: /opt/user_functions/
-            name: trieve-trieve-clickhouse-functions # patched
+            name: trieve-clickhouse-functions
             readOnly: true
         volumes:
         - configMap:
             defaultMode: 365
-            name: trieve-trieve-clickhouse-scripts # patched
-          name: trieve-trieve-clickhouse-scripts # patched
+            name: trieve-clickhouse-scripts
+          name: trieve-clickhouse-scripts
         - configMap:
             defaultMode: 365
-            name: trieve-trieve-clickhouse-functions # patched
-          name: trieve-trieve-clickhouse-functions # patched
+            name: trieve-clickhouse-functions
+          name: trieve-clickhouse-functions
     volumeClaimTemplates:
-    - name: trieve-trieve-clickhouse-userscripts # patched
+    - name: trieve-clickhouse-userscripts
       spec:
         accessModes:
         - ReadWriteOnce
         resources:
           requests:
             storage: 1Gi
-    - name: trieve-trieve-clickhouse-data # patched
+    - name: trieve-clickhouse-data
       spec:
         accessModes:
         - ReadWriteOnce
         resources:
           requests:
             storage: 2Gi
-    - name: trieve-trieve-clickhouse-logs # patched
+    - name: trieve-clickhouse-logs
       spec:
         accessModes:
         - ReadWriteOnce
@@ -1460,25 +1493,30 @@ metadata:
     app.kubernetes.io/name: trieve
     app.kubernetes.io/part-of: trieve
   name: trieve-keycloak
-  namespace: default
 spec:
   db:
-    host: trieve-keycloak-db-rw
+    host: trieve-keycloak-db-cluster-rw
     passwordSecret:
       key: password
-      name: trieve-keycloak-db-app
+      name: trieve-keycloak-db-cluster-app
     usernameSecret:
       key: username
-      name: trieve-keycloak-db-app
+      name: trieve-keycloak-db-cluster-app
     vendor: postgres
   hostname:
-    hostname: http://trieve-trieve-keycloak-service:8080 # patched
+    hostname: http://trieve-keycloak-service:8080
     strict: false
   http:
     httpEnabled: true
   instances: 1
   proxy:
     headers: xforwarded
+  resources:
+    limits:
+      memory: 2Gi
+    requests:
+      cpu: 100m
+      memory: 500Mi
 ---
 apiVersion: k8s.keycloak.org/v2alpha1
 kind: KeycloakRealmImport
@@ -1489,7 +1527,6 @@ metadata:
     app.kubernetes.io/name: trieve
     app.kubernetes.io/part-of: trieve
   name: trieve-realm
-  namespace: default
 spec:
   keycloakCRName: trieve-keycloak
   realm:
@@ -3312,12 +3349,33 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   labels:
+    app.kubernetes.io/component: keycloak
+    app.kubernetes.io/instance: trieve
+    app.kubernetes.io/name: trieve
+    app.kubernetes.io/part-of: trieve
+  name: trieve-keycloak
+spec:
+  rules:
+  - host: auth.localtrieve.com
+    http:
+      paths:
+      - backend:
+          service:
+            name: trieve-keycloak-service
+            port:
+              number: 8080
+        path: /
+        pathType: Prefix
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  labels:
     app.kubernetes.io/component: trieve-server
     app.kubernetes.io/instance: trieve
     app.kubernetes.io/name: trieve
     app.kubernetes.io/part-of: trieve
   name: trieve-server
-  namespace: default
 spec:
   rules:
   - host: api.localtrieve.com
@@ -3340,7 +3398,6 @@ metadata:
     app.kubernetes.io/name: trieve
     app.kubernetes.io/part-of: trieve
   name: trieve-ui-analytics
-  namespace: default
 spec:
   rules:
   - host: analytics.localtrieve.com
@@ -3363,7 +3420,6 @@ metadata:
     app.kubernetes.io/name: trieve
     app.kubernetes.io/part-of: trieve
   name: trieve-ui-chat
-  namespace: default
 spec:
   rules:
   - host: chat.localtrieve.com
@@ -3386,7 +3442,6 @@ metadata:
     app.kubernetes.io/name: trieve
     app.kubernetes.io/part-of: trieve
   name: trieve-ui-dashboard
-  namespace: default
 spec:
   rules:
   - host: dashboard.localtrieve.com
@@ -3409,7 +3464,6 @@ metadata:
     app.kubernetes.io/name: trieve
     app.kubernetes.io/part-of: trieve
   name: trieve-ui-search
-  namespace: default
 spec:
   rules:
   - host: search.localtrieve.com
@@ -3422,47 +3476,3 @@ spec:
               name: http
         path: /
         pathType: Prefix
----
-apiVersion: postgresql.cnpg.io/v1
-kind: Cluster
-metadata:
-  labels:
-    app.kubernetes.io/component: keycloak
-    app.kubernetes.io/instance: trieve
-    app.kubernetes.io/name: trieve
-    app.kubernetes.io/part-of: trieve
-  name: trieve-keycloak-db
-  namespace: default
-spec:
-  bootstrap:
-    initdb:
-      database: keycloak
-      owner: keycloak
-  enableSuperuserAccess: false
-  instances: 1
-  monitoring:
-    enablePodMonitor: true
-  storage:
-    size: 2Gi
----
-apiVersion: postgresql.cnpg.io/v1
-kind: Cluster
-metadata:
-  labels:
-    app.kubernetes.io/component: trieve-server
-    app.kubernetes.io/instance: trieve
-    app.kubernetes.io/name: trieve
-    app.kubernetes.io/part-of: trieve
-  name: trieve-postgresql-server
-  namespace: default
-spec:
-  bootstrap:
-    initdb:
-      database: trieve
-      owner: trieve
-  enableSuperuserAccess: false
-  instances: 2
-  monitoring:
-    enablePodMonitor: true
-  storage:
-    size: 2Gi
