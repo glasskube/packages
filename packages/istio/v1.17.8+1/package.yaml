@@ -1,0 +1,16 @@
+# yaml-language-server: $schema=https://glasskube.dev/schemas/v1/package-manifest.json
+name: istio
+iconUrl: https://raw.githubusercontent.com/istio/istio.io/e9dd610/static/img/logo.png
+shortDescription: Connect, secure, control, and observe services.
+longDescription: |
+  Istio is an open source service mesh that layers transparently onto existing distributed applications.
+  Istio’s powerful features provide a uniform and more efficient way to secure, connect, and monitor services.
+  Istio is the path to load balancing, service-to-service authentication, and monitoring – with few or no service code changes.
+defaultNamespace: istio-system
+helm:
+  repositoryUrl: https://istio-release.storage.googleapis.com/charts
+  releases:
+    - chartName: base
+      chartVersion: "1.17.8"
+    - chartName: istiod
+      chartVersion: "1.17.8"
