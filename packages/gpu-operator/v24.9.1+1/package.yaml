@@ -1,0 +1,23 @@
+# yaml-language-server: $schema=https://glasskube.dev/schemas/v1/package-manifest.json
+
+name: gpu-operator
+shortDescription: Management of NVIDIA components needed to provision GPU
+iconUrl: https://avatars.githubusercontent.com/u/1728152
+defaultNamespace: gpu-operator
+helm:
+  chartName: gpu-operator
+  chartVersion: 24.9.1
+  repositoryUrl: https://helm.ngc.nvidia.com/nvidia
+  values:
+    nfd:
+      enabled: false
+dependencies:
+  - name: node-feature-discovery
+references:
+  - label: ArtifactHub
+    url: https://artifacthub.io/packages/helm/gpu-operator/gpu-operator
+  - label: GitHub
+    url: https://github.com/NVIDIA/gpu-operator
+  - label: Website
+    url: https://docs.nvidia.com/datacenter/cloud-native/gpu-operator/latest/index.html
+longDescription: NVIDIA GPU Operator creates/configures/manages GPUs atop Kubernetes
