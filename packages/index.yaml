@@ -39,7 +39,7 @@ packages:
     scope: Cluster
     shortDescription: Opt-in to automatically update your Packages
   - iconUrl: https://avatars.githubusercontent.com/u/1728152
-    latestVersion: v24.6.2+1
+    latestVersion: v24.9.1+1
     name: gpu-operator
     shortDescription: Management of NVIDIA components needed to provision GPU
   - iconUrl: https://avatars.githubusercontent.com/u/122369679
