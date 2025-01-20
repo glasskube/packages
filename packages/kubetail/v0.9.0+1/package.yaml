@@ -1,0 +1,19 @@
+# yaml-language-server: $schema=https://glasskube.dev/schemas/v1/package-manifest.json
+
+name: kubetail
+shortDescription: Kubetail is a web-based, real-time log viewer for Kubernetes clusters
+iconUrl: https://avatars.githubusercontent.com/u/141319696
+defaultNamespace: kubetail
+helm:
+  chartName: kubetail
+  chartVersion: 0.9.0
+  repositoryUrl: https://kubetail-org.github.io/helm-charts/
+entrypoints:
+  - serviceName: kubetail-server
+    port: 80
+    localPort: 4000
+    name: server
+references:
+  - label: ArtifactHub
+    url: https://artifacthub.io/packages/helm/kubetail/kubetail
+longDescription: Real-time logging dashboard for Kubernetes
