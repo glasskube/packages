@@ -49,7 +49,7 @@ jobs:
       - name: Check local webserver
         run: curl -v "http://host.minikube.internal:9090/packages/${{ matrix.change[0] }}/${{ matrix.change[1] }}/package.yaml"
       - name: Start minikube cluster
-        uses: medyagh/setup-minikube@d8c0eb871f6f455542491d86a574477bd3894533 # v0.0.18
+        uses: medyagh/setup-minikube@cea33675329b799adccc9526aa5daccc26cd5052 # v0.0.19
       - name: Minikube Tunnel
         run: minikube tunnel &
       - name: Bootstrap Glasskube in Minikube cluster
