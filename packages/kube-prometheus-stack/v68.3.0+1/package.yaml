@@ -139,11 +139,13 @@ valueDefinitions:
     type: boolean
     metadata:
       label: Node Exporter host network
+    defaultValue: "false"
     targets:
       - patch:
           op: add
           path: /prometheus-node-exporter/hostNetwork
         chartName: kube-prometheus-stack
+        valueTemplate: "{{.}}"
 longDescription: kube-prometheus-stack collects Kubernetes manifests, Grafana
   dashboards, and Prometheus rules combined with documentation and scripts to
   provide easy to operate end-to-end Kubernetes cluster monitoring with
