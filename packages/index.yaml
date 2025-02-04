@@ -72,7 +72,7 @@ packages:
     scope: Cluster
     shortDescription: Open Source Identity and Access Management
   - iconUrl: https://avatars.githubusercontent.com/u/66682517
-    latestVersion: v67.3.0+1
+    latestVersion: v68.4.4+1
     name: kube-prometheus-stack
     shortDescription: Use Prometheus to monitor Kubernetes and applications running on Kubernetes
   - iconUrl: https://avatars.githubusercontent.com/u/13629408
