@@ -43,7 +43,7 @@ packages:
     name: gpu-operator
     shortDescription: Management of NVIDIA components needed to provision GPU
   - iconUrl: https://avatars.githubusercontent.com/u/122369679
-    latestVersion: v0.27.0+1
+    latestVersion: v0.28.0+1
     name: headlamp
     scope: Cluster
     shortDescription: A Kubernetes web UI that is fully-featured, user-friendly and extensible.
