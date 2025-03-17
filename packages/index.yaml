@@ -80,9 +80,9 @@ packages:
     name: kubernetes-dashboard
     shortDescription: General-purpose web UI for Kubernetes clusters
   - iconUrl: https://avatars.githubusercontent.com/u/141319696
-    latestVersion: v0.8.4+2
+    latestVersion: v0.9.8+1
     name: kubetail
-    shortDescription: Kubetail is a web-based, real-time log viewer for Kubernetes clusters
+    shortDescription: Real-time logging dashboard for Kubernetes
   - iconUrl: https://avatars.githubusercontent.com/u/13629408
     latestVersion: v0.7.2+1
     name: metrics-server
