@@ -1,0 +1,36 @@
+# yaml-language-server: $schema=https://glasskube.dev/schemas/v1/package-manifest.json
+
+name: "distr"
+scope: Namespaced
+shortDescription: "Open Source Software Distribution Platform."
+iconUrl: "https://distr.sh/favicon.svg"
+defaultNamespace: "distr"
+helm:
+  repositoryUrl: "oci://ghcr.io/glasskube/charts"
+  chartName: "distr"
+  chartVersion: "1.1.2"
+  values:
+    postgresql:
+      enabled: true
+    env:
+      - name: USER_EMAIL_VERIFICATION_REQUIRED
+        value: false
+dependencies:
+  - name: "cloudnative-pg"
+references:
+  - label: "Website"
+    url: "https://distr.sh/"
+  - label: "GitHub"
+    url: "https://github.com/glasskube/distr"
+  - label: "Docs"
+    url: "https://distr.sh/docs/"
+  - label: "ArtifactHub"
+    url: "https://artifacthub.io/packages/helm/distr/distr"
+
+
+entrypoints:
+  - serviceName: distr-distr
+    port: 8080
+    localPort: 8080
+    scheme: http
+
