@@ -9,7 +9,7 @@ defaultNamespace: headlamp-system
 helm:
   chartName: headlamp
   chartVersion: 0.25.0
-  repositoryUrl: https://headlamp-k8s.github.io/headlamp/
+  repositoryUrl: https://kubernetes-sigs.github.io/headlamp/
   values:
     serviceAccount:
       name: headlamp-admin
