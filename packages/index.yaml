@@ -48,7 +48,7 @@ packages:
     scope: Cluster
     shortDescription: A Kubernetes web UI that is fully-featured, user-friendly and extensible.
   - iconUrl: https://avatars.githubusercontent.com/u/13629408
-    latestVersion: v1.12.0+1
+    latestVersion: v1.12.1+1
     name: ingress-nginx
     scope: Namespaced
     shortDescription: ingress-nginx is an Ingress controller for Kubernetes using
@@ -58,7 +58,7 @@ packages:
     name: k8sgpt-operator
     shortDescription: Automatic SRE Superpowers within your Kubernetes cluster
   - iconUrl: https://raw.githubusercontent.com/cncf/artwork/main/projects/keptn/icon/color/keptn-icon-color.svg
-    latestVersion: v2.4.0+1
+    latestVersion: v2.5.0+1
     name: keptn
     shortDescription: Toolkit for cloud-native application lifecycle management
   - iconUrl: https://avatars.githubusercontent.com/u/4921466
