@@ -1,0 +1,37 @@
+# yaml-language-server: $schema=https://glasskube.dev/schemas/v1/package-manifest.json
+
+name: cert-manager
+shortDescription: X.509 certificate management for Kubernetes and OpenShift
+longDescription: A Helm chart for cert-manager
+iconUrl: https://avatars.githubusercontent.com/u/39950598
+defaultNamespace: cert-manager
+helm:
+  chartName: cert-manager
+  chartVersion: 1.17.2
+  repositoryUrl: https://charts.jetstack.io
+  values:
+    installCRDs: true
+    prometheus:
+      enabled: false
+      podmonitor:
+        enabled: false
+references:
+  - label: ArtifactHub
+    url: https://artifacthub.io/packages/helm/cert-manager/cert-manager
+valueDefinitions:
+  metrics:
+    type: boolean
+    metadata:
+      description: Requires kube-prometheus-stack
+    defaultValue: "false"
+    targets:
+      - chartName: cert-manager
+        valueTemplate: "{{.}}"
+        patch:
+          op: replace
+          path: /prometheus/enabled
+      - chartName: cert-manager
+        valueTemplate: "{{.}}"
+        patch:
+          op: replace
+          path: /prometheus/podmonitor/enabled
