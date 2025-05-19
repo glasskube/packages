@@ -1,0 +1,19 @@
+# yaml-language-server: $schema=https://glasskube.dev/schemas/v1/package-manifest.json
+
+name: kubetail
+shortDescription: Real-time logging dashboard for Kubernetes
+iconUrl: https://avatars.githubusercontent.com/u/141319696
+defaultNamespace: kubetail-system
+helm:
+  chartName: kubetail
+  chartVersion: 0.11.5
+  repositoryUrl: https://kubetail-org.github.io/helm-charts/
+entrypoints:
+  - serviceName: kubetail-dashboard
+    port: 8080
+    localPort: 4500
+    name: dashboard
+references:
+  - label: ArtifactHub
+    url: https://artifacthub.io/packages/helm/kubetail/kubetail
+longDescription: Real-time logging dashboard for Kubernetes
