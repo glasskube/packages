@@ -1,0 +1,32 @@
+# yaml-language-server: $schema=https://glasskube.dev/schemas/v1/package-manifest.json
+
+name: cyclops
+shortDescription: Developer friendly Kubernetes
+longDescription: >
+  Welcome to Cyclops, a powerful user interface for managing and interacting
+  with Kubernetes clusters.
+
+  Cyclops is designed to simplify the management of containerized applications
+  on Kubernetes,
+
+  providing an intuitive and user-friendly experience for developers, system
+  administrators, and DevOps professionals.
+
+  Divide the responsibility between your infrastructure and your developer teams
+  so everyone can play to their strengths.
+
+  Automate your processes and shrink the window for deployment mistakes.
+references:
+  - label: Github
+    url: https://github.com/cyclops-ui/cyclops
+  - label: Website
+    url: https://cyclops-ui.com/
+defaultNamespace: cyclops
+iconUrl: https://cyclops-ui.com/img/logo.png
+manifests:
+  - url: https://raw.githubusercontent.com/cyclops-ui/cyclops/v0.21.0/install/cyclops-install.yaml
+  - url: https://raw.githubusercontent.com/cyclops-ui/cyclops/v0.21.0/install/demo-templates.yaml
+entrypoints:
+  - serviceName: cyclops-ui
+    port: 3000
+    name: ui
