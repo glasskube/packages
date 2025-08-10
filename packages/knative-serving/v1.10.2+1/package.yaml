@@ -1,0 +1,19 @@
+# yaml-language-server: $schema=https://glasskube.dev/schemas/v1/package-manifest.json
+name: knative-serving
+shortDescription: Kubernetes-based, scale-to-zero, request-driven compute
+longDescription: |
+  Knative Serving builds on Kubernetes to support deploying and serving of applications and functions as serverless containers. Serving is easy to get started with and scales to support advanced scenarios.
+
+  The Knative Serving project provides middleware primitives that enable:
+  - Rapid deployment of serverless containers
+  - Automatic scaling up and down to zero
+  - Routing and network programming
+  - Point-in-time snapshots of deployed code and configurations
+iconUrl: https://raw.githubusercontent.com/knative/docs/e1286025fc19330b7f5d9aa26cc364899992f8e3/blog/docs/images/knative.png
+defaultNamespace: knative-serving
+manifests:
+  - url: https://github.com/knative/serving/releases/download/knative-v1.10.2/serving-crds.yaml
+  - url: https://github.com/knative/serving/releases/download/knative-v1.10.2/serving-core.yaml
+  - url: https://github.com/knative/net-istio/releases/download/knative-v1.10.2/net-istio.yaml
+dependencies:
+  - name: istio
