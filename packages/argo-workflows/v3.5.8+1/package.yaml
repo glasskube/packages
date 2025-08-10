@@ -1,0 +1,17 @@
+# yaml-language-server: $schema=https://glasskube.dev/schemas/v1/package-manifest.json
+name: argo-workflows
+shortDescription: Kubernetes-native workflow engine supporting DAG and step-based workflows.
+defaultNamespace: argo
+iconUrl: https://avatars.githubusercontent.com/u/30269780
+manifests:
+  - url: https://github.com/argoproj/argo-workflows/releases/download/v3.5.8/install.yaml
+references:
+  - label: Github
+    url: https://github.com/argoproj/argo-workflows
+  - label: Website
+    url: https://argoproj.github.io/workflows/
+entrypoints:
+  - serviceName: argo-server
+    port: 2746
+    localPort: 2746
+    name: UI
