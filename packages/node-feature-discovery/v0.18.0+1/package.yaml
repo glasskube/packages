@@ -1,0 +1,18 @@
+# yaml-language-server: $schema=https://glasskube.dev/schemas/v1/package-manifest.json
+
+name: node-feature-discovery
+shortDescription: Detects hardware features available on each node in a
+  Kubernetes cluster, and advertises those features using node labels.
+iconUrl: https://avatars.githubusercontent.com/u/13629408
+defaultNamespace: node-feature-discovery
+helm:
+  chartName: node-feature-discovery
+  chartVersion: 0.18.0
+  repositoryUrl: https://kubernetes-sigs.github.io/node-feature-discovery/charts
+references:
+  - label: ArtifactHub
+    url: https://artifacthub.io/packages/helm/node-feature-discovery/node-feature-discovery
+  - label: GitHub
+    url: https://github.com/kubernetes-sigs/node-feature-discovery
+longDescription: "Detects hardware features available on each node in a
+  Kubernetes cluster, and advertises those features using node labels. "
