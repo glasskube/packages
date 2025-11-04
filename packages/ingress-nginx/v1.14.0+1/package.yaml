@@ -1,0 +1,53 @@
+# yaml-language-server: $schema=https://glasskube.dev/schemas/v1/package-manifest.json
+
+name: ingress-nginx
+shortDescription: ingress-nginx is an Ingress controller for Kubernetes using
+  NGINX as a reverse proxy and load balancer.
+longDescription: Ingress controller for Kubernetes using NGINX as a reverse
+  proxy and load balancer
+iconUrl: https://avatars.githubusercontent.com/u/13629408
+scope: Namespaced
+defaultNamespace: ingress-nginx
+helm:
+  chartName: ingress-nginx
+  chartVersion: 4.14.0
+  repositoryUrl: https://kubernetes.github.io/ingress-nginx
+  values:
+    controller:
+      ingressClassResource: {}
+references:
+  - label: ArtifactHub
+    url: https://artifacthub.io/packages/helm/ingress-nginx/ingress-nginx
+valueDefinitions:
+  ingressClass:
+    type: text
+    defaultValue: nginx
+    metadata:
+      description: |
+        Name of the ingressClass managed by the controller
+    constraints:
+      required: false
+    targets:
+      - chartName: ingress-nginx
+        patch:
+          op: add
+          path: /controller/ingressClass
+      - chartName: ingress-nginx
+        patch:
+          op: add
+          path: /controller/ingressClassResource/name
+  ingressClassController:
+    type: text
+    defaultValue: ingress-nginx
+    metadata:
+      description: |
+        Controller-value of the controller that is processing this ingressClass
+    constraints:
+      required: false
+    targets:
+      - chartName: ingress-nginx
+        patch:
+          op: add
+          path: /controller/ingressClassResource/controllerValue
+        valueTemplate: |
+          "k8s.io\/{{ . }}"
