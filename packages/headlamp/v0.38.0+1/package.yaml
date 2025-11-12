@@ -1,0 +1,23 @@
+# yaml-language-server: $schema=https://glasskube.dev/schemas/v1/package-manifest.json
+
+name: headlamp
+scope: Cluster
+shortDescription: A Kubernetes web UI that is fully-featured, user-friendly and extensible.
+longDescription: Headlamp is an easy-to-use and extensible Kubernetes web UI.
+iconUrl: https://avatars.githubusercontent.com/u/122369679
+defaultNamespace: headlamp-system
+helm:
+  chartName: headlamp
+  chartVersion: 0.38.0
+  repositoryUrl: https://kubernetes-sigs.github.io/headlamp/
+  values:
+    serviceAccount:
+      name: headlamp-admin
+references:
+  - label: ArtifactHub
+    url: https://artifacthub.io/packages/helm/headlamp/headlamp
+entrypoints:
+  - serviceName: headlamp-headlamp
+    port: 80
+    localPort: 8030
+    name: ui
