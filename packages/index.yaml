@@ -48,7 +48,7 @@ packages:
     scope: Cluster
     shortDescription: A Kubernetes web UI that is fully-featured, user-friendly and extensible.
   - iconUrl: https://avatars.githubusercontent.com/u/13629408
-    latestVersion: v1.12.0+1
+    latestVersion: v1.12.1+1
     name: ingress-nginx
     scope: Namespaced
     shortDescription: ingress-nginx is an Ingress controller for Kubernetes using
@@ -113,7 +113,7 @@ packages:
     scope: Namespaced
     shortDescription: Cloud-native search engine for observability
   - iconUrl: https://raw.githubusercontent.com/rabbitmq/rabbitmq-website/30967fb4a7c39f28e9a5f591b8d70db185d8fd54/static/img/rabbitmq-logo.svg
-    latestVersion: v2.11.0+1
+    latestVersion: v2.17.0+1
     name: rabbitmq-operator
     shortDescription: Kubernetes operator to deploy and manage RabbitMQ clusters
   - iconUrl: https://avatars.githubusercontent.com/u/1529926
