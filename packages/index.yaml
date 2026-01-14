@@ -48,7 +48,7 @@ packages:
     scope: Cluster
     shortDescription: A Kubernetes web UI that is fully-featured, user-friendly and extensible.
   - iconUrl: https://avatars.githubusercontent.com/u/13629408
-    latestVersion: v1.12.0+1
+    latestVersion: v1.12.1+1
     name: ingress-nginx
     scope: Namespaced
     shortDescription: ingress-nginx is an Ingress controller for Kubernetes using
@@ -103,7 +103,7 @@ packages:
     scope: Namespaced
     shortDescription: The World's Most Advanced Open Source Relational Database
   - iconUrl: https://avatars.githubusercontent.com/u/73504361
-    latestVersion: v1.13.2+1
+    latestVersion: v1.15.5+1
     name: qdrant
     scope: Namespaced
     shortDescription: High-Performance Vector Search at Scale
