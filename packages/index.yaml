@@ -26,7 +26,7 @@ packages:
     name: cloudnative-pg
     shortDescription: A comprehensive platform designed to seamlessly manage PostgreSQL databases
   - iconUrl: https://cyclops-ui.com/img/logo.png
-    latestVersion: v0.15.5+1
+    latestVersion: v0.21.1+1
     name: cyclops
     shortDescription: Developer friendly Kubernetes
   - iconUrl: https://avatars.githubusercontent.com/u/36015203
@@ -48,7 +48,7 @@ packages:
     scope: Cluster
     shortDescription: A Kubernetes web UI that is fully-featured, user-friendly and extensible.
   - iconUrl: https://avatars.githubusercontent.com/u/13629408
-    latestVersion: v1.12.0+1
+    latestVersion: v1.12.1+1
     name: ingress-nginx
     scope: Namespaced
     shortDescription: ingress-nginx is an Ingress controller for Kubernetes using
