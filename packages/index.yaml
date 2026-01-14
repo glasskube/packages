@@ -14,7 +14,7 @@ packages:
     scope: Cluster
     shortDescription: This is the Kubernetes Ingress Controller for Caddy
   - iconUrl: https://avatars.githubusercontent.com/u/39950598
-    latestVersion: v1.17.0+2
+    latestVersion: v1.19.1+1
     name: cert-manager
     shortDescription: X.509 certificate management for Kubernetes and OpenShift
   - iconUrl: https://avatars.githubusercontent.com/u/54801242
@@ -48,7 +48,7 @@ packages:
     scope: Cluster
     shortDescription: A Kubernetes web UI that is fully-featured, user-friendly and extensible.
   - iconUrl: https://avatars.githubusercontent.com/u/13629408
-    latestVersion: v1.12.0+1
+    latestVersion: v1.12.1+1
     name: ingress-nginx
     scope: Namespaced
     shortDescription: ingress-nginx is an Ingress controller for Kubernetes using
