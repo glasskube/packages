@@ -30,7 +30,7 @@ packages:
     name: cyclops
     shortDescription: Developer friendly Kubernetes
   - iconUrl: https://avatars.githubusercontent.com/u/36015203
-    latestVersion: v1.2.1+1
+    latestVersion: v1.4.0+1
     name: gateway-api
     shortDescription: The Gateway API provides a standardized way to configure and
       manage network traffic routing in Kubernetes clusters.
@@ -48,7 +48,7 @@ packages:
     scope: Cluster
     shortDescription: A Kubernetes web UI that is fully-featured, user-friendly and extensible.
   - iconUrl: https://avatars.githubusercontent.com/u/13629408
-    latestVersion: v1.12.0+1
+    latestVersion: v1.12.1+1
     name: ingress-nginx
     scope: Namespaced
     shortDescription: ingress-nginx is an Ingress controller for Kubernetes using
