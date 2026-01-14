@@ -48,7 +48,7 @@ packages:
     scope: Cluster
     shortDescription: A Kubernetes web UI that is fully-featured, user-friendly and extensible.
   - iconUrl: https://avatars.githubusercontent.com/u/13629408
-    latestVersion: v1.12.0+1
+    latestVersion: v1.12.1+1
     name: ingress-nginx
     scope: Namespaced
     shortDescription: ingress-nginx is an Ingress controller for Kubernetes using
@@ -72,7 +72,7 @@ packages:
     scope: Cluster
     shortDescription: Open Source Identity and Access Management
   - iconUrl: https://avatars.githubusercontent.com/u/66682517
-    latestVersion: v68.4.4+1
+    latestVersion: v79.5.0+1
     name: kube-prometheus-stack
     shortDescription: Use Prometheus to monitor Kubernetes and applications running on Kubernetes
   - iconUrl: https://avatars.githubusercontent.com/u/13629408
