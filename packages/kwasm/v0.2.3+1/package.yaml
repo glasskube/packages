@@ -1,0 +1,18 @@
+# yaml-language-server: $schema=https://glasskube.dev/schemas/v1/package-manifest.json
+
+name: "kwasm"
+shortDescription: "This Kubernetes Operators installs WebAssembly support on your Kubernetes Nodes"
+iconUrl: "https://avatars.githubusercontent.com/u/113929551"
+defaultNamespace: "kwasm"
+helm:
+  repositoryUrl: "http://kwasm.sh/kwasm-operator/"
+  chartName: "kwasm-operator"
+  chartVersion: "0.2.3"
+  values:
+    kwasmOperator: 
+      installerImage: "ghcr.io/spinkube/containerd-shim-spin/node-installer:v0.15.1"
+references:
+  - label: "Website"
+    url: "https://kwasm.sh/"
+  - label: "GitHub"
+    url: "https://github.com/KWasm/kwasm-operator/"
