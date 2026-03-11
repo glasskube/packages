@@ -1,0 +1,1 @@
+"my-quickwit" --value "defaultIndexRootUri=s3://bucket" --value "s3Endpoint=" --value "s3Flavor=" --value "s3Region=" --value "s3SecretAccessKey=" --value "metastoreUri=s3://" --value "quickwitDomain=" --value "s3AccessKeyId="
