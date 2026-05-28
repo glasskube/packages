@@ -8,6 +8,10 @@ packages:
     latestVersion: v2.14.1+1
     name: argo-cd
     shortDescription: Declarative Continuous Deployment for Kubernetes
+  - iconUrl: https://raw.githubusercontent.com/attune-io/attune/main/docs/logo.png
+    latestVersion: v0.1.5+1
+    name: attune
+    shortDescription: Safe, in-place Kubernetes pod resource right-sizing operator
   - iconUrl: https://avatars.githubusercontent.com/u/12955528
     latestVersion: v1.1.0+1
     name: caddy-ingress-controller
